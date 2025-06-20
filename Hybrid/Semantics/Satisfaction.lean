@@ -26,7 +26,7 @@ def Model.VNom (M : Model symbs) : symbs.nominal s → M.Fr.W s
 | .inl n => M.Fr.Nm n
 | .inr n => M.Vₙ n
 
-def Assignment (M : Model symbs) : Type := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
+def Assignment (M : Model symbs) : Type u := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
 
 def Assignment.variant {M : Model symbs} (g' g : Assignment M) (x : symbs.svar s): Prop :=
   ∀ y : symbs.svar s, x ≠ y → g' y = g y
@@ -44,26 +44,33 @@ def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : FormL sy
 
 notation:50 "⟨" M "," g "," w "⟩" "⊨" φ => Sat M g w φ
 
--- The set of worlds at which a formula is satisfied in a model, under an assignment
--- (Auxiliary, currently unneeded)
-def FormL.Worlds (φ : FormL symbs sorts) (M : Model symbs) (g : Assignment M) : Set (WProd M.Fr.W sorts) :=
-  λ w => Sat M g w φ
+section Defs
+  variable {α : Type u}
+  variable [DecidableEq α]
+  variable {symbs : Symbols α}
+  variable {s : symbs.signature.S}
 
-def FormL.satisfiable (φ : FormL symbs sorts) : Prop :=
-  ∃ M g w, ⟨M, g, w⟩ ⊨ φ
+  -- The set of worlds at which a formula is satisfied in a model, under an assignment
+  -- (Auxiliary, currently unneeded)
+  def FormL.Worlds (φ : FormL symbs sorts) (M : Model symbs) (g : Assignment M) : Set (WProd M.Fr.W sorts) :=
+    λ w => Sat M g w φ
 
-def Model.valid (M : Model symbs) (φ : FormL symbs sorts) : Prop :=
-  ∀ g w, ⟨M, g, w⟩ ⊨ φ
+  def FormL.satisfiable (φ : FormL symbs sorts) : Prop :=
+    ∃ M g w, ⟨M, g, w⟩ ⊨ φ
 
-def Frame.valid (Fr : Frame symbs.signature) (φ : FormL symbs sorts) : Prop :=
-  ∀ M g w, M.Fr = Fr → ⟨M, g, w⟩ ⊨ φ
+  def Model.valid (M : Model symbs) (φ : FormL symbs sorts) : Prop :=
+    ∀ g w, ⟨M, g, w⟩ ⊨ φ
 
-def FormL.valid (φ : FormL symbs sorts): Prop :=
-  ∀ M g w, ⟨M, g, w⟩ ⊨ φ
+  def Frame.valid (Fr : Frame symbs.signature) (φ : FormL symbs sorts) : Prop :=
+    ∀ M g w, M.Fr = Fr → ⟨M, g, w⟩ ⊨ φ
 
-notation:50 M "⊨" φ => Model.valid M φ
-notation:50 F "⊨" φ => Frame.valid F φ
-notation:50 "⊨" φ   => FormL.valid φ
+  def FormL.valid (φ : FormL symbs sorts): Prop :=
+    ∀ M g w, ⟨M, g, w⟩ ⊨ φ
+
+  notation:50 M "⊨" φ => Model.valid M φ
+  notation:50 F "⊨" φ => Frame.valid F φ
+  notation:50 "⊨" φ   => FormL.valid φ
+end Defs
 
 def SatSet (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
   ∀ φ, φ ∈ Γ → ⟨M, g, w⟩ ⊨ φ
