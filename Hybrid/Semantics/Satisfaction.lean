@@ -50,35 +50,182 @@ section Defs
   variable {symbs : Symbols α}
   variable {s : symbs.signature.S}
 
+  -- Definitions below will be paramtrized over a particular *class* of models,
+  -- so not necessarily over the class of all models.
+
   -- The set of worlds at which a formula is satisfied in a model, under an assignment
   -- (Auxiliary, currently unneeded)
-  def FormL.Worlds (φ : FormL symbs sorts) (M : Model symbs) (g : Assignment M) : Set (WProd M.Fr.W sorts) :=
+  def FormL.Worlds (φ : Form symbs s) (M : Model symbs) (g : Assignment M) : Set (M.Fr.W s) :=
     λ w => Sat M g w φ
 
-  def FormL.satisfiable (φ : FormL symbs sorts) : Prop :=
-    ∃ M g w, ⟨M, g, w⟩ ⊨ φ
+  def FormL.satisfiable (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
+    ∃ M : ModelClass, ∀ g w, ⟨M, g, w⟩ ⊨ φ
 
-  def Model.valid (M : Model symbs) (φ : FormL symbs sorts) : Prop :=
+  def Model.valid (M : Model symbs) (φ : Form symbs s) : Prop :=
     ∀ g w, ⟨M, g, w⟩ ⊨ φ
-
-  def Frame.valid (Fr : Frame symbs.signature) (φ : FormL symbs sorts) : Prop :=
-    ∀ M g w, M.Fr = Fr → ⟨M, g, w⟩ ⊨ φ
-
-  def FormL.valid (φ : FormL symbs sorts): Prop :=
-    ∀ M g w, ⟨M, g, w⟩ ⊨ φ
-
   notation:50 M "⊨" φ => Model.valid M φ
+
+  def FormL.validClass (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
+    ∀ M : ModelClass, M ⊨ φ
+  notation:50 "⊨" "(" M ")" φ   => FormL.validClass φ M
+
+  /-
+    The class of all models.
+  -/
+  def Models.All : Set (Model symbs) :=
+    {M : Model symbs | true}
+
+  /-
+    The class of models determined by a class of frames contains all
+      models which whose frame belongs to the class.
+  -/
+  def Models.Fr (Frs : Set (Frame symbs.signature)) : Set (Model symbs) :=
+    {M : Model symbs | M.Fr ∈ Frs}
+
+  /-
+    The class of models determined by a particular set of axioms contains all
+      models in which those axioms are valid.
+  -/
+  def Models.Ax (Λ : AxiomSet symbs) : Set (Model symbs) :=
+    {M : Model symbs | ∀ s, ∀ φ ∈ Λ s, M ⊨ φ}
+
+  /-
+    A formula is valid in a frame `Fr`,
+      iff it is valid in each model which has `Fr` as its frame.
+  -/
+  def Frame.valid (Fr : Frame symbs.signature) (φ : Form symbs s) : Prop :=
+    ∀ M : (Models.Fr { Fr }), M ⊨ φ
   notation:50 F "⊨" φ => Frame.valid F φ
-  notation:50 "⊨" φ   => FormL.valid φ
+
+  /-
+    The class of frames determined by a particular set of axioms contains all
+      frames in which those axioms are valid.
+  -/
+  def Frames.Ax (Λ : AxiomSet symbs) : Set (Frame symbs.signature) :=
+    {Fr : Frame symbs.signature | ∀ s, ∀ φ ∈ Λ s, Fr ⊨ φ}
+
+  def SatSet (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
+    ∀ φ : Γ, ⟨M, g, w⟩ ⊨ φ.1
+  notation:50 "⟨" M "," g "," w "⟩" "⊨" Γ => SatSet M g w Γ
+
+  -- The local consequence relation
+  def Entails (Γ : PremiseSet symbs s) (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
+    ∀ M : ModelClass, ∀ g w, (⟨M.1, g, w⟩ ⊨ Γ) → ⟨M.1, g, w⟩ ⊨ φ
+  notation:50 Γ "⊨" "(" M ")" φ => Entails Γ φ M
+
+  @[reducible] def FormL.valid (φ : Form symbs s) : Prop :=
+    ⊨(Models.All) φ
+  notation:50 "⊨" φ  => FormL.valid φ
+
+  @[reducible] def Models.AxValid (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
+    ⊨(Models.Ax Λ) φ
+  notation:50 "⊨" "Mod" "(" Λ:25 ")" φ:arg => Models.AxValid φ Λ
+
+  @[reducible] def Models.FrValid (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
+    ⊨(Models.Fr (Frames.Ax Λ)) φ
+  notation:50 "⊨" "Fr" "(" Λ:25 ")" φ:arg => Models.FrValid φ Λ
+
+  @[reducible] def Entails.General (Γ : PremiseSet symbs s) (φ : Form symbs s) : Prop :=
+    Γ ⊨(Models.All) φ
+  notation:50 Γ:arg "⊨" φ:arg => Entails.General Γ φ
+
+  @[reducible] def Entails.Mod (Γ : PremiseSet symbs s) (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
+    Γ ⊨(Models.Ax Λ) φ
+  notation:50 Γ:arg "⊨" "Mod" "(" Λ:25 ")" φ:arg => Entails.Mod Γ φ Λ
+
+  @[reducible] def Entails.Fr (Γ : PremiseSet symbs s) (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
+    Γ ⊨(Models.Fr (Frames.Ax Λ)) φ
+  notation:50 Γ:arg "⊨" "Fr" "(" Λ:25 ")" φ:arg => Entails.Fr Γ φ Λ
+
 end Defs
 
-def SatSet (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
-  ∀ φ, φ ∈ Γ → ⟨M, g, w⟩ ⊨ φ
+section Lemmas
+  lemma Models.AllMaximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
+    simp only [All, Set.setOf_true, Set.subset_univ, implies_true]
 
-notation:50 "⟨" M "," g "," w "⟩" "⊨" Γ => SatSet M g w Γ
+  lemma Models.FrInModels.Ax {Λ : AxiomSet symbs} : (Models.Fr (Frames.Ax Λ)) ⊆  Models.Ax Λ := by
+    simp [Models.Fr, Models.Ax]
+    intro M fr s sSort φ φAx
+    simp only [Frames.Ax, Frame.valid, Models.Fr, Set.coe_setOf, Set.mem_setOf_eq, Subtype.forall,
+      Set.mem_singleton_iff] at fr
+    apply_assumption
+    . exact φAx
+    . rfl
 
--- The local consequence relation
-def SemanticConsequence (Γ : PremiseSet symbs s) (φ : Form symbs s) : Prop :=
-  ∀ M g w, (⟨M, g, w⟩ ⊨ Γ) → ⟨M, g, w⟩ ⊨ φ
+  lemma Entails.IfGeneral {Γ : PremiseSet symbs s} : (Γ ⊨ φ) → (Γ ⊨(C) φ) := by
+    intro h
+    intro M
+    have := h ⟨M, Models.AllMaximal C M.2⟩
+    exact this
 
-notation:50 Γ "⊨" φ => SemanticConsequence Γ φ
+  lemma Entails.ModelImpliesFrame {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊨Fr(Λ) φ := by
+    intro h
+    intro M
+    have := h ⟨M, Models.FrInModels.Ax M.2⟩
+    exact this
+
+  lemma Entails.NoPremises {C : Set (Model symbs)} : (∅ ⊨(C) φ) ↔ ⊨(C) φ := by
+    apply Iff.intro
+    . intro h M g w
+      apply h
+      . simp only [SatSet, Subtype.forall, Set.mem_empty_iff_false, false_implies, implies_true]
+    . intro h M g w _
+      apply h
+
+  lemma Valid.GeneralImpliesModel (C : Set (Model symbs)) : (⊨ φ) → ⊨(C) φ := by
+    unfold FormL.valid
+    rw [←Entails.NoPremises, ←Entails.NoPremises]
+    apply Entails.IfGeneral
+
+ lemma Deduction : ((Γ ∪ {φ}) ⊨(C) ψ) ↔ Γ ⊨(C) (φ ⟶ ψ) := by
+    apply Iff.intro
+    . intro h
+      admit
+    . admit
+
+
+  lemma Monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
+    intro hsub hg
+    admit
+
+ lemma Valid.ConjunctionEntails {C : Set (Model symbs)} :
+  (∃ ch : FiniteChoice Γ, ⊨(C) (ch.conjunction ⟶ φ)) → (Γ ⊨(C) φ) := by
+
+    intro ⟨ch, h⟩
+    induction ch generalizing φ with
+    | nil =>
+        apply Monotonicity
+        . apply Set.empty_subset
+        rw [Entails.NoPremises]
+        simp [FiniteChoice.conjunction] at h
+        intro M g w
+        have := h M g w
+        simp [Sat] at this
+        exact this
+    | cons ψ ch ih =>
+        have : Γ = Γ ∪ {ψ.1} := by simp only [Set.union_singleton, Subtype.coe_prop,
+          Set.insert_eq_of_mem]
+        rw [this, Deduction]
+        apply ih
+        clear ih
+        cases ch
+        . simp [FiniteChoice.conjunction] at h ⊢
+          intro M g w
+          simp only [Sat, not_or, not_not, not_and_self, false_or]
+          apply h
+        . simp [FiniteChoice.conjunction] at h ⊢
+          -- The part below is unreadable
+          intro M g w
+          have h := h M g w
+          simp only [Sat, not_or, not_not, not_and] at h ⊢
+          rw [←imp_iff_not_or]
+          intro h2
+          rw [←imp_iff_not_or]
+          intro h3
+          apply Or.elim h
+          . intro h
+            have := h h2
+            contradiction
+          . simp only [imp_self]
+
+end Lemmas
