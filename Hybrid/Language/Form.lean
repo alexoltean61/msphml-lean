@@ -50,8 +50,8 @@ prefix:60 "∼ "  => FormL.neg
 
 infixr:55 " ⋁ "  => FormL.or
 notation:57 φ:40 " ⋀ " ψ:57  => ∼(∼φ ⋁ ∼ψ)
-notation:53 φ:40 " ⟶ " ψ:53  => ∼(φ ⋁ ψ)
-notation:51 φ:40 " ↔ " ψ:51  => (φ ⟶ ψ) ⋀ (ψ ⟶ φ)
+notation:53 φ:40 " ⟶ " ψ:53  => ∼φ ⋁ ψ
+notation:51 φ:40 " ←→ " ψ:51  => (φ ⟶ ψ) ⋀ (ψ ⟶ φ)
 
 -- Define H(@), the fragment of H(@, ∀) without binders, as a subtype of Form
 def HAt : FormL symbs s → Prop
@@ -77,11 +77,13 @@ def FormHAt (symbs: Symbols α) s := {φ : Form symbs s // HAt φ}
 @[reducible] def FiniteChoice.conjunction {Γ: PremiseSet symbs s}: FiniteChoice Γ → Form symbs s
   | []      =>
       let p := FormL.prop ((symbs.propNonEmpty s).default)
-      ∼(p ⋁ ∼p)
+      p ⋁ ∼p
   | [φ]     => φ
   | φ :: ψs =>
       let ψs_as_premiseSet : FiniteChoice Γ := ψs -- annoying
-      φ ⋀ ψs_as_premiseSet.conjunction
+      ψs_as_premiseSet.conjunction ⋀ φ
 
 
 -- Do we need a DecidableEq instance for FormL?
+
+@[reducible] def AxiomSet (symbs : Symbols α) := (s: symbs.signature.S) → Set (Form symbs s)

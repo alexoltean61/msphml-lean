@@ -4,8 +4,6 @@ import Hybrid.Language.Substitution
 variable {α : Type u}
 variable [DecidableEq α]
 
-@[reducible] def AxiomSet (symbs : Symbols α) := (s: symbs.signature.S) → Set (Form symbs s)
-
 inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signature.S) → Form symbs s → Type u
   -- Λ:
   | ax    : (φ : Λ s) → Proof Λ s φ
@@ -24,9 +22,9 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   -- H(@, ∀):
   -- 1. Axioms about @
   | kAt j φ ψ    : Proof Λ s (ℋ@j (φ ⟶ ψ) ⟶ (ℋ@j φ ⟶ ℋ@j ψ))
-  | agree j k φ  : Proof Λ s (ℋ@k (ℋ@j φ) ↔ ℋ@j φ)
-  | selfDual j φ : Proof Λ s (ℋ@j φ ↔ ∼ ℋ@j (∼φ))
-  | intro j φ    : Proof Λ s (ℋNom j ⟶ (φ ↔ ℋ@j φ))
+  | agree j k φ  : Proof Λ s (ℋ@k (ℋ@j φ) ←→ ℋ@j φ)
+  | selfDual j φ : Proof Λ s (ℋ@j φ ←→ ∼ ℋ@j (∼φ))
+  | intro j φ    : Proof Λ s (ℋNom j ⟶ (φ ←→ ℋ@j φ))
   | back j φ ψ
          (σ : symbs.signature.Sig _ s)
          (C : Context (@FormL.at α symbs t sᵢ j ψ) φ):
