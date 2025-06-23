@@ -31,6 +31,10 @@ def FormL.applDual {symbs : Symbols α}
                       {σ // σ ∈ symbs.signature.Sig (h :: t) s} → FormL symbs (h :: t) → FormL symbs [s] := λ σ φ =>
   .neg (.appl σ φ.negAll)
 
+def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
+def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
+def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
+
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
 prefix:65 "ℋVar "   => FormL.svar
@@ -49,9 +53,9 @@ notation:62 "ℋ∃ " x:arg φ:arg => FormL.neg (FormL.bind x (FormL.neg φ))
 prefix:60 "∼ "  => FormL.neg
 
 infixr:55 " ⋁ "  => FormL.or
-notation:57 φ:40 " ⋀ " ψ:57  => ∼(∼φ ⋁ ∼ψ)
-notation:53 φ:40 " ⟶ " ψ:53  => ∼φ ⋁ ψ
-notation:51 φ:40 " ←→ " ψ:51  => (φ ⟶ ψ) ⋀ (ψ ⟶ φ)
+notation:57 φ:40 " ⋀ " ψ:57  => FormL.and φ ψ
+notation:53 φ:40 " ⟶ " ψ:53  => FormL.implies φ ψ
+notation:51 φ:40 " ←→ " ψ:51  => FormL.iff φ ψ
 
 -- Define H(@), the fragment of H(@, ∀) without binders, as a subtype of Form
 def HAt : FormL symbs s → Prop
