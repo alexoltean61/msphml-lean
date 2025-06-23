@@ -176,10 +176,10 @@ section Defs
 end Defs
 
 section Lemmas
-  lemma Models.AllMaximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
+  lemma Models.all_maximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
     simp only [All, Set.setOf_true, Set.subset_univ, implies_true]
 
-  lemma Models.FrInModels.Ax {Λ : AxiomSet symbs} : (Models.Fr (Frames.Ax Λ)) ⊆  Models.Ax Λ := by
+  lemma Models.fr_in_ax {Λ : AxiomSet symbs} : (Models.Fr (Frames.Ax Λ)) ⊆  Models.Ax Λ := by
     simp [Models.Fr, Models.Ax]
     intro M fr s sSort φ φAx
     simp only [Frames.Ax, Frame.valid, Models.Fr, Set.coe_setOf, Set.mem_setOf_eq, Subtype.forall,
@@ -188,19 +188,19 @@ section Lemmas
     . exact φAx
     . rfl
 
-  lemma Entails.IfGeneral {Γ : PremiseSet symbs s} : (Γ ⊨ φ) → (Γ ⊨(C) φ) := by
+  lemma Entails.if_general {Γ : PremiseSet symbs s} : (Γ ⊨ φ) → (Γ ⊨(C) φ) := by
     intro h
     intro M
-    have := h ⟨M, Models.AllMaximal C M.2⟩
+    have := h ⟨M, Models.all_maximal C M.2⟩
     exact this
 
-  lemma Entails.ModelImpliesFrame {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊨Fr(Λ) φ := by
+  lemma Entails.if_model_frame {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊨Fr(Λ) φ := by
     intro h
     intro M
-    have := h ⟨M, Models.FrInModels.Ax M.2⟩
+    have := h ⟨M, Models.fr_in_ax M.2⟩
     exact this
 
-  lemma Entails.NoPremises {C : Set (Model symbs)} : (∅ ⊨(C) φ) ↔ ⊨(C) φ := by
+  lemma Entails.no_premises {C : Set (Model symbs)} : (∅ ⊨(C) φ) ↔ ⊨(C) φ := by
     apply Iff.intro
     . intro h M g w
       apply h
@@ -208,12 +208,12 @@ section Lemmas
     . intro h M g w _
       apply h
 
-  lemma Valid.GeneralImpliesModel (C : Set (Model symbs)) : (⊨ φ) → ⊨(C) φ := by
+  lemma Valid.if_general_model (C : Set (Model symbs)) : (⊨ φ) → ⊨(C) φ := by
     unfold FormL.valid
-    rw [←Entails.NoPremises, ←Entails.NoPremises]
-    apply Entails.IfGeneral
+    rw [←Entails.no_premises, ←Entails.no_premises]
+    apply Entails.if_general
 
- lemma Entails.Deduction : ((Γ ∪ {φ}) ⊨(C) ψ) ↔ Γ ⊨(C) (φ ⟶ ψ) := by
+ lemma Entails.deduction : ((Γ ∪ {φ}) ⊨(C) ψ) ↔ Γ ⊨(C) (φ ⟶ ψ) := by
     apply Iff.intro
     . intro h1 M g w h2
       rw [Sat.implies]
@@ -234,21 +234,21 @@ section Lemmas
       . exact h2.1
 
 
-  lemma Entails.Monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
+  lemma Entails.monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
     intro h1 M
     intro g w h2
     apply h1
     intro φ
     exact h2 ⟨φ.1, h φ.2⟩
 
- lemma Valid.ConjunctionEntails {C : Set (Model symbs)} :
+ lemma Valid.conjunction_entails {C : Set (Model symbs)} :
   (∃ ch : FiniteChoice Γ, ⊨(C) (ch.conjunction ⟶ φ)) → (Γ ⊨(C) φ) := by
     intro ⟨ch, h⟩
     induction ch generalizing φ with
     | nil =>
-        apply Entails.Monotonicity
+        apply Entails.monotonicity
         . apply Set.empty_subset
-        rw [Entails.NoPremises]
+        rw [Entails.no_premises]
         simp only [FiniteChoice.conjunction] at h
         intro M g w
         have := h M g w
@@ -257,7 +257,7 @@ section Lemmas
     | cons ψ ch ih =>
         have : Γ = Γ ∪ {ψ.1} := by simp only [Set.union_singleton, Subtype.coe_prop,
           Set.insert_eq_of_mem]
-        rw [this, Entails.Deduction]
+        rw [this, Entails.deduction]
         apply ih
         clear ih
         cases ch
