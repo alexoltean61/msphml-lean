@@ -44,6 +44,42 @@ def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : FormL sy
 
 notation:50 "⟨" M "," g "," w "⟩" "⊨" φ => Sat M g w φ
 
+@[simp]
+lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
+  apply Iff.intro
+  . simp only [Sat]
+    intro h _
+    apply Or.elim h
+    . intro
+      contradiction
+    . simp only [imp_self]
+  . simp only [Sat]
+    intro h
+    apply not_or_of_imp
+    assumption
+
+@[simp]
+lemma Sat.and : (⟨M, g, w⟩ ⊨ φ ⋀ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) ∧ ⟨M, g, w⟩ ⊨ ψ := by
+  apply Iff.intro
+  repeat {
+    simp only [Sat]
+    rw [not_or, not_not, not_not]
+    simp only [imp_self]
+  }
+
+@[simp]
+lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔ ⟨M, g, w⟩ ⊨ ψ) := by
+  apply Iff.intro
+  . simp only [Sat, not_or, not_not, not_and, and_imp]
+    intros
+    apply Iff.intro
+    repeat assumption
+  . simp only [Sat, not_or, not_not, not_and, and_imp]
+    intro h
+    apply And.intro
+    . exact h.mp
+    . exact h.mpr
+
 section Defs
   variable {α : Type u}
   variable [DecidableEq α]
@@ -104,9 +140,9 @@ section Defs
   def Frames.Ax (Λ : AxiomSet symbs) : Set (Frame symbs.signature) :=
     {Fr : Frame symbs.signature | ∀ s, ∀ φ ∈ Λ s, Fr ⊨ φ}
 
-  def SatSet (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
+  def Sat.Set (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
     ∀ φ : Γ, ⟨M, g, w⟩ ⊨ φ.1
-  notation:50 "⟨" M "," g "," w "⟩" "⊨" Γ => SatSet M g w Γ
+  notation:50 "⟨" M "," g "," w "⟩" "⊨" Γ => Sat.Set M g w Γ
 
   -- The local consequence relation
   def Entails (Γ : PremiseSet symbs s) (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
@@ -168,7 +204,7 @@ section Lemmas
     apply Iff.intro
     . intro h M g w
       apply h
-      . simp only [SatSet, Subtype.forall, Set.mem_empty_iff_false, false_implies, implies_true]
+      . simp only [Sat.Set, Subtype.forall, Set.mem_empty_iff_false, false_implies, implies_true]
     . intro h M g w _
       apply h
 
@@ -177,55 +213,67 @@ section Lemmas
     rw [←Entails.NoPremises, ←Entails.NoPremises]
     apply Entails.IfGeneral
 
- lemma Deduction : ((Γ ∪ {φ}) ⊨(C) ψ) ↔ Γ ⊨(C) (φ ⟶ ψ) := by
+ lemma Entails.Deduction : ((Γ ∪ {φ}) ⊨(C) ψ) ↔ Γ ⊨(C) (φ ⟶ ψ) := by
     apply Iff.intro
-    . intro h
-      admit
-    . admit
+    . intro h1 M g w h2
+      rw [Sat.implies]
+      intro h3
+      apply h1
+      simp only [Sat.Set, Subtype.forall, Set.union_singleton, Set.mem_insert_iff, forall_eq_or_imp] at h2 ⊢
+      apply And.intro
+      repeat assumption
+    . intro h M g w h2
+      have := h M g w
+      simp only [Sat.implies] at this
+      simp only [Sat.Set, Subtype.forall, Set.union_singleton, Set.mem_insert_iff,
+        forall_eq_or_imp] at h2
+      apply this
+      . intro φ
+        apply h2.2
+        exact φ.2
+      . exact h2.1
 
 
-  lemma Monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
-    intro hsub hg
-    admit
+  lemma Entails.Monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
+    intro h1 M
+    intro g w h2
+    apply h1
+    intro φ
+    exact h2 ⟨φ.1, h φ.2⟩
 
  lemma Valid.ConjunctionEntails {C : Set (Model symbs)} :
   (∃ ch : FiniteChoice Γ, ⊨(C) (ch.conjunction ⟶ φ)) → (Γ ⊨(C) φ) := by
-
     intro ⟨ch, h⟩
     induction ch generalizing φ with
     | nil =>
-        apply Monotonicity
+        apply Entails.Monotonicity
         . apply Set.empty_subset
         rw [Entails.NoPremises]
-        simp [FiniteChoice.conjunction] at h
+        simp only [FiniteChoice.conjunction] at h
         intro M g w
         have := h M g w
-        simp [Sat] at this
+        simp only [Sat, not_or, not_not, not_and_self, false_or] at this
         exact this
     | cons ψ ch ih =>
         have : Γ = Γ ∪ {ψ.1} := by simp only [Set.union_singleton, Subtype.coe_prop,
           Set.insert_eq_of_mem]
-        rw [this, Deduction]
+        rw [this, Entails.Deduction]
         apply ih
         clear ih
         cases ch
-        . simp [FiniteChoice.conjunction] at h ⊢
+        . simp only [FiniteChoice.conjunction] at h ⊢
           intro M g w
-          simp only [Sat, not_or, not_not, not_and_self, false_or]
-          apply h
-        . simp [FiniteChoice.conjunction] at h ⊢
-          -- The part below is unreadable
+          rw [Sat.implies, Sat.implies]
+          intros
+          apply Sat.implies.mp (h M g w)
+          assumption
+        . simp only [FiniteChoice.conjunction] at h ⊢
           intro M g w
-          have h := h M g w
-          simp only [Sat, not_or, not_not, not_and] at h ⊢
-          rw [←imp_iff_not_or]
-          intro h2
-          rw [←imp_iff_not_or]
-          intro h3
-          apply Or.elim h
-          . intro h
-            have := h h2
-            contradiction
-          . simp only [imp_self]
+          rw [Sat.implies, Sat.implies]
+          intros
+          apply Sat.implies.mp (h M g w)
+          rw [Sat.and]
+          apply And.intro
+          repeat assumption
 
 end Lemmas
