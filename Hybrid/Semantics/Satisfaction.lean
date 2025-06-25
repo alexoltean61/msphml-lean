@@ -43,6 +43,12 @@ def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : FormL sy
 | .cons φ ψs     => Sat M g w.1 φ ∧ Sat M g w.2 ψs
 
 notation:50 "⟨" M "," g "," w "⟩" "⊨" φ => Sat M g w φ
+notation:50 "⟨" M "," g "," w "⟩" "⊭" φ => ¬ Sat M g w φ
+
+variable {α : Type u}
+variable [DecidableEq α]
+variable {symbs : Symbols α}
+variable {s : symbs.signature.S}
 
 @[simp]
 lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
@@ -80,12 +86,33 @@ lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔
     . exact h.mp
     . exact h.mpr
 
+@[simp]
+lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
+  (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔ (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) → ⟨M, g, ws⟩ ⊨ args) := by
+  simp only [Sat, not_exists, not_and]
+  cases t with
+  | nil =>
+      simp only [WProd]
+      apply Iff.intro
+      . intro h1 w h2
+        by_contra h3
+        exact h1 w h3 h2
+      . intro h1 w h2 h3
+        apply h2
+        exact h1 w h3
+  | cons s₂ t =>
+      simp only [WProd]
+      apply Iff.intro
+      . intro h1 ws h2
+        by_contra
+        apply h1 ws
+        repeat assumption
+      . intro h1 ws h2
+        by_contra
+        apply h2
+        apply h1
+        assumption
 section Defs
-  variable {α : Type u}
-  variable [DecidableEq α]
-  variable {symbs : Symbols α}
-  variable {s : symbs.signature.S}
-
   -- Definitions below will be paramtrized over a particular *class* of models,
   -- so not necessarily over the class of all models.
 
