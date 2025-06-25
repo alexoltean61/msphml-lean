@@ -44,7 +44,7 @@ macro_rules
   | `(($x)) => `($x)
   | `(($x, $xs:term,*)) => `(FormL.cons $x ($xs,*))
 notation:65 "ℋ⟨" σ:lead "⟩" φ:arg => FormL.appl σ φ
-notation:65 "ℋ[" σ:lead "]" φ:arg => FormL.applDual σ φ
+notation:65 "ℋ⟨" σ:lead "⟩ᵈ" φ:arg => FormL.applDual σ φ
 
 notation:63 "ℋ@ " j:arg φ:arg => FormL.at j φ
 notation:63 "ℋ∀ " x:arg φ:arg => FormL.bind x φ

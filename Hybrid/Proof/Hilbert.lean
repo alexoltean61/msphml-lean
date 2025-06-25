@@ -14,11 +14,11 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | k φ ψ χ
       (σ : symbs.signature.Sig _ s)
       (C : Context (φ ⟶ ψ) χ):
-            Proof Λ s (ℋ[σ] χ ⟶ (ℋ[σ] C[φ] ⟶ ℋ[σ] C[ψ]))
+            Proof Λ s (ℋ⟨σ⟩ᵈ χ ⟶ (ℋ⟨σ⟩ᵈ C[φ] ⟶ ℋ⟨σ⟩ᵈ C[ψ]))
   | mp    : Proof Λ s (φ ⟶ ψ) → Proof Λ s φ → Proof Λ s ψ
   | ug {φ : Form symbs s₁}
        (C : Context φ ψ):
-            Proof Λ s₁ φ → Proof Λ s₂ (ℋ[σ] ψ)
+            Proof Λ s₁ φ → Proof Λ s₂ (ℋ⟨σ⟩ᵈ ψ)
   -- H(@, ∀):
   -- 1. Axioms about @
   | kAt j φ ψ    : Proof Λ s (ℋ@j (φ ⟶ ψ) ⟶ (ℋ@j φ ⟶ ℋ@j ψ))
@@ -40,7 +40,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | barcan x φ ψ
       (σ : symbs.signature.Sig _ s)
       (C : Context φ ψ):
-            Proof Λ s (ℋ∀x (ℋ[σ] ψ) ⟶ (ℋ[σ] C[ℋ∀x φ]))
+            Proof Λ s (ℋ∀x (ℋ⟨σ⟩ᵈ ψ) ⟶ (ℋ⟨σ⟩ᵈ C[ℋ∀x φ]))
   | barcanAt x j φ:
             Proof Λ s (ℋ∀x (ℋ@j φ) ⟶ ℋ@j (ℋ∀x φ))
   -- 4. Axiom Nom, linking svars and nominals together:
