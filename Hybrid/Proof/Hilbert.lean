@@ -13,11 +13,11 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | prop3 φ ψ   : Proof Λ s ((∼ψ ⟶ ∼φ) ⟶ (φ ⟶ ψ))
   | k φ ψ χ
       (σ : symbs.signature.Sig _ s)
-      (C : Context (φ ⟶ ψ) χ):
+      (C : (φ ⟶ ψ).Context χ):
             Proof Λ s (ℋ⟨σ⟩ᵈ χ ⟶ (ℋ⟨σ⟩ᵈ C[φ] ⟶ ℋ⟨σ⟩ᵈ C[ψ]))
   | mp    : Proof Λ s (φ ⟶ ψ) → Proof Λ s φ → Proof Λ s ψ
   | ug {φ : Form symbs s₁}
-       (C : Context φ ψ):
+       (C : φ.Context ψ):
             Proof Λ s₁ φ → Proof Λ s₂ (ℋ⟨σ⟩ᵈ ψ)
   -- H(@, ∀):
   -- 1. Axioms about @
@@ -27,7 +27,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | intro j φ    : Proof Λ s (ℋNom j ⟶ (φ ←→ ℋ@j φ))
   | back j φ ψ
          (σ : symbs.signature.Sig _ s)
-         (C : Context (@FormL.at α symbs t sᵢ j ψ) φ):
+         (C : (@FormL.at α symbs t sᵢ j ψ).Context φ):
       Proof Λ s (ℋ⟨σ⟩ φ ⟶ ℋ@j ψ)
   -- 2. Axioms about svars and binders
   | q1 x φ ψ
@@ -37,9 +37,9 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
       φ.varSubstableFor y x → Proof Λ s ((ℋ∀x φ) ⟶ φ[y // x])
   | name x : Proof Λ s (ℋ∃x (ℋVar x))
   -- 3. Barcan axioms
-  | barcan x φ ψ
+  | barcan x (φ ψ : Form symbs s)
       (σ : symbs.signature.Sig _ s)
-      (C : Context φ ψ):
+      (C : φ.Context ψ):
             Proof Λ s (ℋ∀x (ℋ⟨σ⟩ᵈ ψ) ⟶ (ℋ⟨σ⟩ᵈ C[ℋ∀x φ]))
   | barcanAt x j φ:
             Proof Λ s (ℋ∀x (ℋ@j φ) ⟶ ℋ@j (ℋ∀x φ))
@@ -51,7 +51,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | genAt s₂ j : Proof Λ s₁ φ → Proof Λ s₂ (ℋ@j φ)
   | nameAt s₂ {j : symbs.nominal s₂} {φ : Form symbs s₂} :
             (φ.occurs j = false) → Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ φ
-  | paste (C : Context (ℋNom k) χ):
+  | paste (C : (ℋNom k).Context χ):
         k ≠ j → φ.occurs k = false → ψ.occurs k = false →
           Proof Λ s (ℋ@j (ℋ⟨σ⟩ χ) ⋀ ℋ@k φ ⟶ ψ) → Proof Λ s (ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ)
   | gen x : Proof Λ s φ → Proof Λ s (ℋ∀x φ)
