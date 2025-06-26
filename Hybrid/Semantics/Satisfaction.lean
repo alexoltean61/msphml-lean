@@ -12,6 +12,17 @@ import Hybrid.Language
   | [s]     => W s
   | s :: sorts  => W s × WProd W sorts
 
+/--
+  We can use a `Context` to take a certain projection from a `WProd`.
+    A `Context` effectively selects a certain formula ocurring in a formula list.
+    `WProd.select` selects the corresponding *world* of that formula in a `WProd`.
+-/
+def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sorts) (C : φ.Context ψ) : W s :=
+  match C with
+  | .refl => ws
+  | .head => ws.1
+  | .tail C' => ws.2.select C'
+
 structure Frame (signature : Signature α) where
   W  : signature.S → Type -- should you add non-empty contraint?
   R  : signature.Sig dom range → Set (WProd W (range :: dom))
