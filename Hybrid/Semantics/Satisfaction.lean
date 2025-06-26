@@ -61,68 +61,6 @@ variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 
-@[simp]
-lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
-  apply Iff.intro
-  . simp only [Sat]
-    intro h _
-    apply Or.elim h
-    . intro
-      contradiction
-    . simp only [imp_self]
-  . simp only [Sat]
-    intro h
-    apply not_or_of_imp
-    assumption
-
-@[simp]
-lemma Sat.and : (⟨M, g, w⟩ ⊨ φ ⋀ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) ∧ ⟨M, g, w⟩ ⊨ ψ := by
-  apply Iff.intro
-  repeat {
-    simp only [Sat]
-    rw [not_or, not_not, not_not]
-    simp only [imp_self]
-  }
-
-@[simp]
-lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔ ⟨M, g, w⟩ ⊨ ψ) := by
-  apply Iff.intro
-  . simp only [Sat, not_or, not_not, not_and, and_imp]
-    intros
-    apply Iff.intro
-    repeat assumption
-  . simp only [Sat, not_or, not_not, not_and, and_imp]
-    intro h
-    apply And.intro
-    . exact h.mp
-    . exact h.mpr
-
-@[simp]
-lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
-  (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔ (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) → ⟨M, g, ws⟩ ⊨ args) := by
-  simp only [Sat, not_exists, not_and]
-  cases t with
-  | nil =>
-      simp only [WProd]
-      apply Iff.intro
-      . intro h1 w h2
-        by_contra h3
-        exact h1 w h3 h2
-      . intro h1 w h2 h3
-        apply h2
-        exact h1 w h3
-  | cons s₂ t =>
-      simp only [WProd]
-      apply Iff.intro
-      . intro h1 ws h2
-        by_contra
-        apply h1 ws
-        repeat assumption
-      . intro h1 ws h2
-        by_contra
-        apply h2
-        apply h1
-        assumption
 section Defs
   -- Definitions below will be paramtrized over a particular *class* of models,
   -- so not necessarily over the class of all models.
@@ -214,6 +152,70 @@ section Defs
 end Defs
 
 section Lemmas
+
+  @[simp]
+  lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
+    apply Iff.intro
+    . simp only [Sat]
+      intro h _
+      apply Or.elim h
+      . intro
+        contradiction
+      . simp only [imp_self]
+    . simp only [Sat]
+      intro h
+      apply not_or_of_imp
+      assumption
+
+  @[simp]
+  lemma Sat.and : (⟨M, g, w⟩ ⊨ φ ⋀ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) ∧ ⟨M, g, w⟩ ⊨ ψ := by
+    apply Iff.intro
+    repeat {
+      simp only [Sat]
+      rw [not_or, not_not, not_not]
+      simp only [imp_self]
+    }
+
+  @[simp]
+  lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔ ⟨M, g, w⟩ ⊨ ψ) := by
+    apply Iff.intro
+    . simp only [Sat, not_or, not_not, not_and, and_imp]
+      intros
+      apply Iff.intro
+      repeat assumption
+    . simp only [Sat, not_or, not_not, not_and, and_imp]
+      intro h
+      apply And.intro
+      . exact h.mp
+      . exact h.mpr
+
+  @[simp]
+  lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
+    (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔ (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) → ⟨M, g, ws⟩ ⊨ args) := by
+    simp only [Sat, not_exists, not_and]
+    cases t with
+    | nil =>
+        simp only [WProd]
+        apply Iff.intro
+        . intro h1 w h2
+          by_contra h3
+          exact h1 w h3 h2
+        . intro h1 w h2 h3
+          apply h2
+          exact h1 w h3
+    | cons s₂ t =>
+        simp only [WProd]
+        apply Iff.intro
+        . intro h1 ws h2
+          by_contra
+          apply h1 ws
+          repeat assumption
+        . intro h1 ws h2
+          by_contra
+          apply h2
+          apply h1
+          assumption
+
   lemma Models.all_maximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
     simp only [All, Set.setOf_true, Set.subset_univ, implies_true]
 
