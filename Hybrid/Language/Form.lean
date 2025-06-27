@@ -7,18 +7,29 @@ inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
   | appl : symbs.signature.Sig (h :: t) s → FormL symbs (h :: t) → FormL symbs [s]
 --  | ct   : symbs.signature.Sig [] s → FormL symbs [s]
   | or   : FormL symbs [s] → FormL symbs [s] → FormL symbs [s]
-  | neg  : FormL symbs sorts → FormL symbs sorts
+  | neg  : FormL symbs [s] → FormL symbs [s]
   | at   : symbs.nominal t → FormL symbs [t] → FormL symbs [s]
   | bind : symbs.svar t → FormL symbs [s] → FormL symbs [s]
   | cons : FormL symbs [s₁] → FormL symbs (s₂ :: t) → FormL symbs (s₁ :: s₂ :: t)
 
 @[reducible] def Form (symbs : Symbols α) (s : symbs.signature.S) := FormL symbs [s]
 
+def FormL.negAll : FormL sig sorts → FormL sig sorts
+  | .prop p   => .neg (.prop p)
+  | .nom n    => .neg (.nom n)
+  | .svar x   => .neg (.svar x)
+  | .cons φ ψ => .cons (.neg φ) ψ.negAll
+  | .appl σ φ => .neg (.appl σ φ)
+  | .or φ ψ   => .neg (.or φ ψ)
+  | .neg φ    => .neg (.neg φ)
+  | .at k φ   => .neg (.at k φ)
+  | .bind x φ => .neg (.bind x φ)
+
 def FormL.applDual {symbs : Symbols α}
                    {s h : symbs.signature.S}
                    {t : List symbs.signature.S} :
                       {σ // σ ∈ symbs.signature.Sig (h :: t) s} → FormL symbs (h :: t) → FormL symbs [s] := λ σ φ =>
-  .neg (.appl σ φ.neg)
+  .neg (.appl σ φ.negAll)
 
 def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
 def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
