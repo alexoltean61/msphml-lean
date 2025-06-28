@@ -66,3 +66,5 @@ def FormL.Context.subst {φ : Form sig s}
       | .tail inner_ctx => λ plug => .cons h (subst inner_ctx plug)
 
 notation:max C:49 "[" φ:50 "]" => FormL.Context.subst C φ
+
+def idk {φ χ : Form symbs s} {ψ : FormL symbs sorts} (C : φ.Context ψ) : χ.Context C[χ] := sorry

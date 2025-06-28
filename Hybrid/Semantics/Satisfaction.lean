@@ -216,6 +216,57 @@ section Lemmas
           apply h1
           assumption
 
+  lemma Sat.context {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {s}, ∀ {φ : Form symbs s}, ∀ ctx : (φ.Context ψ), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
+    apply Iff.intro
+    . intro h s φ ctx
+      induction ctx with
+      | refl =>
+          simp only [WProd.select]
+          exact h
+      | head =>
+          simp only [Sat] at h
+          simp only [WProd.select]
+          exact h.1
+      | tail _ ih =>
+          simp only [Sat] at h
+          simp only [WProd.select]
+          apply ih
+          exact h.2
+    . intro h
+      induction ψ with
+      | cons χ τ _ ih2 =>
+          simp only [Sat]
+          apply And.intro
+          . have hAppl := h FormL.Context.head
+            simp [WProd.select] at hAppl
+            exact hAppl
+          . apply ih2
+            intro s φ ctx
+            have hAppl := h (FormL.Context.tail ctx)
+            simp [WProd.select] at hAppl
+            exact hAppl
+      | neg _ ih =>
+          simp only [Sat]
+          intro h2
+          admit
+      | _ =>
+          have := h FormL.Context.refl
+          simp [WProd.select] at this
+          exact this
+
+  /--
+    It requires a slightly complicated machinery to give iff conditions for satisfaction of substitutions within contexts.
+
+    The two lemmas below give sufficient conditions for both directions.
+  -/
+  lemma Sat.context_subst {φ χ : Form symbs s} {ψ : FormL symbs sorts} {ctx : φ.Context ψ} :
+    (⟨M, g, ws⟩ ⊨ ψ) → (⟨M, g, ws.select ctx⟩ ⊨ χ) → ⟨M, g, ws⟩ ⊨ ctx[χ] := by
+    admit
+
+  lemma Sat.context_subst' {φ χ : Form symbs s} {ψ : FormL symbs sorts} {ctx : φ.Context ψ} :
+    (⟨M, g, ws⟩ ⊨ ctx[χ]) → ⟨M, g, ws.select ctx⟩ ⊨ χ := by
+    admit
+
   lemma Models.all_maximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
     simp only [All, Set.setOf_true, Set.subset_univ, implies_true]
 
