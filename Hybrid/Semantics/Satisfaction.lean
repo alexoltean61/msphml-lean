@@ -153,6 +153,9 @@ end Defs
 
 section Lemmas
 
+  lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} : C₁.iso C₂ ↔ ws.select C₁ = ws.select C₂ := by
+  admit
+
   @[simp]
   lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
     apply Iff.intro
@@ -191,30 +194,15 @@ section Lemmas
 
   @[simp]
   lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
-    (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔ (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) → ⟨M, g, ws⟩ ⊨ args) := by
-    simp only [Sat, not_exists, not_and]
-    cases t with
-    | nil =>
-        simp only [WProd]
-        apply Iff.intro
-        . intro h1 w h2
-          by_contra h3
-          exact h1 w h3 h2
-        . intro h1 w h2 h3
-          apply h2
-          exact h1 w h3
-    | cons s₂ t =>
-        simp only [WProd]
-        apply Iff.intro
-        . intro h1 ws h2
-          by_contra
-          apply h1 ws
-          repeat assumption
-        . intro h1 ws h2
-          by_contra
-          apply h2
-          apply h1
-          assumption
+    (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔
+      (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) →
+        ∃ φ : Form symbs s, ∃ ctx : φ.Context args, ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
+    simp only [Sat, not_exists, not_and, WProd]
+    apply Iff.intro
+    . intro h1 w h2
+      by_contra h3
+      admit
+    . admit
 
   lemma Sat.context {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {s}, ∀ {φ : Form symbs s}, ∀ ctx : (φ.Context ψ), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
     apply Iff.intro
@@ -245,10 +233,6 @@ section Lemmas
             have hAppl := h (FormL.Context.tail ctx)
             simp [WProd.select] at hAppl
             exact hAppl
-      | neg _ ih =>
-          simp only [Sat]
-          intro h2
-          admit
       | _ =>
           have := h FormL.Context.refl
           simp [WProd.select] at this
