@@ -106,6 +106,12 @@ def FormL.Context.iso {φ : Form symbs s} {ψ : Form symbs s'} {χ τ : FormL sy
       | .tail ctx' => ctx.iso ctx'
       | _ => False
 
+def FormL.subst_to_ctx (χ : Form sig s)
+          {φ : Form sig s}
+          {ψ : FormL sig sorts}
+          (C : Context φ ψ) :
+          χ.Context C[χ] := sorry
+
 lemma FormL.Context.iso_trans {φ : Form symbs s} {ψ : Form symbs s'} {χ : Form symbs s''} {a b c : FormL symbs sorts} {C₁ : φ.Context a} {C₂ : ψ.Context b} {C₃ : χ.Context c} : C₁.iso C₂ → C₁.iso C₃ → C₂.iso C₃ := sorry
 
 lemma FormL.Context.if_iso {φ ψ : Form symbs s} {τ : FormL symbs sorts} (C₁ : φ.Context τ) (C₂ : ψ.Context τ) (h : C₁.iso C₂) : φ = ψ := sorry
