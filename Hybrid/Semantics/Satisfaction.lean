@@ -192,17 +192,81 @@ section Lemmas
       . exact h.mp
       . exact h.mpr
 
+
+  @[simp]
+  lemma Sat.negAll {φ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ φ.negAll) ↔ (∀ {s' : symbs.signature.S} {ψ : Form symbs s'} (C : ψ.Context φ), ⟨M, g, ws.select C⟩ ⊭ ψ) := by
+    apply Iff.intro
+    . intro h1 ψ _ C h2
+      induction φ with
+      | cons h t _ ih2 =>
+          simp only [FormL.negAll, Sat] at h1
+          cases C with
+          | head =>
+              simp [WProd.select] at h2
+              have := h1.1
+              contradiction
+          | tail C' =>
+              specialize ih2 h1.2 C'
+              simp [WProd.select] at h2 ih2
+              contradiction
+      | _ =>
+          simp only [FormL.negAll] at h1
+          cases C with
+          | refl => simp only [WProd.select] at h2 ; contradiction
+    . intro h1
+      induction φ with
+      | cons h t _ ih2 =>
+          simp only [FormL.negAll, Sat]
+          apply And.intro
+          . specialize h1 .head
+            simp only [WProd.select] at h1
+            exact h1
+          . apply ih2
+            intro _ χ C
+            cases C with
+            | refl =>
+                simp only [WProd.select]
+                specialize h1 (.tail .refl)
+                simp only [WProd.select] at h1
+                exact h1
+            | head =>
+                simp only [WProd.select]
+                specialize h1 (.tail .head)
+                simp only [WProd.select] at h1
+                exact h1
+            | tail C' =>
+                simp only [WProd.select]
+                specialize h1 (.tail $ .tail C')
+                simp only [WProd.select] at h1
+                exact h1
+      | _ =>
+          simp only [FormL.negAll]
+          specialize h1 .refl
+          simp [WProd.select] at h1
+          exact h1
+
   @[simp]
   lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
     (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔
       (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) →
-        ∃ φ : Form symbs s, ∃ ctx : φ.Context args, ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
+        ∃ (s' : symbs.signature.S) (φ : Form symbs s') (ctx : φ.Context args), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
     simp only [Sat, not_exists, not_and, WProd]
     apply Iff.intro
     . intro h1 w h2
+      specialize h1 w
       by_contra h3
-      admit
-    . admit
+      simp only [not_exists] at h3
+      apply h1
+      . simp only [Sat.negAll]
+        apply h3
+      . assumption
+    . intro h1 ws h2
+      by_contra h3
+      specialize h1 ws h3
+      rw [Sat.negAll] at h2
+      . have ⟨_, ⟨_, ⟨ctx, _⟩⟩⟩ := h1
+        specialize h2 ctx
+        contradiction
 
   lemma Sat.context {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {s}, ∀ {φ : Form symbs s}, ∀ ctx : (φ.Context ψ), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
     apply Iff.intro
