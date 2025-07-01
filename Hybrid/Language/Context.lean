@@ -67,6 +67,13 @@ def FormL.Context.subst {φ : Form sig s}
 
 notation:max C:49 "[" φ:50 "]" => FormL.Context.subst C φ
 
+
+/--
+  TODO: Working with contexts directly gets very technical.
+  Consider refactoring contexts to something more intuitive, perhaps by use of an
+  equivalent alternative definition and lemmas to translate between the two.
+-/
+
 /-
 def FormL.Context.index {φ : Form symbs s} {ψ : FormL symbs sorts}: φ.Context ψ → Fin (sorts.length)
   | .refl => Fin.mk 0 (by simp only [List.length_singleton, Nat.lt_succ_self])
