@@ -34,7 +34,14 @@ structure Symbols (α : Type u) where
 
 -- Often when dealing with syntax, we treat constant nominals and regular nominals uniformly.
 -- It helps to have their disjoint union defined as a standalone type.
-def Symbols.nominal (symbs : Symbols α) := λ s => symbs.signature.N s ⊕ symbs.nom s
+variable (symbs : Symbols α)
+variable (s : symbs.signature.S)
+def Symbols.nominal := λ s => symbs.signature.N s ⊕ symbs.nom s
+
+instance : Coe (symbs.signature.N s) (symbs.nominal s) where
+  coe := Sum.inl
+instance : Coe (symbs.nom s) (symbs.nominal s) where
+  coe := Sum.inr
 
 -- The `prop` and `svar` fields of the `Symbols` structure are defined as Sets.
 -- Usually Lean is able to coerce a Set to a Type, but not always.

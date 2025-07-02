@@ -27,8 +27,9 @@ def FormL.negAll : FormL sig sorts → FormL sig sorts
 
 def FormL.applDual {symbs : Symbols α}
                    {s h : symbs.signature.S}
-                   {t : List symbs.signature.S} :
-                      {σ // σ ∈ symbs.signature.Sig (h :: t) s} → FormL symbs (h :: t) → FormL symbs [s] := λ σ φ =>
+                   {t : List symbs.signature.S}
+                   (σ : symbs.signature.Sig (h :: t) s)
+                   (φ : FormL symbs (h :: t)) : FormL symbs [s] :=
   .neg (.appl σ φ.negAll)
 
 def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
@@ -56,6 +57,18 @@ infixr:55 " ⋁ "  => FormL.or
 notation:57 φ:40 " ⋀ " ψ:57  => FormL.and φ ψ
 notation:53 φ:40 " ⟶ " ψ:53  => FormL.implies φ ψ
 notation:51 φ:40 " ←→ " ψ:51  => FormL.iff φ ψ
+
+/-
+section Coercions
+
+  variable (symbs : Symbols α)
+  variable (s : symbs.signature.S)
+  instance : Coe (symbs.svar s) (Form symbs s) where
+    coe := FormL.svar
+
+end Coercions
+
+--/
 
 -- Define H(@), the fragment of H(@, ∀) without binders, as a subtype of Form
 def HAt : FormL symbs s → Prop
