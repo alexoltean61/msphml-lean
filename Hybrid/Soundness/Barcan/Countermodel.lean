@@ -1,6 +1,8 @@
 import Hybrid.Semantics
 import Hybrid.Soundness.Barcan.Language
 
+namespace B11_12
+
 /-
   What this file will do:
     We want to find a countermodel for the polyadic Barcan formula
@@ -73,9 +75,9 @@ def g : Assignment countermodel :=
 
 -- Annoying that you have to specify .svar and .prop everywhere,
 -- but coercions introduce weird bugs elsewhere:
-def barcan_antecedent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (ℋ@ j (.svar x), ℋ@ k (.svar x)))
+abbrev barcan_antecedent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (ℋ@ j (.svar x), ℋ@ k (.svar x)))
 
-def barcan_consequent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (ℋ@ j (.svar x)), ℋ@ k (.svar x))
+abbrev barcan_consequent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (ℋ@ j (.svar x)), ℋ@ k (.svar x))
 
 theorem BarcanAntecedentTrue  : ⟨countermodel, g, w₀⟩ ⊨ barcan_antecedent := by
   rw [barcan_antecedent, Sat]
@@ -123,7 +125,7 @@ theorem BarcanConsequentFalse : ⟨countermodel, g, w₀⟩ ⊭ barcan_consequen
 
 theorem BarcanUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs sortS) (C : φ.Context ψ) (σ : symbs.signature.Sig ([sortS, sortS]) sortS),
     -- The Barcan formula is not satisfied everywhere in the countermodel:
-    ¬ countermodel ⊨ (ℋ∀ x(ℋ⟨σ⟩ᵈψ) ⟶ ℋ⟨σ⟩ᵈC[ℋ∀ x φ]) := by
+    ¬ countermodel ⊨ ((ℋ∀ x (ℋ⟨σ⟩ᵈ ψ)) ⟶ ℋ⟨σ⟩ᵈ C[ℋ∀ x φ]) := by
     exists (ℋ@ j (.svar x), ℋ@ k (.svar x))
     exists ℋ@ j (.svar x)
     exists FormL.Context.head
@@ -151,9 +153,9 @@ theorem BarcanUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs 
   (2) is proved as BarcanConverseConsequentFalse.
 -/
 
-def barcan_converse_antecedent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (.svar x), ℋ@j (.svar x))
+abbrev barcan_converse_antecedent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (.svar x), ℋ@j (.svar x))
 
-def barcan_converse_consequent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (.svar x, ℋ@j (.svar x)))
+abbrev barcan_converse_consequent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (.svar x, ℋ@j (.svar x)))
 
 theorem BarcanConverseAntecedentTrue : ⟨countermodel, g, w₀⟩ ⊨ barcan_converse_antecedent := by
   rw [barcan_converse_antecedent, Sat.applDual]
@@ -197,7 +199,7 @@ theorem BarcanConverseConsequentFalse : ⟨countermodel, g, w₀⟩ ⊭ barcan_c
             exact hwit.symm
 
 theorem BarcanConverseUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs sortS) (C : φ.Context ψ) (σ : symbs.signature.Sig ([sortS, sortS]) sortS),
-    ¬ countermodel ⊨ (ℋ⟨σ⟩ᵈC[ℋ∀ x φ] ⟶ ℋ∀ x(ℋ⟨σ⟩ᵈψ)) := by
+    ¬ countermodel ⊨ (ℋ⟨σ⟩ᵈ C[ℋ∀ x φ] ⟶ ℋ∀ x (ℋ⟨σ⟩ᵈ ψ)) := by
     exists (.svar x, ℋ@j (.svar x))
     exists (.svar x)
     exists FormL.Context.head
@@ -211,3 +213,5 @@ theorem BarcanConverseUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : For
     . exact BarcanConverseConsequentFalse
 
 #print axioms BarcanConverseUnsound
+
+end B11_12

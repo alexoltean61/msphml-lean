@@ -1,6 +1,8 @@
 import Aesop
 import Hybrid.Semantics
 
+namespace B11_12
+
 -- First, define the language.
 
 -- Define sorts:
@@ -40,3 +42,5 @@ def symbs : Symbols String where
 def j : symbs.nom sortS  := ⟨"j", by simp [symbs]⟩
 def k : symbs.nom sortS  := ⟨"k", by simp [symbs]⟩
 def x : symbs.svar sortS := ⟨"x", by simp [symbs]⟩
+
+end B11_12
