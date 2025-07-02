@@ -127,8 +127,10 @@ lemma FormL.Context.if_iso_sorts {φ : Form symbs s} {ψ : Form symbs s'} {τ : 
 
 lemma FormL.Context.iso_subst {φ ψ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : ψ.Context C₁[χ]} (h : C₁.iso C₂) : ψ = χ := sorry
 
+lemma FormL.Context.iso_subst_sorts {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : ψ.Context C₁[χ]} (h : C₁.iso C₂) : s = s' := sorry
+
 def FormL.Context.subst_iso {φ ψ : Form symbs s} {χ : FormL symbs sorts} {C₁ : φ.Context χ} (C₂ : ψ.Context C₁[ψ]) (h : C₁.iso C₂) : (τ : Form symbs s) → Σ' C₃ : τ.Context C₁[τ], C₂.iso C₃ := sorry
 
-def FormL.Context.subst_not_iso {φ ψ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} (C₂ : ψ.Context C₁[χ]) (h : ¬C₁.iso C₂) : (δ : Form symbs s) → Σ' C₃ : ψ.Context C₁[δ], C₂.iso C₃ := sorry
+def FormL.Context.subst_not_iso {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} {C₁ : φ.Context τ} (C₂ : ψ.Context C₁[χ]) (h : ¬C₁.iso C₂) : (δ : Form symbs s) → Σ' C₃ : ψ.Context C₁[δ], C₂.iso C₃ := sorry
 
 def FormL.Context.subst_not_iso' {φ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} {C₁ : φ.Context τ} (C₂ : ψ.Context τ) (h : ¬C₁.iso C₂) : (δ : Form symbs s) → Σ' C₃ : ψ.Context C₁[δ], C₂.iso C₃ := sorry
