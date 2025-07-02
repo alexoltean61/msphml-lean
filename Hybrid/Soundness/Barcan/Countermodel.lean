@@ -22,9 +22,9 @@ import Hybrid.Soundness.Barcan.Language
   We take g = {x → w₀}
 
   So we intend to prove that:
-    (1) ⟨M, g, w₁⟩ ⊨ ∀ x σᵈ(@ⱼ x, @ₖ x)
+    (1) ⟨M, g, w₀⟩ ⊨ ∀ x σᵈ(@ⱼ x, @ₖ x)
   but not
-    (2) ⟨M, g, w₁⟩ ⊨ σᵈ(∀ x (@ⱼ x), @ₖ x)
+    (2) ⟨M, g, w₀⟩ ⊨ σᵈ(∀ x (@ⱼ x), @ₖ x)
 
   (1) is proved as BarcanAntecedentTrue.
   (2) is proved as BarcanConsequentFalse.
@@ -137,3 +137,77 @@ theorem BarcanUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs 
     . exact BarcanConsequentFalse
 
 #print axioms BarcanUnsound
+
+/-
+  Converse of Barcan formula doesn't hold either:
+     σᵈ (φ₁, ..., ∀ x φᵢ, ..., φₙ) ⟶ ∀ x σᵈ (φ₁, ..., φᵢ, ..., φₙ), for any 1 ≤ i ≤ n
+
+  Use the same countermodel, and show the following instances of Barcan:
+    (1) ⟨M, g, w₀⟩ ⊨ σᵈ (∀ x x, @j x)
+  but not
+    (2) ⟨M, g, w₀⟩ ⊨ ∀ x σᵈ (x, @j x)
+
+  (1) is proved as BarcanConverseAntecedentTrue.
+  (2) is proved as BarcanConverseConsequentFalse.
+-/
+
+def barcan_converse_antecedent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (.svar x), ℋ@j (.svar x))
+
+def barcan_converse_consequent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (.svar x, ℋ@j (.svar x)))
+
+theorem BarcanConverseAntecedentTrue : ⟨countermodel, g, w₀⟩ ⊨ barcan_converse_antecedent := by
+  rw [barcan_converse_antecedent, Sat.applDual]
+  intros
+  exists sortS
+  exists ℋ@j (.svar x)
+  exists .tail .refl
+
+theorem BarcanConverseConsequentFalse : ⟨countermodel, g, w₀⟩ ⊭ barcan_converse_consequent := by
+  rw [barcan_converse_consequent, Sat, not_forall]
+  let g' : Assignment countermodel := λ y =>
+    if y = x then
+      w₁
+    else g y
+  exists g'
+  rw [Classical.not_imp]
+  apply And.intro
+  . simp [Assignment.variant, g']
+    intro _ _ h1 h2
+    have h2 := h2.symm
+    contradiction
+  . intro habs
+    rw [Sat.applDual] at habs
+    specialize habs ⟨w₀, w₁⟩
+    conv at habs =>
+      lhs ; rhs
+      unfold countermodel
+      unfold frame
+    simp only [and_self, ↓reduceDIte, Set.mem_singleton_iff, Subtype.exists, true_implies] at habs
+    have ⟨_, ⟨_, ⟨_, ⟨ctx_wit, hwit⟩⟩⟩⟩ := habs
+    cases ctx_wit with
+    | head =>
+        simp only [WProd.select, g', Sat, w₀, w₁, ↓reduceIte] at hwit
+        rw [Fin.ext_iff] at hwit
+        contradiction
+    | tail ctx' =>
+        cases ctx' with
+        | refl =>
+            simp [WProd.select, Sat, Model.VNom, countermodel, g'] at hwit
+            apply distinct_worlds
+            exact hwit.symm
+
+theorem BarcanConverseUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs sortS) (C : φ.Context ψ) (σ : symbs.signature.Sig ([sortS, sortS]) sortS),
+    ¬ countermodel ⊨ (ℋ⟨σ⟩ᵈC[ℋ∀ x φ] ⟶ ℋ∀ x(ℋ⟨σ⟩ᵈψ)) := by
+    exists (.svar x, ℋ@j (.svar x))
+    exists (.svar x)
+    exists FormL.Context.head
+    exists sig
+    simp only [FormL.Context.subst, id, Model.valid, not_forall]
+    exists g
+    exists w₀
+    simp only [Sat.implies, Classical.not_imp]
+    apply And.intro
+    . exact BarcanConverseAntecedentTrue
+    . exact BarcanConverseConsequentFalse
+
+#print axioms BarcanConverseUnsound
