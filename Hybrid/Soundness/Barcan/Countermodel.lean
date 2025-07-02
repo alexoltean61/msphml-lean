@@ -16,17 +16,15 @@ import Hybrid.Soundness.Barcan.Language
     W = {w₀, w₁}                (sorts are irrelevant to this example)
     R σ = { (w₀, w₀, w₁) }
 
-    q is true at w₀, not at w₁
-    p is true at w₁, not at w₀
     nominal j is true at w₀,
     nominal k is true at w₁
 
   We take g = {x → w₀}
 
   So we intend to prove that:
-    (1) ⟨M, g, w₁⟩ ⊨ ∀ x σᵈ(@ⱼ (x ∧ p), @ₖ (x ∧ q))
+    (1) ⟨M, g, w₁⟩ ⊨ ∀ x σᵈ(@ⱼ x, @ₖ x)
   but not
-    (2) ⟨M, g, w₁⟩ ⊨ σᵈ(∀ x @ⱼ (x ∧ p), @ₖ (x ∧ q))
+    (2) ⟨M, g, w₁⟩ ⊨ σᵈ(∀ x (@ⱼ x), @ₖ x)
 
   (1) is proved as BarcanAntecedentTrue.
   (2) is proved as BarcanConsequentFalse.
@@ -60,12 +58,7 @@ def frame : Frame signature where
 
 def countermodel : Model symbs := ⟨
   frame,
-  λ prop =>
-    if prop = p then
-      { w₀ } -- p is true only at w₀
-    else if prop = q then
-      { w₁ } -- q is true only at w₁
-    else { },
+  λ _ => { }, -- Vₚ
   λ nom =>
     if nom = j then
       w₀     -- j points to w₀
@@ -80,9 +73,9 @@ def g : Assignment countermodel :=
 
 -- Annoying that you have to specify .svar and .prop everywhere,
 -- but coercions introduce weird bugs elsewhere:
-def barcan_antecedent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (ℋ@ j (.svar x ⋀ .prop p), ℋ@ k (.svar x ⋀ .prop q)))
+def barcan_antecedent : Form symbs sortS := ℋ∀ x (ℋ⟨sig⟩ᵈ (ℋ@ j (.svar x), ℋ@ k (.svar x)))
 
-def barcan_consequent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (ℋ@ j (.svar x ⋀ .prop p)), ℋ@ k (.svar x ⋀ .prop q))
+def barcan_consequent : Form symbs sortS := ℋ⟨sig⟩ᵈ (ℋ∀ x (ℋ@ j (.svar x)), ℋ@ k (.svar x))
 
 theorem BarcanAntecedentTrue  : ⟨countermodel, g, w₀⟩ ⊨ barcan_antecedent := by
   rw [barcan_antecedent, Sat]
@@ -93,14 +86,14 @@ theorem BarcanAntecedentTrue  : ⟨countermodel, g, w₀⟩ ⊨ barcan_anteceden
   subst wRws
   by_cases h : g' x = g x
   . exists sortS
-    exists ℋ@ j (.svar x ⋀ .prop p)
+    exists ℋ@ j (.svar x)
     exists .head
     simp [WProd.select, Sat, Model.VNom, countermodel, h, g]
   . exists sortS
-    exists ℋ@ k (.svar x ⋀ .prop q)
+    exists ℋ@ k (.svar x)
     exists .tail .refl
     unfold g at h
-    simp [WProd.select, Sat, not_or, not_not, two_worlds h, Model.VNom, countermodel, k, j, p, q]
+    simp [WProd.select, Sat, not_or, not_not, two_worlds h, Model.VNom, countermodel, k, j]
 
 theorem BarcanConsequentFalse : ⟨countermodel, g, w₀⟩ ⊭ barcan_consequent := by
   rw [barcan_consequent, Sat.applDual]
@@ -125,14 +118,14 @@ theorem BarcanConsequentFalse : ⟨countermodel, g, w₀⟩ ⊭ barcan_consequen
   | tail ctx' =>
       cases ctx' with
       | refl =>
-          simp [WProd.select, Sat, Model.VNom, countermodel, k, j, p, q, g] at hwit
+          simp [WProd.select, Sat, Model.VNom, countermodel, k, j, g] at hwit
           exact distinct_worlds hwit
 
 theorem BarcanUnsound : ∃ (ψ: FormL symbs ([sortS, sortS])) (φ : Form symbs sortS) (C : φ.Context ψ) (σ : symbs.signature.Sig ([sortS, sortS]) sortS),
     -- The Barcan formula is not satisfied everywhere in the countermodel:
     ¬ countermodel ⊨ (ℋ∀ x(ℋ⟨σ⟩ᵈψ) ⟶ ℋ⟨σ⟩ᵈC[ℋ∀ x φ]) := by
-    exists (ℋ@ j (.svar x ⋀ .prop p), ℋ@ k (.svar x ⋀ .prop q))
-    exists ℋ@ j (.svar x ⋀ .prop p)
+    exists (ℋ@ j (.svar x), ℋ@ k (.svar x))
+    exists ℋ@ j (.svar x)
     exists FormL.Context.head
     exists sig
     simp only [FormL.Context.subst, id, Model.valid, not_forall]

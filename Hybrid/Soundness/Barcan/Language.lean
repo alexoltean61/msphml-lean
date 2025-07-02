@@ -28,7 +28,7 @@ def sig : signature.Sig [sortS, sortS] sortS := ⟨"σ", by unfold signature ; u
 
 def symbs : Symbols String where
   signature := signature
-  prop := λ _ => { "p", "q" }
+  prop := λ _ => { "p" }
   nom  := λ _ => { "j", "k" }
   svar := λ _ => { "x" }
   propCtbl := λ _ => by aesop
@@ -37,8 +37,6 @@ def symbs : Symbols String where
 
   propNonEmpty := λ _ => ⟨"p", by aesop⟩
 
-def p : symbs.prop sortS := ⟨"p", by simp [symbs]⟩
-def q : symbs.prop sortS := ⟨"q", by simp [symbs]⟩
 def j : symbs.nom sortS  := ⟨"j", by simp [symbs]⟩
 def k : symbs.nom sortS  := ⟨"k", by simp [symbs]⟩
 def x : symbs.svar sortS := ⟨"x", by simp [symbs]⟩
