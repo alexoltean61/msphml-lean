@@ -53,7 +53,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
             (φ.occurs j = false) → Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ φ
   | paste (C : (ℋNom k).Context χ):
         k ≠ j → φ.occurs k = false → ψ.occurs k = false →
-          Proof Λ s (ℋ@j (ℋ⟨σ⟩ χ) ⋀ ℋ@k φ ⟶ ψ) → Proof Λ s (ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ)
+          Proof Λ s (ℋ@j (ℋ⟨σ⟩ χ) ⋀ (ℋ@k φ ⟶ ψ)) → Proof Λ s (ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ)
   | gen x : Proof Λ s φ → Proof Λ s (ℋ∀x φ)
 
 notation:25 "⊢" "(" Λ:25 ", " s:26")" φ:arg => Proof Λ s φ

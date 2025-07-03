@@ -34,6 +34,27 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       intro M g w
       apply (Sat.implies.mp (ih1 M g w))
       apply ih2
+  | ug ctx _ ih =>
+      intro M g w
+      rw [Sat.applDual]
+      intro ws wRws
+      rename_i φ _
+      rename_i s' _ _ _ _ _ _
+      exists s'
+      exists φ
+      exists ctx
+      specialize ih M g (ws.select ctx)
+      exact ih
+  | back j φ ψ σ ctx =>
+      intro M g w
+      rw [Sat.implies]
+      intro h
+      simp only [Sat] at h ⊢
+      have ⟨ws, ⟨h, wRws⟩⟩ := h
+      rw [Sat.context] at h
+      specialize h ctx
+      simp only [Sat] at h
+      exact h
   | k φ ψ χ σ ctx =>
       intro M g w
       simp only [Sat.implies, Sat.applDual]
@@ -91,6 +112,13 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         exists form
         exists ctx_w3
   | barcan x φ ψ σ C =>
+      admit
+  | paste ctx h1 h2 h3 _ ih =>
+      intro M g w
+      rw [Sat.implies]
+      intro h4
+      simp only [Sat] at h4
+      have ⟨ws, ⟨sat, inR⟩⟩ := h4
       admit
   | _  => sorry
 

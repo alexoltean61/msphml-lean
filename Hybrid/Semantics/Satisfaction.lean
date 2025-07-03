@@ -268,6 +268,7 @@ section Lemmas
         specialize h2 ctx
         contradiction
 
+  @[simp]
   lemma Sat.context {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {s}, ∀ {φ : Form symbs s}, ∀ ctx : (φ.Context ψ), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
     apply Iff.intro
     . intro h s φ ctx
