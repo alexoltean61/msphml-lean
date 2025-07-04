@@ -25,8 +25,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       repeat apply_assumption
   | prop3 =>
       intro M g w
-      simp only [Sat.implies]
-      rw [Sat, Sat]
+      simp only [Sat.implies, Sat.neg]
       intro
       contrapose
       assumption
@@ -53,7 +52,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       have ⟨ws, ⟨h, wRws⟩⟩ := h
       rw [Sat.context] at h
       specialize h ctx
-      simp only [Sat] at h
+      simp only [Sat.at] at h
       exact h
   | k φ ψ χ σ ctx =>
       intro M g w

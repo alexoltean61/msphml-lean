@@ -152,8 +152,41 @@ end Defs
 
 section Lemmas
 
-  lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} : C₁.iso C₂ ↔ ws.select C₁ = ws.select C₂ := by
-  admit
+  @[simp]
+  lemma Sat.prop : (⟨M, g, w⟩ ⊨ .prop p) ↔ w ∈ M.Vₚ p := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.nom : (⟨M, g, w⟩ ⊨ .nom n) ↔ w = M.VNom n := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.svar : (⟨M, g, w⟩ ⊨ .svar x) ↔ w = g x := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.appl {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} : (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ arg) ↔ ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.neg : (⟨M, g, w⟩ ⊨ ∼φ) ↔ ⟨M, g, w⟩ ⊭ φ := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.or : (⟨M, g, w⟩ ⊨ φ ⋁ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ∨ ⟨M, g, w⟩ ⊨ ψ) := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.at : (⟨M, g, w⟩ ⊨ ℋ@k φ) ↔ (⟨M, g, M.VNom k⟩ ⊨ φ) := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.forall {φ : Form symbs s} {x : symbs.svar t}: (⟨M, g, w⟩ ⊨ ℋ∀ x φ) ↔ (∀ g', g'.variant g x → ⟨M, g', w⟩ ⊨ φ) := by
+    simp only [Sat]
+
+  @[simp]
+  lemma Sat.cons {φ : Form symbs s} : (⟨M, g, ws⟩ ⊨ φ.cons ψs) ↔ ((⟨M, g, ws.1⟩ ⊨ φ) ∧ ⟨M, g, ws.2⟩ ⊨ ψs) := by
+    simp only [Sat]
 
   @[simp]
   lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
@@ -191,6 +224,9 @@ section Lemmas
       . exact h.mp
       . exact h.mpr
 
+  @[simp]
+  lemma Sat.exists {φ : Form symbs s} {x : symbs.svar t}: (⟨M, g, w⟩ ⊨ ℋ∃ x φ) ↔ (∃ g', g'.variant g x ∧ ⟨M, g', w⟩ ⊨ φ) := by
+    simp [FormL.exists]
 
   @[simp]
   lemma Sat.negAll {φ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ φ.negAll) ↔ (∀ {s' : symbs.signature.S} {ψ : Form symbs s'} (C : ψ.Context φ), ⟨M, g, ws.select C⟩ ⊭ ψ) := by
@@ -241,7 +277,7 @@ section Lemmas
       | _ =>
           simp only [FormL.negAll]
           specialize h1 .refl
-          simp [WProd.select] at h1
+          simp only [WProd.select] at h1
           exact h1
 
   @[simp]
@@ -276,18 +312,18 @@ section Lemmas
           simp only [WProd.select]
           exact h
       | head =>
-          simp only [Sat] at h
+          simp only [Sat.cons] at h
           simp only [WProd.select]
           exact h.1
       | tail _ ih =>
-          simp only [Sat] at h
+          simp only [Sat.cons] at h
           simp only [WProd.select]
           apply ih
           exact h.2
     . intro h
       induction ψ with
       | cons χ τ _ ih2 =>
-          simp only [Sat]
+          simp only [Sat.cons]
           apply And.intro
           . have hAppl := h FormL.Context.head
             simp [WProd.select] at hAppl
@@ -302,11 +338,15 @@ section Lemmas
           simp [WProd.select] at this
           exact this
 
+    lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} : C₁.iso C₂ ↔ ws.select C₁ = ws.select C₂ := by
+    admit
+
   /--
     It requires a slightly complicated machinery to give iff conditions for satisfaction of substitutions within contexts.
 
     The two lemmas below give sufficient conditions for both directions.
   -/
+
   lemma Sat.context_subst {φ χ : Form symbs s} {ψ : FormL symbs sorts} {ctx : φ.Context ψ} :
     (⟨M, g, ws⟩ ⊨ ψ) → (⟨M, g, ws.select ctx⟩ ⊨ χ) → ⟨M, g, ws⟩ ⊨ ctx[χ] := by
     admit
@@ -391,7 +431,7 @@ section Lemmas
         simp only [FiniteChoice.conjunction] at h
         intro M g w
         have := h M g w
-        simp only [Sat.implies, Sat] at this
+        simp only [Sat.implies, Sat.or, Sat.neg] at this
         apply this
         apply Classical.em
     | cons ψ ch ih =>

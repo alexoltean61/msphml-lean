@@ -35,6 +35,7 @@ def FormL.applDual {symbs : Symbols α}
 def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
 def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
 def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
+def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := ((φ.neg).bind x).neg
 
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
@@ -49,7 +50,7 @@ notation:65 "ℋ⟨" σ:lead "⟩ᵈ" φ:arg => FormL.applDual σ φ
 
 notation:63 "ℋ@ " j:arg φ:arg => FormL.at j φ
 notation:63 "ℋ∀ " x:arg φ:arg => FormL.bind x φ
-notation:62 "ℋ∃ " x:arg φ:arg => FormL.neg (FormL.bind x (FormL.neg φ))
+notation:62 "ℋ∃ " x:arg φ:arg => FormL.exists x φ
 
 prefix:60 "∼ "  => FormL.neg
 
