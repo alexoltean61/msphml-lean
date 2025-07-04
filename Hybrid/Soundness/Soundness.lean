@@ -110,7 +110,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         exists τ₁
         exists form
         exists ctx_w3
-  | barcan x φ ψ σ C =>
+  | barcan x φ σ C h =>
       admit
   | paste ctx h1 h2 h3 _ ih =>
       intro M g w

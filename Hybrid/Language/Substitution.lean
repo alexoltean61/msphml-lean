@@ -1,4 +1,5 @@
 import Hybrid.Language.Form
+import Hybrid.Language.Context
 
 variable {α : Type u}
 variable [DecidableEq α]
@@ -47,6 +48,7 @@ def varOccurs {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.s
 
 
 -- x occurs in φ, and x is free in φ
+@[simp]
 def varOccursFree {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} (x : symbs.svar s): FormL symbs sorts → Bool
   | @FormL.bind _ _ s' _ y φ =>
       if h : s = s' then
@@ -54,12 +56,16 @@ def varOccursFree {symbs : Symbols α} {s : symbs.signature.S} {sorts : List sym
           false
         else varOccursFree x φ
       else varOccursFree x φ
-  | (φ, ψ)   => varOccursFree x φ && varOccursFree x ψ
+  | (φ, ψ)   => varOccursFree x φ || varOccursFree x ψ
   | ℋ⟨_⟩ φ    => varOccursFree x φ
-  | φ ⋁ ψ    => varOccursFree x φ && varOccursFree x ψ
+  | φ ⋁ ψ    => varOccursFree x φ || varOccursFree x ψ
   | ∼ φ      => varOccursFree x φ
   | ℋ@ _ φ  => varOccursFree x φ
   | φ        => varOccurs x φ
+
+abbrev Context.all_else_not_free {symbs : Symbols α} {s s' : symbs.signature.S} {sorts : List symbs.signature.S} {φ : Form symbs s} {ψ : FormL symbs sorts} (x : symbs.svar s') (C : φ.Context ψ) : Bool :=
+  C.all_else_bool (λ φ => !φ.varOccursFree x)
+
 
 -- x occurs in φ, and x is bound in φ
 def varOccursBound {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} (x : symbs.svar s): FormL symbs sorts → Bool

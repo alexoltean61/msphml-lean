@@ -37,9 +37,10 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
       φ.varSubstableFor y x → Proof Λ s ((ℋ∀x φ) ⟶ φ[y // x])
   | name x : Proof Λ s (ℋ∃x (ℋVar x))
   -- 3. Barcan axioms
-  | barcan x (φ ψ : Form symbs s)
+  | barcan x (φ : Form symbs s)
       (σ : symbs.signature.Sig _ s)
-      (C : φ.Context ψ):
+      (C : φ.Context ψ)
+      (h : C.all_else_not_free x):
             Proof Λ s (ℋ∀x (ℋ⟨σ⟩ᵈ ψ) ⟶ (ℋ⟨σ⟩ᵈ C[ℋ∀x φ]))
   | barcanAt x j φ:
             Proof Λ s (ℋ∀x (ℋ@j φ) ⟶ ℋ@j (ℋ∀x φ))

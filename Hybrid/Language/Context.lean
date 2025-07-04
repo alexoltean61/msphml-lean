@@ -92,6 +92,24 @@ def subst_not_iso {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs 
 
 def subst_not_iso' {φ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} {C₁ : φ.Context τ} (C₂ : ψ.Context τ) (h : ¬C₁.iso C₂) : (δ : Form symbs s) → Σ' C₃ : ψ.Context C₁[δ], C₂.iso C₃ := sorry
 
+/--
+  Will be true if P is true for all other formulas in a FormL, with the exception of the one highlighted by the context.
+-/
+@[simp]
+def all_else_bool {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {φ : Form symbs s} {ψ : FormL symbs sorts} (P : {sorts : List symbs.signature.S} → FormL symbs sorts → Bool) : φ.Context ψ → Bool
+  | .refl => true
+  | @FormL.Context.head _ _ _ _ _ _ rest => P rest
+  | @FormL.Context.tail _ _ _ _ _ _ rest₁ _ rest₂ _ => P rest₁ && P rest₂
+
+/--
+  Will be true if P is true for all other formulas in a FormL, with the exception of the one highlighted by the context.
+-/
+@[simp]
+def all_else_prop {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {φ : Form symbs s} {ψ : FormL symbs sorts} (P : {sorts : List symbs.signature.S} → FormL symbs sorts → Prop) : φ.Context ψ → Prop
+  | .refl => True
+  | @FormL.Context.head _ _ _ _ _ _ rest => P rest
+  | @FormL.Context.tail _ _ _ _ _ _ rest₁ _ rest₂ _ => P rest₁ ∧ P rest₂
+
 end Context
 
 def subst_to_ctx (χ : Form sig s)
