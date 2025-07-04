@@ -15,55 +15,13 @@ inductive FormL.Context {symbs : Symbols α} {s : symbs.signature.S} (φ : Form 
   Given a `Context φ ψ`, returns the `FormL` obtained by substituting `φ` in `ψ` by a plug.
 -/
 def FormL.Context.subst {φ : Form sig s}
-          {ψ : FormL sig sorts}
-          (ctx : Context φ ψ) :
-    Form sig s → FormL sig sorts :=
-
-  match ψ with
-  | .prop _ =>
-      match φ with
-      | .prop _ =>
-        match ctx with
-          | .refl => id
-  | .nom  n   =>
-      match φ with
-      | .nom _ =>
-        match ctx with
-          | .refl => id
-  | .svar x   =>
-      match φ with
-      | .svar _ =>
-        match ctx with
-          | .refl => id
-  | .appl _ _ =>
-      match φ with
-        | .appl _ _ =>
-          match ctx with
-          | .refl => id
-  | .or _ _ =>
-      match φ with
-      | .or _ _ =>
-        match ctx with
-          | .refl => id
-  | .neg _ =>
-      match φ with
-      | .neg _ =>
-        match ctx with
-          | .refl => id
-  | .at _ _   =>
-      match φ with
-      | .at _ _ =>
-        match ctx with
-          | .refl => id
-  | .bind _ _ =>
-      match φ with
-      | .bind _ _ =>
-        match ctx with
-          | .refl => id
-  | .cons h t =>
-      match ctx with
-      | .head => λ plug => .cons plug t
-      | .tail inner_ctx => λ plug => .cons h (subst inner_ctx plug)
+          {ψ : FormL sig sorts} :
+    Context φ ψ → Form sig s → FormL sig sorts
+  | .refl => id
+  | @Context.head _ _ _ _ _ _ t =>
+        λ plug => plug.cons t
+  | @Context.tail _ _ _ _ _ _ _  _ h inner_ctx =>
+        λ plug => h.cons (inner_ctx.subst plug)
 
 notation:max C:49 "[" φ:50 "]" => FormL.Context.subst C φ
 
