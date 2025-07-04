@@ -57,7 +57,6 @@ notation:50 "⟨" M "," g "," w "⟩" "⊨" φ => Sat M g w φ
 notation:50 "⟨" M "," g "," w "⟩" "⊭" φ => ¬ Sat M g w φ
 
 variable {α : Type u}
-variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 
@@ -159,13 +158,13 @@ section Lemmas
   @[simp]
   lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
     apply Iff.intro
-    . simp only [Sat]
+    . simp only [FormL.implies, Sat]
       intro h _
       apply Or.elim h
       . intro
         contradiction
       . simp only [imp_self]
-    . simp only [Sat]
+    . simp only [FormL.implies, Sat]
       intro h
       apply not_or_of_imp
       assumption
@@ -174,7 +173,7 @@ section Lemmas
   lemma Sat.and : (⟨M, g, w⟩ ⊨ φ ⋀ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) ∧ ⟨M, g, w⟩ ⊨ ψ := by
     apply Iff.intro
     repeat {
-      simp only [Sat]
+      simp only [FormL.and, Sat]
       rw [not_or, not_not, not_not]
       simp only [imp_self]
     }
@@ -182,11 +181,11 @@ section Lemmas
   @[simp]
   lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔ ⟨M, g, w⟩ ⊨ ψ) := by
     apply Iff.intro
-    . simp only [Sat, not_or, not_not, not_and, and_imp]
+    . simp only [FormL.iff, FormL.and, FormL.implies, Sat, not_or, not_not, not_and, and_imp]
       intros
       apply Iff.intro
       repeat assumption
-    . simp only [Sat, not_or, not_not, not_and, and_imp]
+    . simp only [FormL.iff, FormL.and, FormL.implies, Sat, not_or, not_not, not_and]
       intro h
       apply And.intro
       . exact h.mp
@@ -250,7 +249,7 @@ section Lemmas
     (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔
       (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) →
         ∃ (s' : symbs.signature.S) (φ : Form symbs s') (ctx : φ.Context args), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
-    simp only [Sat, not_exists, not_and, WProd]
+    simp only [FormL.applDual, Sat, not_exists, not_and, WProd]
     apply Iff.intro
     . intro h1 w h2
       specialize h1 w
@@ -392,8 +391,9 @@ section Lemmas
         simp only [FiniteChoice.conjunction] at h
         intro M g w
         have := h M g w
-        simp only [Sat, not_or, not_not, not_and_self, false_or] at this
-        exact this
+        simp only [Sat.implies, Sat] at this
+        apply this
+        apply Classical.em
     | cons ψ ch ih =>
         have : Γ = Γ ∪ {ψ.1} := by simp only [Set.union_singleton, Subtype.coe_prop,
           Set.insert_eq_of_mem]
