@@ -36,6 +36,9 @@ def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
 def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
 def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
 def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := ((φ.neg).bind x).neg
+abbrev FormL.default : Form symbs s := FormL.prop ((symbs.propNonEmpty s).default)
+def FormL.top : Form symbs s := FormL.default.or FormL.default.neg
+def FormL.bot : Form symbs s := FormL.default.and FormL.default.neg
 
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
@@ -45,6 +48,8 @@ syntax (priority := high) "(" term,+ ")" : term
 macro_rules
   | `(($x)) => `($x)
   | `(($x, $xs:term,*)) => `(FormL.cons $x ($xs,*))
+notation:75 "ℋ⊤" => FormL.top
+notation:75 "ℋ⊥" => FormL.bot
 notation:65 "ℋ⟨" σ:lead "⟩" φ:arg => FormL.appl σ φ
 notation:65 "ℋ⟨" σ:lead "⟩ᵈ" φ:arg => FormL.applDual σ φ
 
@@ -93,9 +98,7 @@ def FormHAt (symbs: Symbols α) s := {φ : Form symbs s // HAt φ}
 
 @[reducible] def FiniteChoice (Γ : PremiseSet symbs s): Type u := List Γ
 @[reducible] def FiniteChoice.conjunction {Γ: PremiseSet symbs s}: FiniteChoice Γ → Form symbs s
-  | []      =>
-      let p := FormL.prop ((symbs.propNonEmpty s).default)
-      p ⋁ ∼p
+  | []      => ℋ⊤
   | [φ]     => φ
   | φ :: ψs =>
       let ψs_as_premiseSet : FiniteChoice Γ := ψs -- annoying

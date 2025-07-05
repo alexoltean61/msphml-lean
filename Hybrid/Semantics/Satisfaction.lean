@@ -303,6 +303,15 @@ section Lemmas
         specialize h2 ctx
         contradiction
 
+  @[simp]
+  lemma Sat.top : ⟨M, g, w⟩ ⊨ ℋ⊤ := by
+    simp [FormL.top]
+    apply Classical.em
+
+  @[simp]
+  lemma Sat.bot : ⟨M, g, w⟩ ⊭ ℋ⊥ := by
+    simp [FormL.bot]
+
   lemma Sat.context {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {s}, ∀ {φ : Form symbs s}, ∀ ctx : (φ.Context ψ), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by
     apply Iff.intro
     . intro h s φ ctx
@@ -454,5 +463,9 @@ section Lemmas
           rw [Sat.and]
           apply And.intro
           repeat assumption
+
+  lemma Assignment.variant_refl {g : Assignment M} : g.variant g x := by
+    unfold Assignment.variant
+    aesop
 
 end Lemmas
