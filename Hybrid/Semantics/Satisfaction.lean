@@ -346,22 +346,18 @@ section Lemmas
           simp [WProd.select] at this
           exact this
 
-    lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} : C₁.iso C₂ ↔ ws.select C₁ = ws.select C₂ := by
-    admit
-
-  /--
-    It requires a slightly complicated machinery to give iff conditions for satisfaction of substitutions within contexts.
-
-    The two lemmas below give sufficient conditions for both directions.
-  -/
-
-  lemma Sat.context_subst {φ χ : Form symbs s} {ψ : FormL symbs sorts} {ctx : φ.Context ψ} :
-    (⟨M, g, ws⟩ ⊨ ψ) → (⟨M, g, ws.select ctx⟩ ⊨ χ) → ⟨M, g, ws⟩ ⊨ ctx[χ] := by
-    admit
-
-  lemma Sat.context_subst' {φ χ : Form symbs s} {ψ : FormL symbs sorts} {ctx : φ.Context ψ} :
-    (⟨M, g, ws⟩ ⊨ ctx[χ]) → ⟨M, g, ws.select ctx⟩ ⊨ χ := by
-    admit
+  lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} (h : C₁.iso C₂) : ws.select C₁ = ws.select C₂ := by
+    induction C₁
+    . cases C₂
+      . simp only [WProd.select]
+    . cases C₂
+      . simp only [WProd.select]
+      . simp only [FormL.Context.iso] at h
+    . cases C₂
+      . simp only [FormL.Context.iso] at h
+      . simp only [FormL.Context.iso, WProd.select] at h ⊢
+        apply_assumption
+        assumption
 
   lemma Models.all_maximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
     simp only [All, Set.setOf_true, Set.subset_univ, implies_true]

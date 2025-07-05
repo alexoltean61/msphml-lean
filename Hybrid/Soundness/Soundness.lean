@@ -90,22 +90,22 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
           subst this
           have := (ctx.iso_subst h_iso').symm
           subst this
-          simp only [WProd.select_iso.mp (FormL.Context.iso_trans h_iso h_iso'), Sat.implies] at hw1
+          simp only [WProd.select_iso (FormL.Context.iso_trans' h_iso h_iso'), Sat.implies] at hw1
           specialize hw1 hw2
           have ⟨ctx_w3, iso⟩ := FormL.Context.subst_iso ctx_w2 h_iso' ψ
-          simp only [WProd.select_iso.mp iso] at hw1
+          simp only [WProd.select_iso iso] at hw1
           rename_i s' _ _ _
           exists s'
           exists ψ
           exists ctx_w3
-        . have ⟨ctx_w3, iso⟩ := FormL.Context.subst_not_iso ctx_w2 h_iso' ψ
-          simp only [WProd.select_iso.mp iso] at hw2
+        . have ⟨ctx_w3, iso⟩ := FormL.Context.subst_not_iso' ctx_w2 h_iso' ψ
+          simp only [WProd.select_iso iso] at hw2
           rename_i form _
           exists τ₂
           exists form
           exists ctx_w3
-      . have ⟨ctx_w3, iso⟩ := ctx.subst_not_iso' ctx_w1 h_iso ψ
-        simp only [WProd.select_iso.mp iso] at hw1
+      . have ⟨ctx_w3, iso⟩ := ctx.subst_not_iso ctx_w1 h_iso ψ
+        simp only [WProd.select_iso iso] at hw1
         rename_i form _ _
         exists τ₁
         exists form
