@@ -1,5 +1,8 @@
 import Hybrid.Proof
 import Hybrid.Semantics
+import Hybrid.Soundness.Lemmas
+
+namespace Soundness
 
 variable {α : Type u}
 variable [DecidableEq α]
@@ -111,7 +114,57 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         exists form
         exists ctx_w3
   | barcan x φ σ C h =>
-      admit
+      intro M g w
+      simp only [Sat.implies]
+      intro h2
+      simp only [Sat.forall, Sat.applDual] at h2 ⊢
+      rw [forall₂_swap] at h2
+      intro ws wRws
+      specialize h2 ws wRws
+      rename_i s' _ _ _
+      apply Or.elim ((BarcanLemma g h) h2)
+      . clear h2
+        intro h2
+        exists s'
+        exists ℋ∀ x φ
+        exists (ℋ∀ x φ).subst_to_ctx C
+        simp only [Sat.forall]
+        intro g' is_variant
+        specialize h2 g' is_variant
+        rw [WProd.select_iso]
+        . exact h2
+        . apply (ℋ∀ x φ).subst_to_ctx_iso
+      . clear h2
+        intro ⟨sort, ⟨arg, ⟨C', h_sat⟩⟩⟩
+        -- C' points to a single argument in the list:
+        --  φ₁, ..., ℋ⊥, ..., φₙ
+        --
+        -- h_sat ensures that the argument picked out by C' is satisfied
+        -- in its respective world.
+        --
+        -- We want to show that there is a formula in the list:
+        --  φ, ..., ℋ∀ x φ, ..., φₙ
+        -- that is satisfied in its respective world.
+        exists sort
+        exists arg
+        by_cases C_iso_C' : C.iso C'
+        . -- In this case, the argument selected by C' is ℋ⊥,
+          -- whose satisfaction by h_sat leads to a contradiction
+          have := C.iso_subst_sorts C_iso_C'
+          subst this
+          have := C.iso_subst C_iso_C'
+          subst this
+          simp only [Sat.bot] at h_sat
+        . -- In this case, C' selects some argument other than ℋ⊥.
+          -- Since this necessarily is also an argument ocurring in:
+          --   φ, ..., ℋ∀ x φ, ..., φₙ,
+          -- then by h_sat, we have our desired conclusion.
+          have ⟨C'', C'_iso_C''⟩ := C.subst_not_iso' C' C_iso_C' (ℋ∀ x φ)
+          exists C''
+          rw [WProd.select_iso]
+          . exact h_sat
+          . symm
+            exact C'_iso_C''
   | paste ctx h1 h2 h3 _ ih =>
       intro M g w
       rw [Sat.implies]
@@ -135,3 +188,5 @@ theorem FrameSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) φ
   apply Entails.if_model_frame
   apply ModelSoundness
   exact pf
+
+end Soundness
