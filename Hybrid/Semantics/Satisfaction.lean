@@ -27,9 +27,11 @@ def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sort
   | .tail C' => ws.2.select C'
 
 structure Frame (signature : Signature α) where
-  W  : signature.S → Type -- should you add non-empty contraint?
+  W  : signature.S → Type
   R  : signature.Sig dom range → Set (WProd W (range :: dom))
   Nm : {s : signature.S} → signature.N s → W s
+
+  WNonEmpty : ∀ s, Inhabited (W s)
 
 structure Model (symbs : Symbols α) where
   Fr  : Frame symbs.signature

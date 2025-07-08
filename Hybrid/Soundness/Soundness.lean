@@ -187,6 +187,13 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       simp only [Sat.implies, Sat.and, Sat.at, Sat.svar, Sat.nom, and_imp]
       intro h1 h2
       rw [h1, h2]
+  | broadcastS _ _ h =>
+      rename_i s₁ _ _ _ _ _
+      intro M g w
+      simp only [Sat.at]
+      specialize h M g ((M.1).Fr.WNonEmpty s₁).default
+      simp only [Sat.at] at h
+      exact h
   | paste C _ h =>
       intro M g w
       specialize h M g w
