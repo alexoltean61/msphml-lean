@@ -71,6 +71,24 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       specialize h ctx
       simp only [Sat.at] at h
       exact h
+  | name x =>
+      rename_i s
+      intro M g w
+      simp only [WProd] at w
+      simp only [Sat.exists, Sat.svar]
+      let g' : Assignment M :=
+            λ {t : symbs.signature.S} (y : symbs.svar t) =>
+              if h : s = t then
+                if h ▸ x = y then
+                  h ▸ w
+                else g y
+              else g y
+      exists g'
+      apply And.intro
+      . unfold g'
+        unfold Assignment.variant
+        aesop
+      . simp only [↓reduceDIte, ↓reduceIte, g']
   | k φ ψ χ σ ctx =>
       intro M g w
       simp only [Sat.implies, Sat.applDual]
@@ -194,6 +212,12 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       specialize h M g ((M.1).Fr.WNonEmpty s₁).default
       simp only [Sat.at] at h
       exact h
+  | genAt _ _ _ h =>
+      rename_i j _
+      intro M g w
+      simp only [Sat.at]
+      specialize h M g ((M.1).VNom j)
+      exact h
   | paste C _ h =>
       intro M g w
       specialize h M g w
@@ -229,6 +253,12 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
           rw [WProd.select_iso C''_iso_C']
           exact sat_χ C''
       . exact jRws
+  | gen _ _ h =>
+      intro M g w
+      simp only [Sat.forall]
+      intro g' _
+      specialize h M g' w
+      exact h
   | _  => sorry
 
 -- Strong model soundness
