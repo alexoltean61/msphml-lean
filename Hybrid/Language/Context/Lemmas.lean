@@ -208,6 +208,35 @@ def subst_not_iso' {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs
       case snd =>
         exact iso
 
+def subst_not_iso'' {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : ψ.Context C₁[χ]} (h : ¬C₁.iso C₂) : Σ' C₃ : ψ.Context τ, C₂.iso C₃ := by
+  cases C₁
+  . cases C₂
+    . simp only [iso, not_true_eq_false] at h
+  . cases C₂
+    . simp only [iso, not_true_eq_false] at h
+    case tail C' =>
+      apply PSigma.mk
+      case fst =>
+        exact tail C'
+      case snd =>
+        simp only [iso, iso_refl]
+  case tail C' =>
+    cases C₂
+    . simp only [subst]
+      apply PSigma.mk
+      case fst =>
+        exact head
+      case snd =>
+        simp only [iso]
+    case tail C'' =>
+      simp only [iso] at h
+      have ⟨C''', iso⟩ := subst_not_iso'' h
+      apply PSigma.mk
+      case fst =>
+        exact tail C'''
+      case snd =>
+        exact iso
+
 end Context
 
 lemma subst_to_ctx_iso {χ : Form sig s}

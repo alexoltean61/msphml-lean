@@ -165,13 +165,41 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
           . exact h_sat
           . symm
             exact C'_iso_C''
-  | paste ctx h1 h2 h3 _ ih =>
+  | paste C _ h =>
       intro M g w
-      rw [Sat.implies]
-      intro h4
-      simp only [Sat] at h4
-      have ⟨ws, ⟨sat, inR⟩⟩ := h4
-      admit
+      specialize h M g w
+      simp only [Sat.and, Sat.at, Sat.implies] at h
+      have ⟨k_φ, imp⟩ := h
+      clear h
+
+      simp only [Sat.implies, Sat.at, Sat.appl]
+      intro ⟨ws, ⟨sat_χ, jRws⟩⟩
+
+      apply imp
+      simp only [Sat.appl]
+      exists ws
+
+      apply And.intro
+      . rw [Sat.context] at sat_χ ⊢
+        intro s' τ C'
+        by_cases is_iso : C.iso C'
+        . have := C.iso_subst_sorts is_iso
+          symm at this
+          subst this
+          have := C.iso_subst is_iso
+          symm at this
+          subst this
+          symm at is_iso
+          rw [WProd.select_iso is_iso]
+
+          specialize sat_χ C
+          simp only [Sat.nom] at sat_χ
+          rw [sat_χ]
+          exact k_φ
+        . have ⟨C'', C''_iso_C'⟩ := C.subst_not_iso'' is_iso
+          rw [WProd.select_iso C''_iso_C']
+          exact sat_χ C''
+      . exact jRws
   | _  => sorry
 
 -- Strong model soundness
