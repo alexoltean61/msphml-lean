@@ -71,6 +71,9 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       specialize h ctx
       simp only [Sat.at] at h
       exact h
+  | ref =>
+      intro M g w
+      simp only [Sat.at, Sat.nom]
   | name x =>
       rename_i s
       intro M g w

@@ -29,6 +29,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
          (σ : symbs.signature.Sig _ s)
          (C : (@FormL.at α symbs t sᵢ j ψ).Context φ):
       Proof Λ s (ℋ⟨σ⟩ φ ⟶ ℋ@j ψ)
+  | ref j s₂ : Proof Λ s₂ (ℋ@j (ℋNom j))
   -- 2. Axioms about svars and binders
   | q1 x φ ψ
         (_: φ.varOccursFree x = false):
