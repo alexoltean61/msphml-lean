@@ -47,6 +47,20 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       exists ctx
       specialize ih M g (ws.select ctx)
       exact ih
+  | kAt =>
+      intro M g w
+      simp only [Sat.implies, Sat.at, imp_self]
+  | agree =>
+      intro M g w
+      simp only [Sat.iff, Sat.at]
+  | selfDual =>
+      intro M g w
+      simp only [Sat.iff, Sat.at, Sat.neg, not_not]
+  | intro =>
+      intro M g w
+      simp only [Sat.implies, Sat.nom, Sat.iff, Sat.at]
+      intro h
+      rw [h]
   | back j φ ψ σ ctx =>
       intro M g w
       rw [Sat.implies]
@@ -165,6 +179,14 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
           . exact h_sat
           . symm
             exact C'_iso_C''
+  | barcanAt =>
+      intro M g w
+      simp only [Sat.implies, Sat.forall, Sat.at, imp_self]
+  | nom =>
+      intro M g w
+      simp only [Sat.implies, Sat.and, Sat.at, Sat.svar, Sat.nom, and_imp]
+      intro h1 h2
+      rw [h1, h2]
   | paste C _ h =>
       intro M g w
       specialize h M g w
