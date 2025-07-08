@@ -34,8 +34,8 @@ structure Symbols (α : Type u) where
 
 -- Often when dealing with syntax, we treat constant nominals and regular nominals uniformly.
 -- It helps to have their disjoint union defined as a standalone type.
-variable (symbs : Symbols α)
-variable (s : symbs.signature.S)
+variable {symbs : Symbols α}
+variable {s : symbs.signature.S}
 def Symbols.nominal := λ s => symbs.signature.N s ⊕ symbs.nom s
 
 instance : Coe (symbs.signature.N s) (symbs.nominal s) where
