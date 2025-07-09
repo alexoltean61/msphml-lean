@@ -46,8 +46,8 @@ instance : Coe (symbs.nom s) (symbs.nominal s) where
 -- The `prop` and `svar` fields of the `Symbols` structure are defined as Sets.
 -- Usually Lean is able to coerce a Set to a Type, but not always.
 -- For such cases, we define the explicit (many-sorted families of) types below.
-def Symbols.propType (symbs : Symbols α) := λ s => Set.Elem (symbs.prop s)
-def Symbols.svarType (symbs : Symbols α) := λ s => Set.Elem (symbs.svar s)
+abbrev Symbols.propType (symbs : Symbols α) := λ s => Set.Elem (symbs.prop s)
+abbrev Symbols.svarType (symbs : Symbols α) := λ s => Set.Elem (symbs.svar s)
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.signature.N s) := λ i j =>
   if h : (i.1 = j.1) then

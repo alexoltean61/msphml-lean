@@ -262,6 +262,35 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       intro g' _
       specialize h M g' w
       exact h
+  | q1 _ _ _ h =>
+      intro M g w
+      simp only [Sat.implies, Sat.forall]
+      intro h' g_sat g' is_variant
+      apply h' g' is_variant
+      rw [Agreement]
+      . exact g_sat
+      . exact BarcanL2 h is_variant
+  | q2 x y φ is_substable =>
+      intro M g w
+      simp only [Sat.implies]
+      intro h
+      rename_i s _
+      let g' : Assignment M :=
+            λ {t : symbs.signature.S} (z : symbs.svar t) =>
+              if h : t = s then
+                if h ▸ z = x then
+                  h ▸ g y
+                else g z
+              else g z
+      have g'_variant : g'.variant g x := by
+        unfold g'
+        unfold Assignment.variant
+        aesop
+      have g'_value : g' x = g y := by
+        unfold g'
+        simp only [↓reduceDIte, ↓reduceIte]
+      rw [Substitution is_substable g'_variant g'_value]
+      exact h g' g'_variant
   | _  => sorry
 
 -- Strong model soundness

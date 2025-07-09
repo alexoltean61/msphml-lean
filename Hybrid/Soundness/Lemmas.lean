@@ -196,6 +196,22 @@ section AgreementLemma
 
 end AgreementLemma
 
+section SubstitutionLemma
+
+  lemma Substitution {M : Model symbs} {g g' : Assignment M} {φ : FormL symbs sorts} {ws : WProd M.Fr.W sorts} {x y : symbs.svarType t} (h1 : φ.varSubstableFor y x) (h2 : g'.variant g x) (h3 : g' x = g y) :
+    (⟨M, g, ws⟩ ⊨ φ[y // x]) ↔ ⟨M, g', ws⟩ ⊨ φ := by
+    induction φ with
+    | prop => admit
+    | nom => admit
+    | svar x => admit
+    | appl _ _ ih => admit
+    | or φ ψ ih1 ih2 => admit
+    | neg φ ih => admit
+    | bind x φ ih => admit
+    | cons φ ψs ih1 ih2 => admit
+    | «at» k _ ih => admit
+
+end SubstitutionLemma
 section BarcanLemma
 
   lemma BarcanL1 {ψ : FormL symbs sorts} {φ : Form symbs s} {x : symbs.svar s'} (C : φ.Context ψ) (h : ψ.varOccursFree x = false) : φ.varOccursFree x = false := by
