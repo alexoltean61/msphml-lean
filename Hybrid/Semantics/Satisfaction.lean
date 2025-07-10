@@ -51,6 +51,9 @@ def Assignment.variant {M : Model symbs} (g' g : Assignment M) (x : symbs.svar s
 def Assignment.free_agree {M : Model symbs} (g g' : Assignment M) (φ : FormL symbs sorts): Prop :=
   ∀ {s : symbs.signature.S} (x : symbs.svar s), φ.varOccursFree x → g x = g' x
 
+def Assignment.equal {M : Model symbs} (g g' : Assignment M): Prop :=
+  ∀ {s : symbs.signature.S} (x : symbs.svar s), g x = g' x
+
 def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : FormL symbs sorts → Prop
 | .prop p        => w ∈ M.Vₚ p
 | .nom n         => w = M.VNom n
@@ -468,30 +471,5 @@ section Lemmas
           rw [Sat.and]
           apply And.intro
           repeat assumption
-
-  lemma Assignment.variant_refl {g : Assignment M} : g.variant g x := by
-    unfold Assignment.variant
-    aesop
-
-  @[symm]
-  lemma Assignment.variant_symm {g g' : Assignment M} : g.variant g' x → g'.variant g x := by
-    unfold Assignment.variant
-    aesop
-
-  section free_agree
-    variable {α : Type u}
-    variable [DecidableEq α]
-    variable {symbs : Symbols α}
-    variable {s : symbs.signature.S}
-
-    @[symm]
-    def Assignment.free_agree_symm {M : Model symbs} {g g' : Assignment M} {φ : FormL symbs sorts} : g.free_agree g' φ → g'.free_agree g φ := by
-      unfold Assignment.free_agree
-      intro h1 s x h2
-      symm
-      apply h1
-      repeat apply_assumption
-
-  end free_agree
 
 end Lemmas

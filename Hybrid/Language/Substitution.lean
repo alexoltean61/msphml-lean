@@ -114,7 +114,7 @@ def varSubst {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.si
         --  y in (∀ z. φ)[x / y]
         -- Safety is guaranteed only if a proof of (y is free for x in φ) is also given in the context.
         else ℋ∀z (varSubst x y φ)
-      else ℋ∀z φ
+      else ℋ∀z (varSubst x y φ)
   | (φ, ψ)   => (varSubst x y φ, varSubst x y ψ)
   | ℋ⟨σ⟩ φ    => ℋ⟨σ⟩ (varSubst x y φ)
   | φ ⋁ ψ    => (varSubst x y φ) ⋁ (varSubst x y ψ)
@@ -133,12 +133,8 @@ def nomSubst {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.si
       if h : s = s' then
         if (y = h ▸ z) then
           ℋ∀z φ
-        -- This function is NOT capture aware!
-        --  If z = x and y is free in φ, this function will capture
-        --  y in (∀ z. φ)[x / y]
-        -- Safety is guaranteed only if a proof of (y is free for x in φ) is also given in the context.
         else ℋ∀z (nomSubst i y φ)
-      else ℋ∀z φ
+      else ℋ∀z (nomSubst i y φ)
   | (φ, ψ)   => (nomSubst i y φ, nomSubst i y ψ)
   | ℋ⟨σ⟩ φ    => ℋ⟨σ⟩ (nomSubst i y φ)
   | φ ⋁ ψ    => (nomSubst i y φ) ⋁ (nomSubst i y ψ)
@@ -159,5 +155,132 @@ notation:max φ:lead "[" x:arg "//" y:arg "]" => Term.subst x y φ
 
 -- Checks if a term occurs in a formula
 abbrev occurs {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {β : symbs.signature.S → Type v} [Term symbs β] (x : β s) (φ: FormL symbs sorts) := Term.occurs x φ
+
+section CongrLemmas
+
+variable {symbs : Symbols α}
+variable {s t u : symbs.signature.S}
+variable {sorts : List symbs.signature.S}
+variable {x y : symbs.svarType s}
+variable {i j : symbs.nominal s}
+variable {σ : symbs.signature.Sig (t :: sorts) u}
+
+@[simp]
+lemma subst_var_appl : (ℋ⟨σ⟩ φ)[y // x] = ℋ⟨σ⟩ (φ[y // x]) := by
+  simp only [Term.subst, varSubst]
+
+@[simp]
+lemma subst_nom_appl : (ℋ⟨σ⟩ φ)[i // x] = ℋ⟨σ⟩ (φ[i // x]) := by
+  simp only [Term.subst, nomSubst]
+
+@[simp]
+lemma subst_var_or : (φ ⋁ ψ)[y // x] = φ[y // x] ⋁ ψ[y // x] := by
+  simp only [Term.subst, varSubst]
+
+@[simp]
+lemma subst_nom_or : (φ ⋁ ψ)[i // x] = φ[i // x] ⋁ ψ[i // x] := by
+  simp only [Term.subst, nomSubst]
+
+@[simp]
+lemma subst_var_neg : (∼φ)[y // x] = ∼(φ[y // x]) := by
+  simp only [Term.subst, varSubst]
+
+@[simp]
+lemma subst_nom_neg : (∼φ)[i // x] = ∼(φ[i // x]) := by
+  simp only [Term.subst, nomSubst]
+
+@[simp]
+lemma subst_var_at {φ : Form symbs t} {k : symbs.nominal t} : (@FormL.at α symbs t u k φ)[y // x] = (ℋ@ k (φ[y // x])) := by
+  simp only [Term.subst, varSubst]
+
+@[simp]
+lemma subst_nom_at {φ : Form symbs t} {k : symbs.nominal t} : (@FormL.at α symbs t u k φ)[j // x] = (ℋ@ k (φ[j // x])) := by
+  simp only [Term.subst, nomSubst]
+
+@[simp]
+lemma subst_var_cons {φ : Form symbs t} : (φ, ψ)[y // x] = (φ[y // x], ψ[y // x]) := by
+  simp only [Term.subst, varSubst]
+
+@[simp]
+lemma subst_nom_cons {φ : Form symbs t} : (φ, ψ)[i // x] = (φ[i // x], ψ[i // x]) := by
+  simp only [Term.subst, nomSubst]
+
+@[simp]
+lemma subst_var_bind_neq_sorts {z : symbs.svar t} (h : ¬s = t) : (ℋ∀ z φ)[y // x] = ℋ∀ z (φ[y // x]) := by
+  simp only [Term.subst, varSubst, h, ↓reduceDIte]
+
+@[simp]
+lemma subst_var_bind_neq_vars {z : symbs.svar s} (h : ¬x = z) : (ℋ∀ z φ)[y // x] = ℋ∀ z (φ[y // x]) := by
+  simp only [Term.subst, varSubst, ↓reduceDIte, h, ↓reduceIte]
+
+@[simp]
+lemma subst_var_bind : (ℋ∀ x φ)[y // x] = ℋ∀ x φ := by
+  simp only [Term.subst, varSubst, ↓reduceDIte, ↓reduceIte]
+
+end CongrLemmas
+
+lemma notFreeBound {symbs : Symbols α} {s t u : symbs.signature.S} {x : symbs.svarType s} {y : symbs.svarType t} {φ : Form symbs u} (h : φ.varOccursFree x = false): (ℋ∀ y φ).varOccursFree x = false := by
+  simp only [varOccursFree, h, ite_self, dite_eq_ite]
+
+lemma notFreeBound' {symbs : Symbols α} {s t : symbs.signature.S} {x : symbs.svarType s} {φ : Form symbs t}: (ℋ∀ x φ).varOccursFree x = false := by
+  simp only [varOccursFree, ↓reduceDIte, ↓reduceIte]
+
+lemma notFreeVarSubst {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {x y : symbs.svarType s} {φ : FormL symbs sorts} (h : φ.varOccursFree x = false): φ[y // x] = φ := by
+  induction φ with
+  | bind z φ ih =>
+      rename_i t _
+      by_cases eq_sorts : s = t
+      . subst eq_sorts
+        simp [Term.subst, varSubst] at ih ⊢
+        simp [varOccursFree] at h
+        intro h2
+        apply ih
+        apply h
+        exact h2
+      . simp only [eq_sorts, not_false_eq_true, subst_var_bind_neq_sorts, bind.injEq, heq_eq_eq,
+        true_and]
+        simp only [varOccursFree, eq_sorts, ↓reduceDIte] at h
+        exact ih h
+  | svar z =>
+      simp [varOccursFree, varOccurs] at h
+      simp [Term.subst, varSubst]
+      intro h2
+      specialize h h2
+      intro v
+      subst v
+      contradiction
+  | appl σ ψ ih =>
+      simp [Term.subst, varSubst]
+      apply ih
+      exact h
+  | or φ ψ ih1 ih2 =>
+      simp [Term.subst, varSubst]
+      simp at h
+      apply And.intro
+      . apply ih1
+        exact h.1
+      . apply ih2
+        exact h.2
+  | neg φ ih =>
+      simp [Term.subst, varSubst]
+      apply ih
+      exact h
+  | cons φ ψs ih1 ih2 =>
+      simp [Term.subst, varSubst]
+      simp at h
+      apply And.intro
+      . apply ih1
+        exact h.1
+      . apply ih2
+        exact h.2
+  | «at» k _ ih =>
+      simp [Term.subst, varSubst]
+      apply ih
+      exact h
+  | _ => simp [Term.subst, varSubst] at h ⊢
+
+lemma notFreeVarSubst' {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {x y : symbs.svarType s} {φ : FormL symbs sorts} (h : φ.varOccursFree x = false): φ.varSubst y x = φ := by
+  apply notFreeVarSubst
+  exact h
 
 end FormL
