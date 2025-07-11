@@ -32,10 +32,10 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | ref j s₂ : Proof Λ s₂ (ℋ@j (ℋNom j))
   -- 2. Axioms about svars and binders
   | q1 x φ ψ
-        (_: φ.varOccursFree x = false):
+        (_: φ.occurs_free x = false):
       Proof Λ s (ℋ∀x (φ ⟶ ψ) ⟶ (φ ⟶ ℋ∀x ψ))
   | q2 (x y: symbs.svarType s') φ:
-      φ.varSubstableFor y x → Proof Λ s ((ℋ∀x φ) ⟶ φ[y // x])
+      φ.free_for y x → Proof Λ s ((ℋ∀x φ) ⟶ φ[y // x])
   | name x : Proof Λ s (ℋ∃x (ℋVar x))
   -- 3. Barcan axioms
   | barcan x (φ : Form symbs s)

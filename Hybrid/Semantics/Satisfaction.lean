@@ -49,7 +49,7 @@ def Assignment.variant {M : Model symbs} (g' g : Assignment M) (x : symbs.svar s
     ∀ {t : symbs.signature.S} (y : symbs.svar t), s ≠ t → g' y = g y
 
 def Assignment.free_agree {M : Model symbs} (g g' : Assignment M) (φ : FormL symbs sorts): Prop :=
-  ∀ {s : symbs.signature.S} (x : symbs.svar s), φ.varOccursFree x → g x = g' x
+  ∀ {s : symbs.signature.S} (x : symbs.svar s), φ.occurs_free x → g x = g' x
 
 def Assignment.equal {M : Model symbs} (g g' : Assignment M): Prop :=
   ∀ {s : symbs.signature.S} (x : symbs.svar s), g x = g' x
