@@ -482,6 +482,75 @@ section SubstitutionLemma
         apply h_variant_g'.1
         simp [ne_comm, hneq_x]
 
+  lemma SubstitutionL1Nom {M : Model symbs} {i : symbs.nominal t} {x : symbs.svarType t} {z : symbs.svarType u}
+   {g g' : Assignment M} {φ : Form symbs s} {ws : M.Fr.W s}
+    {ih : ∀ {g g' : Assignment M} {ws : WProd M.Fr.W ([s])},
+        g'.variant g x → g' x = (M.VNom i) → ((⟨M,g,ws⟩⊨φ[i//x]) ↔ ⟨M,g',ws⟩⊨φ)}
+    {hneq_sorts : ¬t = u}
+    {h2 : g'.variant g x}
+    {h3 : g' x = M.VNom i}:
+      (⟨M,g,ws⟩⊨ℋ∀ z φ[i//x]) ↔ ⟨M,g',ws⟩⊨ℋ∀ z φ := by
+
+    apply Iff.intro
+    . intro h4 g'' g''_variant_g'
+      have g''_agree_g' : g'' x = g' x := by
+                apply g''_variant_g'.2
+                simp [ne_eq, ne_comm, hneq_sorts]
+      have ⟨h', ⟨h'', ⟨h'_var, ⟨h''_var, equal⟩⟩⟩⟩ := Assignment.factor_two_step_variant_diff_sorts h2 g''_variant_g' hneq_sorts
+      rw [←(SubstitutionL0 equal)]
+      rw [←ih]
+      . apply h4
+        exact h'_var
+      . exact h''_var
+      . simp [equal x, g''_agree_g', h3]
+
+    . intro h4 g'' g''_variant_g
+
+      symm at h2
+      have ⟨h', ⟨h'', ⟨h'_var, ⟨h''_var, equal⟩⟩⟩⟩ := Assignment.factor_two_step_variant_diff_sorts h2 g''_variant_g hneq_sorts
+      rw [←(SubstitutionL0 equal)]
+      rw [ih]
+      . apply h4
+        exact h'_var
+      . symm
+        exact h''_var
+      . simp [←h3]
+        apply h'_var.2
+        simp [ne_comm, hneq_sorts]
+
+  lemma SubstitutionL2Nom {M : Model symbs} {i : symbs.nominal t} {x z : symbs.svarType t}
+   {g g' : Assignment M} {φ : Form symbs s} {ws : M.Fr.W s}
+    {ih : ∀ {g g' : Assignment M} {ws : WProd M.Fr.W ([s])},
+        g'.variant g x → g' x = (M.VNom i) → ((⟨M,g,ws⟩⊨φ[i//x]) ↔ ⟨M,g',ws⟩⊨φ)}
+    {hneq_x : ¬x = z}
+    {h2 : g'.variant g x}
+    {h3 : g' x = M.VNom i}:
+      (⟨M,g,ws⟩⊨ℋ∀ z φ[i//x]) ↔ ⟨M,g',ws⟩⊨ℋ∀ z φ := by
+
+    apply Iff.intro
+    . intro h4 g'' g''_variant_g'
+      have ⟨h, ⟨h_variant_g, h_variant_g''⟩⟩ := Assignment.factor_two_step_variant h2 g''_variant_g'
+      have g''_agree_g' : g'' x = g' x := by
+                apply g''_variant_g'.1
+                simp [ne_eq, ne_comm, hneq_x]
+      specialize h4 h h_variant_g
+      rw [←ih]
+      . exact h4
+      . symm
+        exact h_variant_g''
+      . rw [g''_agree_g', h3]
+
+    . intro h4 g'' g''_variant_g
+      symm at h2
+      have ⟨h, ⟨h_variant_g', h_variant_g''⟩⟩ := Assignment.factor_two_step_variant h2 g''_variant_g
+      specialize h4 h h_variant_g'
+      rw [ih]
+      . exact h4
+      . exact h_variant_g''
+      . rw [←h3]
+        apply h_variant_g'.1
+        simp [ne_comm, hneq_x]
+
   lemma Substitution {M : Model symbs} {g g' : Assignment M} {φ : FormL symbs sorts} {ws : WProd M.Fr.W sorts} {x y : symbs.svarType t} (h1 : φ.free_for y x) (h2 : g'.variant g x) (h3 : g' x = g y) :
     (⟨M, g, ws⟩ ⊨ φ[y // x]) ↔ ⟨M, g', ws⟩ ⊨ φ := by
     induction φ generalizing g g' with
@@ -540,13 +609,13 @@ section SubstitutionLemma
         . subst eq_sorts
           by_cases eq_form : x = z
           . subst eq_form
-            simp only [Term.subst, FormL.var_subst, ↓reduceDIte, ↓reduceIte, Sat.svar]
+            simp only [FormL.subst_var_var, Sat.svar]
             rw [h3]
           . rw [←ne_eq] at eq_form
-            simp only [Term.subst, FormL.var_subst, ↓reduceDIte, eq_form, ↓reduceIte, Sat.svar]
+            simp only [eq_form, not_false_eq_true, FormL.subst_var_neq_var, Sat.svar]
             rw [h2.1 z eq_form]
         . rw [←ne_eq] at eq_sorts
-          simp only [Term.subst, FormL.var_subst, eq_sorts, ↓reduceDIte, Sat.svar]
+          simp only [eq_sorts, not_false_eq_true, FormL.subst_var_neq_var_sorts, Sat.svar]
           rw [h2.2 z eq_sorts]
     | appl σ ψ ih =>
         simp only [FormL.free_for] at h1
@@ -579,6 +648,70 @@ section SubstitutionLemma
         rw [ih]
         repeat assumption
     | _ => simp only [Term.subst, FormL.var_subst, Sat.nom, Sat.prop]
+
+  lemma SubstitutionNominal {M : Model symbs} {g g' : Assignment M} {φ : FormL symbs sorts} {ws : WProd M.Fr.W sorts} {i : symbs.nominal t} {x : symbs.svarType t} (h2 : g'.variant g x) (h3 : g' x = M.VNom i) :
+    (⟨M, g, ws⟩ ⊨ φ[i // x]) ↔ ⟨M, g', ws⟩ ⊨ φ := by
+    induction φ generalizing g g' with
+    | bind z φ ih =>
+        -- ⟨M, g, ws⟩ ⊨ (∀ z φ)[y // x]   iff   ⟨M, g', ws⟩ ⊨ ∀ z φ
+        rename_i t' _
+        . -- Case 1: x is free in φ, so substitution *may* happen
+          by_cases eq_sorts : t = t'
+          . subst eq_sorts
+            . by_cases eq_form_2 : x = z
+              . -- In this case we have:
+                --   (∀ x φ)[i // x], which is the same as ∀ x φ.
+                subst eq_form_2
+                simp only [FormL.subst_nom_bind]
+                apply Agreement
+                apply BarcanL2
+                . apply FormL.not_free_bound'
+                . symm
+                  exact h2
+              . -- In this case all of x, y and z are distinct, so we have to prove
+                simp only [eq_form_2, not_false_eq_true, FormL.subst_nom_bind_neq_vars]
+                apply SubstitutionL2Nom
+                repeat assumption
+          . -- Same as just above: all are distinct, same conditions. Same proof procedure
+            simp only [eq_sorts, not_false_eq_true, FormL.subst_nom_bind_neq_sorts]
+            apply SubstitutionL1Nom
+            repeat assumption
+    | svar z =>
+        rename_i t'
+        by_cases eq_sorts : t = t'
+        . subst eq_sorts
+          by_cases eq_form : x = z
+          . subst eq_form
+            simp only [FormL.subst_nom_var, Sat.nom, Sat.svar]
+            rw [h3]
+          . rw [←ne_eq] at eq_form
+            simp only [eq_form, not_false_eq_true, FormL.subst_nom_neq_var, Sat.svar]
+            rw [h2.1 z eq_form]
+        . rw [←ne_eq] at eq_sorts
+          simp only [eq_sorts, not_false_eq_true, FormL.subst_nom_neq_var_sorts, Sat.svar]
+          rw [h2.2 z eq_sorts]
+    | appl σ ψ ih =>
+        simp only [FormL.subst_nom_appl, Sat.appl]
+        conv =>
+          lhs ; rhs ; ext w' ; lhs
+          rw [@ih g g' w' h2 h3]
+    | or φ ψ ih1 ih2 =>
+        simp only [FormL.subst_nom_or, Sat.or]
+        rw [ih1, ih2]
+        repeat assumption
+    | neg φ ih =>
+        simp only [FormL.subst_nom_neg, Sat.neg]
+        rw [ih]
+        repeat assumption
+    | cons φ ψs ih1 ih2 =>
+        simp only [FormL.subst_nom_cons, Sat.cons]
+        rw [ih1, ih2]
+        repeat assumption
+    | «at» k _ ih =>
+        simp only [FormL.subst_nom_at, Sat.at]
+        rw [ih]
+        repeat assumption
+    | _ => simp only [Term.subst, FormL.nom_subst, Sat.nom, Sat.prop]
 
 end SubstitutionLemma
 

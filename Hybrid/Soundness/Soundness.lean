@@ -270,7 +270,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       rw [Agreement]
       . exact g_sat
       . exact BarcanL2 h is_variant
-  | q2 x y φ is_substable =>
+  | q2_var x y φ is_substable =>
       intro M g w
       simp only [Sat.implies]
       intro h
@@ -290,6 +290,27 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         unfold g'
         simp only [↓reduceDIte, ↓reduceIte]
       rw [Substitution is_substable g'_variant g'_value]
+      exact h g' g'_variant
+  | q2_nom i x φ =>
+      intro M g w
+      simp only [Sat.implies]
+      intro h
+      rename_i s _
+      let g' : Assignment M :=
+            λ {t : symbs.signature.S} (z : symbs.svar t) =>
+              if h : t = s then
+                if h ▸ z = x then
+                  h ▸ (M.1).VNom i
+                else g z
+              else g z
+      have g'_variant : g'.variant g x := by
+        unfold g'
+        unfold Assignment.variant
+        aesop
+      have g'_value : g' x = (M.1).VNom i := by
+        unfold g'
+        simp only [↓reduceDIte, ↓reduceIte]
+      rw [SubstitutionNominal g'_variant g'_value]
       exact h g' g'_variant
   | _  => sorry
 

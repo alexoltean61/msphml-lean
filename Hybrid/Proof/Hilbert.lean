@@ -34,8 +34,10 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | q1 x φ ψ
         (_: φ.occurs_free x = false):
       Proof Λ s (ℋ∀x (φ ⟶ ψ) ⟶ (φ ⟶ ℋ∀x ψ))
-  | q2 (x y: symbs.svarType s') φ:
+  | q2_var (x y: symbs.svarType s') φ:
       φ.free_for y x → Proof Λ s ((ℋ∀x φ) ⟶ φ[y // x])
+  | q2_nom (i : symbs.nominal s') (x: symbs.svarType s') φ:
+      Proof Λ s ((ℋ∀x φ) ⟶ φ[i // x])
   | name x : Proof Λ s (ℋ∃x (ℋVar x))
   -- 3. Barcan axioms
   | barcan x (φ : Form symbs s)

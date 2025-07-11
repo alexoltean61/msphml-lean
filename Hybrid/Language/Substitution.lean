@@ -210,12 +210,48 @@ lemma subst_var_bind_neq_sorts {z : symbs.svar t} (h : ¬s = t) : (ℋ∀ z φ)[
   simp only [Term.subst, var_subst, h, ↓reduceDIte]
 
 @[simp]
+lemma subst_nom_bind_neq_sorts {z : symbs.svar t} (h : ¬s = t) : (ℋ∀ z φ)[i // x] = ℋ∀ z (φ[i // x]) := by
+  simp only [Term.subst, nom_subst, h, ↓reduceDIte]
+
+@[simp]
 lemma subst_var_bind_neq_vars {z : symbs.svar s} (h : ¬x = z) : (ℋ∀ z φ)[y // x] = ℋ∀ z (φ[y // x]) := by
   simp only [Term.subst, var_subst, ↓reduceDIte, h, ↓reduceIte]
 
 @[simp]
+lemma subst_nom_bind_neq_vars {z : symbs.svar s} (h : ¬x = z) : (ℋ∀ z φ)[i // x] = ℋ∀ z (φ[i // x]) := by
+  simp only [Term.subst, nom_subst, ↓reduceDIte, h, ↓reduceIte]
+
+@[simp]
 lemma subst_var_bind : (ℋ∀ x φ)[y // x] = ℋ∀ x φ := by
   simp only [Term.subst, var_subst, ↓reduceDIte, ↓reduceIte]
+
+@[simp]
+lemma subst_nom_bind : (ℋ∀ x φ)[i // x] = ℋ∀ x φ := by
+  simp only [Term.subst, nom_subst, ↓reduceDIte, ↓reduceIte]
+
+@[simp]
+lemma subst_var_var : (ℋVar x)[y // x] = (ℋVar y) := by
+  simp only [Term.subst, var_subst, ↓reduceDIte, ↓reduceIte]
+
+@[simp]
+lemma subst_nom_var : (ℋVar x)[i // x] = (ℋNom i) := by
+  simp only [Term.subst, nom_subst, ↓reduceDIte, ↓reduceIte]
+
+@[simp]
+lemma subst_var_neq_var (h : ¬x = z) : (ℋVar z)[y // x] = (ℋVar z) := by
+  simp only [Term.subst, var_subst, ↓reduceDIte, h, ↓reduceIte]
+
+@[simp]
+lemma subst_nom_neq_var (h : ¬x = y) : (ℋVar y)[i // x] = (ℋVar y) := by
+  simp only [Term.subst, nom_subst, ↓reduceDIte, h, ↓reduceIte]
+
+@[simp]
+lemma subst_var_neq_var_sorts {z : symbs.svar t} (h : ¬s = t) : (ℋVar z)[y // x] = (ℋVar z) := by
+  simp only [Term.subst, var_subst, h, ↓reduceDIte]
+
+@[simp]
+lemma subst_nom_neq_var_sorts {z : symbs.svar t} (h : ¬s = t) : (ℋVar z)[i // x] = (ℋVar z) := by
+  simp only [Term.subst, nom_subst, h, ↓reduceDIte]
 
 end CongrLemmas
 
