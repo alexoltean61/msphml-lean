@@ -39,6 +39,7 @@ def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := 
 abbrev FormL.default : Form symbs s := FormL.prop ((symbs.propNonEmpty s).default)
 def FormL.top : Form symbs s := FormL.default.or FormL.default.neg
 def FormL.bot : Form symbs s := FormL.default.and FormL.default.neg
+def FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
 
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
@@ -54,6 +55,7 @@ notation:65 "ℋ⟨" σ:lead "⟩" φ:arg => FormL.appl σ φ
 notation:65 "ℋ⟨" σ:lead "⟩ᵈ" φ:arg => FormL.applDual σ φ
 
 notation:63 "ℋ@ " j:arg φ:arg => FormL.at j φ
+notation:63 "ℋ@" "(" t:arg ")" j:arg φ:arg => FormL.at_sort t j φ
 notation:63 "ℋ∀ " x:arg φ:arg => FormL.bind x φ
 notation:62 "ℋ∃ " x:arg φ:arg => FormL.exists x φ
 
@@ -64,7 +66,6 @@ notation:57 φ:40 " ⋀ " ψ:57  => FormL.and φ ψ
 notation:53 φ:40 " ⟶ " ψ:53  => FormL.implies φ ψ
 notation:51 φ:40 " ←→ " ψ:51  => FormL.iff φ ψ
 
-/-
 section Coercions
 
   variable (symbs : Symbols α)
@@ -72,9 +73,10 @@ section Coercions
   instance : Coe (symbs.svar s) (Form symbs s) where
     coe := FormL.svar
 
-end Coercions
+  instance : Coe (symbs.nominal s) (Form symbs s) where
+    coe := FormL.nom
 
---/
+end Coercions
 
 -- Define H(@), the fragment of H(@, ∀) without binders, as a subtype of Form
 def HAt : FormL symbs s → Prop

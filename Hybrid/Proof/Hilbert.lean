@@ -59,10 +59,20 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
           Proof Λ s (ℋ@k φ ⋀ (ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ)) → Proof Λ s ((ℋ@j (ℋ⟨σ⟩ χ) ⟶ ψ))
   | gen x : Proof Λ s φ → Proof Λ s (ℋ∀x φ)
 
-notation:25 "⊢" "(" Λ:25 ", " s:26")" φ:arg => Proof Λ s φ
+def Provable {symbs : Symbols α} (Λ : AxiomSet symbs) (s : symbs.signature.S) (φ : Form symbs s) : Prop := Nonempty (Proof Λ s φ)
+
+notation:25 "⊢" "(" Λ:25 ", " s:26")" φ:75  => Provable Λ s φ
 
 -- The local consequence relation
-def SyntacticConsequence {symbs : Symbols α} {s : symbs.signature.S} (Γ : PremiseSet symbs s) (Λ : AxiomSet symbs) (φ : Form symbs s): Type u :=
-    Σ ch : FiniteChoice Γ, ⊢(Λ, s) (ch.conjunction ⟶ φ)
+def SyntacticConsequence {symbs : Symbols α} {s : symbs.signature.S} (Γ : PremiseSet symbs s) (Λ : AxiomSet symbs) (φ : Form symbs s): Prop :=
+    ∃ ch : FiniteChoice Γ, ⊢(Λ, s) (ch.conjunction ⟶ φ)
 
-notation:25 Γ:arg "⊢" "(" Λ:25 ")" φ:arg => SyntacticConsequence Γ Λ φ
+notation:25 Γ:arg "⊢" "(" Λ:25 ")" φ:75 => SyntacticConsequence Γ Λ φ
+
+omit [DecidableEq α] in
+def AxiomSet.consistent {symbs : Symbols α} (Λ : AxiomSet symbs) := ∀ s : symbs.signature.S, ¬ (⊢(Λ, s) ℋ⊥)
+
+-- IMPORTANT!
+--  If we don't add the Λ.consistent assumption to this definition,
+--  then we may be able to derive a contradiction on a sort s' ≠ s!
+def PremiseSet.consistent {symbs : Symbols α} {s : symbs.signature.S} {Γ : PremiseSet symbs s} (Λ : AxiomSet symbs) := Λ.consistent ∧ ¬(Γ ⊢(Λ) ℋ⊥)

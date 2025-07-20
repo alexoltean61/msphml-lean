@@ -10,7 +10,7 @@ variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 
 theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
-  intro pf
+  intro ⟨pf⟩
   induction pf with
   | ax ψ =>
       intro M g w

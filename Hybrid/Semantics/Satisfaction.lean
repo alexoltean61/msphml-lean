@@ -131,6 +131,9 @@ section Defs
     ∀ φ : Γ, ⟨M, g, w⟩ ⊨ φ.1
   notation:50 "⟨" M "," g "," w "⟩" "⊨" Γ => Sat.Set M g w Γ
 
+  def PremiseSet.satisfiable (Γ : PremiseSet symbs s) (ModelClass : Set (Model symbs)) : Prop :=
+    ∃ M : ModelClass, ∃ g w, ⟨M, g, w⟩ ⊨ Γ
+
   -- The local consequence relation
   def Entails (Γ : PremiseSet symbs s) (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
     ∀ M : ModelClass, ∀ g w, (⟨M.1, g, w⟩ ⊨ Γ) → ⟨M.1, g, w⟩ ⊨ φ
