@@ -12,10 +12,9 @@ variable {s : S.signature.S}
 variable {Λ : AxiomSet S}
 variable {Γ : PremiseSet S s}
 
-abbrev m  := S.new_nominals.2
-abbrev S_plus := S.new_nominals.1
-abbrev s_plus := m.m.morph_sort s
+noncomputable abbrev m  := Classical.choice S.new_nominals.choose_spec
+noncomputable abbrev S_plus := S.new_nominals.choose
 
-lemma Lindenbaum (h : Γ.consistent Λ) : ∃ Γ' : NamedPastedWitnessedMCS S_plus s_plus (m.m.morph_axiom Λ), (m.m.morph_premise Γ) ⊆ Γ'.set := sorry
+lemma Lindenbaum (h : Γ.consistent Λ) : ∃ Γ' : NamedPastedWitnessedMCS S_plus (m+ s) (m+ Λ), (m+ Γ) ⊆ Γ'.set := sorry
 
 end Completeness

@@ -55,7 +55,7 @@ notation:65 "ℋ⟨" σ:lead "⟩" φ:arg => FormL.appl σ φ
 notation:65 "ℋ⟨" σ:lead "⟩ᵈ" φ:arg => FormL.applDual σ φ
 
 notation:63 "ℋ@ " j:arg φ:arg => FormL.at j φ
-notation:63 "ℋ@" "(" t:arg ")" j:arg φ:arg => FormL.at_sort t j φ
+notation:63 "ℋ@" "[[" t:arg "]]" j:arg φ:arg => FormL.at_sort t j φ
 notation:63 "ℋ∀ " x:arg φ:arg => FormL.bind x φ
 notation:62 "ℋ∃ " x:arg φ:arg => FormL.exists x φ
 

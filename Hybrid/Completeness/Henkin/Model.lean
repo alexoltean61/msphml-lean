@@ -10,7 +10,7 @@ variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {s t : symbs.signature.S}
 
-def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ) : Models.Ax Λ := sorry
+def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ) : Λ.Models := sorry
 
 def NamedPastedWitnessedMCS.HenkinAsgn (Γ : NamedPastedWitnessedMCS symbs s Λ) : Assignment (Γ.HenkinModel).1 := sorry
 

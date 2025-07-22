@@ -109,7 +109,7 @@ section Defs
     The class of models determined by a particular set of axioms contains all
       models in which those axioms are valid.
   -/
-  def Models.Ax (Λ : AxiomSet symbs) : Set (Model symbs) :=
+  def AxiomSet.Models (Λ : AxiomSet symbs) : Set (Model symbs) :=
     {M : Model symbs | ∀ s, ∀ φ ∈ Λ s, M ⊨ φ}
 
   /-
@@ -124,7 +124,7 @@ section Defs
     The class of frames determined by a particular set of axioms contains all
       frames in which those axioms are valid.
   -/
-  def Frames.Ax (Λ : AxiomSet symbs) : Set (Frame symbs.signature) :=
+  def AxiomSet.Frames (Λ : AxiomSet symbs) : Set (Frame symbs.signature) :=
     {Fr : Frame symbs.signature | ∀ s, ∀ φ ∈ Λ s, Fr ⊨ φ}
 
   def Sat.Set (M : Model symbs) (g : Assignment M) (w : M.Fr.W s) (Γ : PremiseSet symbs s) : Prop :=
@@ -144,11 +144,11 @@ section Defs
   notation:50 "⊨" φ  => FormL.valid φ
 
   @[reducible] def Models.AxValid (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
-    ⊨(Models.Ax Λ) φ
+    ⊨(Λ.Models) φ
   notation:50 "⊨" "Mod" "(" Λ:25 ")" φ:arg => Models.AxValid φ Λ
 
   @[reducible] def Models.FrValid (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
-    ⊨(Models.Fr (Frames.Ax Λ)) φ
+    ⊨(Models.Fr (Λ.Frames)) φ
   notation:50 "⊨" "Fr" "(" Λ:25 ")" φ:arg => Models.FrValid φ Λ
 
   @[reducible] def Entails.General (Γ : PremiseSet symbs s) (φ : Form symbs s) : Prop :=
@@ -156,11 +156,11 @@ section Defs
   notation:50 Γ:arg "⊨" φ:arg => Entails.General Γ φ
 
   @[reducible] def Entails.Mod (Γ : PremiseSet symbs s) (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
-    Γ ⊨(Models.Ax Λ) φ
+    Γ ⊨(Λ.Models) φ
   notation:50 Γ:arg "⊨" "Mod" "(" Λ:25 ")" φ:arg => Entails.Mod Γ φ Λ
 
   @[reducible] def Entails.Fr (Γ : PremiseSet symbs s) (φ : Form symbs s) (Λ : AxiomSet symbs) : Prop :=
-    Γ ⊨(Models.Fr (Frames.Ax Λ)) φ
+    Γ ⊨(Models.Fr (Λ.Frames)) φ
   notation:50 Γ:arg "⊨" "Fr" "(" Λ:25 ")" φ:arg => Entails.Fr Γ φ Λ
 
 end Defs
@@ -377,10 +377,10 @@ section Lemmas
   lemma Models.all_maximal : ∀ C : Set (Model Symbs), C ⊆ Models.All := by
     simp only [All, Set.setOf_true, Set.subset_univ, implies_true]
 
-  lemma Models.fr_in_ax {Λ : AxiomSet symbs} : (Models.Fr (Frames.Ax Λ)) ⊆  Models.Ax Λ := by
-    simp [Models.Fr, Models.Ax]
+  lemma Models.fr_in_ax {Λ : AxiomSet symbs} : (Models.Fr (Λ.Frames)) ⊆  Λ.Models := by
+    simp [Models.Fr, AxiomSet.Models]
     intro M fr s sSort φ φAx
-    simp only [Frames.Ax, Frame.valid, Models.Fr, Set.coe_setOf, Set.mem_setOf_eq, Subtype.forall,
+    simp only [AxiomSet.Frames, Frame.valid, Models.Fr, Set.coe_setOf, Set.mem_setOf_eq, Subtype.forall,
       Set.mem_singleton_iff] at fr
     apply_assumption
     . exact φAx

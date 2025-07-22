@@ -14,7 +14,7 @@ omit [DecidableEq α] in
 lemma SatSubset {Γ : PremiseSet symbs s} {C : Set (Model symbs)} : Γ.satisfiable C → Δ ⊆ Γ → Δ.satisfiable C := by
   admit
 
-lemma ModelExistence {Λ : AxiomSet symbs} {Γ : PremiseSet symbs s} : (Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ) ↔ (Γ.consistent Λ → Γ.satisfiable (Models.Ax Λ)) := by
+lemma ModelExistence {Λ : AxiomSet symbs} {Γ : PremiseSet symbs s} : (Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ) ↔ (Γ.consistent Λ → Γ.satisfiable Λ.Models) := by
   apply Iff.intro
   . intro h
     admit
