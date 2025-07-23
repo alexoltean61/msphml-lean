@@ -20,7 +20,7 @@ variable {symbs : Symbols α}
     A `Context` effectively selects a certain formula ocurring in a formula list.
     `WProd.select` selects the corresponding *world* of that formula in a `WProd`.
 -/
-def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sorts) (C : φ.Context ψ) : W s :=
+def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sorts) (C : φ.Context ψ) : WProd W ([s]) :=
   match C with
   | .refl => ws
   | .head => ws.1
@@ -42,7 +42,7 @@ def Model.VNom (M : Model symbs) : symbs.nominal s → M.Fr.W s
 | .inl n => M.Fr.Nm n
 | .inr n => M.Vₙ n
 
-def Assignment (M : Model symbs) : Type u := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
+abbrev Assignment (M : Model symbs) : Type u := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
 
 def Assignment.variant {M : Model symbs} (g' g : Assignment M) (x : symbs.svar s): Prop :=
   (∀ y : symbs.svar s, x ≠ y → g' y = g y) ∧

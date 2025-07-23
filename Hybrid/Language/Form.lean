@@ -39,7 +39,7 @@ def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := 
 abbrev FormL.default : Form symbs s := FormL.prop ((symbs.propNonEmpty s).default)
 def FormL.top : Form symbs s := FormL.default.or FormL.default.neg
 def FormL.bot : Form symbs s := FormL.default.and FormL.default.neg
-def FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
+abbrev FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
 
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop

@@ -77,3 +77,7 @@ instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : Decidab
   | .inr i => match j with
             | .inl _ => isFalse (λ habs => Sum.noConfusion habs)
             | .inr j => if h : i = j then isTrue (congrArg Sum.inr h) else isFalse (λ habs => h $ Sum.inr.inj habs)
+
+def Symbols.nominal.ne {symbs : Symbols α} [DecidableEq α] {s₁ s₂ : symbs.signature.S} (i : symbs.nominal s₁) (j : symbs.nominal s₂) : Prop := (h : s₁ = s₂) → h ▸ i ≠ j
+
+infix:50 "≠ₛ" => Symbols.nominal.ne

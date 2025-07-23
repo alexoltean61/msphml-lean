@@ -1,8 +1,9 @@
 import Hybrid.Proof
 import Hybrid.Semantics
+import Hybrid.Soundness.ValuationVariants
 import Hybrid.Soundness.Lemmas
 
-namespace Soundness
+open Soundness
 
 variable {α : Type u}
 variable [DecidableEq α]
@@ -221,41 +222,62 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       simp only [Sat.at]
       specialize h M g ((M.1).VNom j)
       exact h
-  | paste C _ h =>
+  | paste C neq noccΛ noccφ noccψ noccχ _ ih =>
+      rename_i sₜ k _ _ _ sⱼ j _ _ φ _ _
       intro M g w
-      specialize h M g w
-      simp only [Sat.and, Sat.at, Sat.implies] at h
-      have ⟨k_φ, imp⟩ := h
-      clear h
-
-      simp only [Sat.implies, Sat.at, Sat.appl]
-      intro ⟨ws, ⟨sat_χ, jRws⟩⟩
-
-      apply imp
-      simp only [Sat.appl]
-      exists ws
-
-      apply And.intro
-      . rw [Sat.context] at sat_χ ⊢
-        intro s' τ C'
-        by_cases is_iso : C.iso C'
-        . have := C.iso_subst_sorts is_iso
-          symm at this
-          subst this
-          have := C.iso_subst is_iso
-          symm at this
-          subst this
-          symm at is_iso
-          rw [WProd.select_iso is_iso]
-
-          specialize sat_χ C
-          simp only [Sat.nom] at sat_χ
-          rw [sat_χ]
-          exact k_φ
-        . have ⟨C'', C''_iso_C'⟩ := C.subst_not_iso'' is_iso
-          rw [WProd.select_iso C''_iso_C']
-          exact sat_χ C''
-      . exact jRws
+      simp only [Sat.implies]
+      intro h
+      simp only [Sat.at, Sat.appl] at h
+      have ⟨ws, ⟨wsSat,jRws⟩⟩ := h
+      rw [Sat.context] at wsSat
+      let t  := φ.subst_to_ctx C
+      have t_iso_C := φ.subst_to_ctx_iso C
+      let wₜ := ws.select t
+      let M' : Λ.Models := ⟨M.1.v_variant k wₜ, Set.Elem.v_variant_modelclass_inv Λ M k noccΛ wₜ⟩
+      let g' : Assignment M'.1 := g.v_variant k wₜ
+      let w' := w.v_variant k wₜ
+      specialize ih M' g' w'
+      simp only [Sat.implies, Sat.and, Sat.at, and_imp] at ih
+      rw [v_variant_agreement noccψ wₜ]
+      apply ih
+      . exists ws.v_variant k wₜ
+        apply And.intro
+        . rw [Sat.context]
+          intro sᵤ χᵤ Cᵤ
+          by_cases h : Cᵤ.iso C
+          . have := FormL.Context.if_iso_sorts Cᵤ C h
+            subst this
+            have := FormL.Context.if_iso Cᵤ C h
+            subst this
+            rw [WProd.select_iso h, ←WProd.select_iso t_iso_C]
+            simp [M', v_variant_valuation, wₜ, t, WProd.v_variant_select_inv]
+          . rw [WProd.v_variant_select_inv]
+            have h_symm : ¬C.iso Cᵤ := by intro h2; symm at h2; exact h h2
+            have ⟨C', C'_iso⟩ := C.subst_not_iso Cᵤ h_symm φ
+            specialize wsSat C'
+            symm at C'_iso
+            rw [not_nominal_occurs_context] at noccχ
+            specialize noccχ Cᵤ
+            rw [←v_variant_agreement noccχ wₜ]
+            rw [WProd.select_iso C'_iso] at wsSat
+            exact wsSat
+        . rw [←v_variant_acc_inv neq]
+          exact jRws
+      . let sort_name := M'.1.Fr.W sₜ
+        have : M.1.Fr.W sₜ = M'.1.Fr.W sₜ := v_variant_world_inv sₜ
+        conv =>
+          lhs; simp [M', v_variant_valuation]
+        rw [←v_variant_agreement noccφ wₜ]
+        exact wsSat t
+  | @nameAt s₁ s₂ j φ noccΛ noccφ _ ih =>
+      intro M g w
+      let M' : Λ.Models := ⟨M.1.v_variant j w, Set.Elem.v_variant_modelclass_inv Λ M j noccΛ w⟩
+      let g' : Assignment M'.1 := g.v_variant j w
+      let w' := (M'.1.Fr.WNonEmpty s₁).default
+      specialize ih M' g' w'
+      simp only [Sat.at, M', v_variant_valuation] at ih
+      rw [v_variant_agreement noccφ w]
+      exact ih
   | gen _ _ h =>
       intro M g w
       simp only [Sat.forall]
@@ -312,7 +334,6 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         simp only [↓reduceDIte, ↓reduceIte]
       rw [SubstitutionNominal g'_variant g'_value]
       exact h g' g'_variant
-  | _  => sorry
 
 -- Strong model soundness
 theorem ModelSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Mod(Λ) φ := by
@@ -328,5 +349,3 @@ theorem FrameSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) φ
   apply Entails.if_model_frame
   apply ModelSoundness
   exact pf
-
-end Soundness
