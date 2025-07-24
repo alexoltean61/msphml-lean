@@ -172,7 +172,10 @@ section AgreementLemma
         simp only [Assignment.free_agree, FormL.occurs_free, Bool.or_eq_true] at agree
         have ⟨agree_φ, agree_ψ⟩ : g.free_agree g' φ ∧ g.free_agree g' ψs := by
           unfold Assignment.free_agree
-          aesop
+          apply And.intro <;>
+          . intros
+            apply agree
+            first | apply Or.inl ; assumption | apply Or.inr ; assumption
         clear agree
         apply Iff.intro
         . intro ⟨h1, h2⟩

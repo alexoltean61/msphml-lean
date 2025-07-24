@@ -3,6 +3,8 @@ import Hybrid.Semantics
 import Hybrid.Soundness.ValuationVariants
 import Hybrid.Soundness.Lemmas
 
+set_option maxHeartbeats 400000
+
 open Soundness
 
 variable {α : Type u}
