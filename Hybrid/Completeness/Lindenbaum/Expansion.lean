@@ -254,7 +254,6 @@ section NewNominals
             . intro x
               simp only [Set.coe_setOf, Equiv.toFun_as_coe, Equiv.invFun_as_coe,
                 Function.comp_apply, Set.Elem.image_preimage_inv', Equiv.apply_symm_apply]
-        propNonEmpty := λ s => ⟨(S₁.propNonEmpty s.preimage).default.image⟩
       },
       ⟨{
         m := {

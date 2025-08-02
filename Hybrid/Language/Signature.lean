@@ -27,8 +27,6 @@ structure Symbols (α : Type u) where
   nomCtbl  (s) : Encodable (nom s)
   svarCtbl (s) : Denumerable (svar s)
 
-  propNonEmpty (s) : Inhabited (prop s)
-  -- Should you add further inhabitance constraints?
   -- Should you add disjointness constraints?
 
 -- Often when dealing with syntax, we treat constant nominals and regular nominals uniformly.
