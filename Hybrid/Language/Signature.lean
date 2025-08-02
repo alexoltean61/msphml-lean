@@ -8,9 +8,9 @@ structure Signature (α : Type u) where
   Sig  : List S → S → Set α
   N    : S → Set α
 
-  sortsCtbl : S.Countable
-  opsCtbl   : ∀ dom range, (Sig dom range).Countable
-  nomCtbl   : ∀ s, (N s).Countable
+  sortsCtbl : Encodable S
+  opsCtbl (dom range) : Encodable (Sig dom range)
+  nomCtbl (s)         : Encodable (N s)
 
   sNonEmpty : Inhabited S
   -- Should you add further inhabitance constraints?
@@ -23,12 +23,11 @@ structure Symbols (α : Type u) where
   nom  : (s : signature.S) → Set α
   svar : (s : signature.S) → Set α
 
-  propCtbl : ∀ s, (prop s).Countable
-  nomCtbl  : ∀ s, (nom s).Countable
-  svarCtbl : ∀ s, (svar s).Countable
-  -- ^ actually, this should be Denumerable: not just countable ("cel mult numarabil") but infinite
+  propCtbl (s) : Encodable (prop s)
+  nomCtbl  (s) : Encodable (nom s)
+  svarCtbl (s) : Denumerable (svar s)
 
-  propNonEmpty : ∀ s, Inhabited (prop s)
+  propNonEmpty (s) : Inhabited (prop s)
   -- Should you add further inhabitance constraints?
   -- Should you add disjointness constraints?
 
@@ -48,6 +47,21 @@ instance : Coe (symbs.nom s) (symbs.nominal s) where
 -- For such cases, we define the explicit (many-sorted families of) types below.
 abbrev Symbols.propType (symbs : Symbols α) := λ s => Set.Elem (symbs.prop s)
 abbrev Symbols.svarType (symbs : Symbols α) := λ s => Set.Elem (symbs.svar s)
+
+instance : Denumerable (symbs.svarType s) where
+  encode := (symbs.svarCtbl s).encode
+  decode := (symbs.svarCtbl s).decode
+  encodek := (symbs.svarCtbl s).encodek
+  decode_inv := (symbs.svarCtbl s).decode_inv
+
+instance : OfNat (symbs.svarType s) (n : Nat) where
+  ofNat := Denumerable.ofNat (symbs.svarType s) n
+
+instance : HAdd (symbs.svarType s) Nat (symbs.svarType s) where
+  hAdd := λ x n => OfNat.ofNat ((symbs.svarCtbl s).encode x + n)
+
+instance : HAdd Nat (symbs.svarType s)  (symbs.svarType s) where
+  hAdd := λ n x => OfNat.ofNat (n + (symbs.svarCtbl s).encode x)
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.signature.N s) := λ i j =>
   if h : (i.1 = j.1) then

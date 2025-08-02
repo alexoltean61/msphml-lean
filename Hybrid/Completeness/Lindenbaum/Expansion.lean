@@ -152,6 +152,15 @@ section NewNominals
     obtain ⟨e, pf⟩ := e
     simp_all only [Subtype.mk.injEq, Sum.inr.injEq]
 
+  lemma Set.Elem.image_preimage_inv'' {S : Set α} (e : S.embed) : e.preimage.image = e := by
+    obtain ⟨e, pf⟩ := e
+    cases e with
+    | inl n => simp at pf
+    | inr n =>
+        have := pf.choose_spec.2
+        simp at this ⊢
+        exact this
+
   lemma Set.Elem.image_preimage_inv {S : Set α} : (@Set.Elem.preimage α S) ∘ Set.Elem.image = id := by
     funext
     apply Set.Elem.image_preimage_inv'
@@ -166,28 +175,28 @@ section NewNominals
           N := λ st =>
             (S₁.signature.N st.preimage).embed,
           sortsCtbl := by
-            apply Countable.mk
-            have ⟨S₁_f, S₁_f_inj⟩ := S₁.signature.sortsCtbl.exists_injective_nat'
+            apply @Encodable.ofInj _ ℕ
+            let S₁_f := S₁.signature.sortsCtbl.encode
+            let S₁_f_inj := S₁.signature.sortsCtbl.encode_injective
             let f : S₁.signature.S.embed → ℕ := S₁_f ∘ Set.Elem.preimage
-            exists f
             rw [Function.Injective.of_comp_iff]
             . exact Set.Elem.preimage_injective
             . exact S₁_f_inj,
           opsCtbl := by
             intro dom rng
-            apply Countable.mk
-            have ⟨S₁_f, S₁_f_inj⟩ := (S₁.signature.opsCtbl dom.preimage rng.preimage).exists_injective_nat'
+            apply @Encodable.ofInj _ ℕ
+            let S₁_f := (S₁.signature.opsCtbl dom.preimage rng.preimage).encode
+            let S₁_f_inj := (S₁.signature.opsCtbl dom.preimage rng.preimage).encode_injective
             let f : (S₁.signature.Sig dom.preimage rng.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
-            exists f
             rw [Function.Injective.of_comp_iff]
             . exact Set.Elem.preimage_injective
             . exact S₁_f_inj,
           nomCtbl := by
             intro st
-            apply Countable.mk
-            have ⟨S₁_f, S₁_f_inj⟩ := (S₁.signature.nomCtbl st.preimage).exists_injective_nat'
+            apply @Encodable.ofInj _ ℕ
+            let S₁_f := (S₁.signature.nomCtbl st.preimage).encode
+            let S₁_f_inj := (S₁.signature.nomCtbl st.preimage).encode_injective
             let f : (S₁.signature.N st.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
-            exists f
             rw [Function.Injective.of_comp_iff]
             . exact Set.Elem.preimage_injective
             . exact S₁_f_inj,
@@ -201,19 +210,24 @@ section NewNominals
             (S₁.svar st.preimage).embed,
         propCtbl := by
             intro st
-            apply Countable.mk
-            have ⟨S₁_f, S₁_f_inj⟩ := (S₁.propCtbl st.preimage).exists_injective_nat'
+            apply @Encodable.ofInj _ ℕ
+            let S₁_f := (S₁.propCtbl st.preimage).encode
+            let S₁_f_inj := (S₁.propCtbl st.preimage).encode_injective
             let f : (S₁.prop st.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
-            exists f
             rw [Function.Injective.of_comp_iff]
             . exact Set.Elem.preimage_injective
             . exact S₁_f_inj,
         nomCtbl := by
             intro st
+            -- Easier if we prove Countable instead of Encodable,
+            -- because we have the Set.countable_union lemma.
+            -- This definition is nonconstructive anyway.
+            apply Set.Countable.toEncodable
             rw [Set.countable_union]
             apply And.intro
             . apply Countable.mk
-              have ⟨S₁_f, S₁_f_inj⟩ := (S₁.nomCtbl st.preimage).exists_injective_nat'
+              let S₁_f := (S₁.nomCtbl st.preimage).encode
+              let S₁_f_inj := (S₁.nomCtbl st.preimage).encode_injective
               let f : (S₁.nom st.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
               exists f
               rw [Function.Injective.of_comp_iff]
@@ -228,13 +242,18 @@ section NewNominals
                 simp,
         svarCtbl := by
             intro st
-            apply Countable.mk
-            have ⟨S₁_f, S₁_f_inj⟩ := (S₁.svarCtbl st.preimage).exists_injective_nat'
-            let f : (S₁.svar st.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
-            exists f
-            rw [Function.Injective.of_comp_iff]
-            . exact Set.Elem.preimage_injective
-            . exact S₁_f_inj,
+            apply Denumerable.ofEquiv ℕ
+            apply Equiv.mk
+            case toFun =>
+                exact (S₁.svarCtbl st.preimage).eqv.toFun ∘ Set.Elem.preimage
+            case invFun =>
+                exact Set.Elem.image ∘ (S₁.svarCtbl st.preimage).eqv.invFun
+            . intro x
+              simp only [Set.coe_setOf, Equiv.invFun_as_coe, Equiv.toFun_as_coe,
+                Function.comp_apply, Equiv.symm_apply_apply, Set.Elem.image_preimage_inv'']
+            . intro x
+              simp only [Set.coe_setOf, Equiv.toFun_as_coe, Equiv.invFun_as_coe,
+                Function.comp_apply, Set.Elem.image_preimage_inv', Equiv.apply_symm_apply]
         propNonEmpty := λ s => ⟨(S₁.propNonEmpty s.preimage).default.image⟩
       },
       ⟨{
