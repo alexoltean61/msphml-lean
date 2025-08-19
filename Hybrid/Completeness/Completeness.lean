@@ -45,10 +45,10 @@ theorem Completeness {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ 
     . -- Here, apply Truth lemma,
       --  and use the fact that Γ' is a MCS and so is
       --  closed under Gen@ rule.
-      exists Γ'.HenkinModel
+      exists ⟨Γ'.HenkinModel, sorry⟩
       exists Γ'.HenkinAsgn
       have ⟨j, j_in_Γ'⟩ := Γ'.named
-      exists |j| Γ'
+      exists ⟦j⟧
       intro φ
       rw [Truth]
       apply gen_at_closed Γ'.mcs

@@ -1,6 +1,6 @@
 import Hybrid.Completeness.Lindenbaum.Expansion.Helpers
 
-variable {β : Type v}
+variable {α β : Type u}
 variable {S₁ : Symbols α}
 variable {s : S₁.signature.S}
 variable {Λ : AxiomSet S₁}

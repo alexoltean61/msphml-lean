@@ -13,6 +13,6 @@ variable {φ : Form symbs t}
 variable {Λ : AxiomSet symbs}
 variable {Γ : NamedPastedWitnessedMCS symbs s Λ}
 
-lemma Truth : (⟨Γ.HenkinModel, Γ.HenkinAsgn, |j| Γ⟩ ⊨ φ) ↔ (ℋ@j φ) ∈ Γ.set := sorry
+lemma Truth : (⟨Γ.HenkinModel, Γ.HenkinAsgn, ⟦j⟧⟩ ⊨ φ) ↔ (ℋ@j φ) ∈ Γ.set := sorry
 
 end Completeness

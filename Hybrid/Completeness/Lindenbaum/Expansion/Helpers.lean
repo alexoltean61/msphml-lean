@@ -4,6 +4,7 @@ namespace Completeness
 
 open Completeness
 
+variable {α β : Type u}
 variable {S₁ : Symbols α}
 variable {S₂ : Symbols β}
 variable {s : S₁.signature.S}
@@ -46,13 +47,13 @@ section ClassicalRequired
   abbrev Symbols.embedding.morph_axiom (Λ : AxiomSet S₁) (m : S₁ ↪ S₂) : AxiomSet S₂ :=
     m.m.morph_axiom Λ
 
-  abbrev Symbols.morphism.morph_worlds (W : S₁.signature.S → Type) (m : S₁.morphism S₂) : S₂.signature.S → Type :=
+  abbrev Symbols.morphism.morph_worlds (W : S₁.signature.S → Type u) (m : S₁.morphism S₂) : S₂.signature.S → Type u :=
     λ s₂ =>
         if h : ∃ s₁, s₂ = m.morph_sort s₁ then
                   W h.choose
-        else Unit
+        else PUnit
 
-  noncomputable def Symbols.morphism.morph_wprod {W : S₁.signature.S → Type} (ws : WProd W sorts) (inh : ∀ s, Inhabited (W s)) (m : S₁.morphism S₂) : WProd (m.morph_worlds W) (sorts.map m.morph_sort) :=
+  noncomputable def Symbols.morphism.morph_wprod {W : S₁.signature.S → Type u} (ws : WProd W sorts) (inh : ∀ s, Inhabited (W s)) (m : S₁.morphism S₂) : WProd (m.morph_worlds W) (sorts.map m.morph_sort) :=
   match sorts with
   | []  => ws
   | [s] => by
@@ -77,7 +78,7 @@ section ClassicalRequired
               exact ⟨(F.WNonEmpty h.choose).default⟩
         else by
             simp only [morph_worlds, h, ↓reduceDIte]
-            exact ⟨()⟩
+            exact ⟨⟨⟩⟩
     R := λ {dom₂} {rng₂} σ₂ =>
           if h : ∃ dom₁ : List S₁.signature.S, dom₁.map m.morph_sort = dom₂ then
             if h' : ∃ rng₁ : S₁.signature.S, m.morph_sort rng₁ = rng₂ then
@@ -97,7 +98,7 @@ section ClassicalRequired
               exact (F.WNonEmpty h.choose).default
           else by
             simp only [morph_worlds, h, ↓reduceDIte]
-            exact ()
+            exact ⟨⟩
   }
 
   noncomputable def Symbols.morphism.morph_world {F : Frame S₁.signature} (w : F.W s₁) (m : S₁.morphism S₂) : (m.morph_frame F).W (m.morph_sort s₁) :=
@@ -132,7 +133,7 @@ section ClassicalRequired
               exact (M.Fr.WNonEmpty h.choose).default
           else by
             simp only [morph_frame, morph_worlds, h, ↓reduceDIte]
-            exact ()
+            exact ⟨⟩
   }
 
   noncomputable abbrev Symbols.embedding.morph_model (M : Model S₁) (m : S₁ ↪ S₂) : Model S₂ :=

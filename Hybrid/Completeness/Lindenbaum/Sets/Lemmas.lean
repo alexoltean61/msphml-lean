@@ -47,8 +47,8 @@ end MCS
 
 section ExtendiblePremiseSet
 
-  variable {α : Type u} [DecidableEq α]
-  variable {β : Type v} [β_deq : DecidableEq β]
+  variable {α β : Type u}
+  variable [DecidableEq α] [β_deq : DecidableEq β]
   variable {S : Symbols α}
   variable {s : S.signature.S}
   variable {Λ : AxiomSet S}
@@ -68,13 +68,13 @@ section ExtendiblePremiseSet
   lemma Lindenbaum.even_nominal_inj [inst : Encodable β] {Γ : ExtendiblePremiseSet symbs sort ax} : (@Γ.even_nominal α _ _ _ _ _ inst t).Injective :=
     λ _ _ h => sorry
 
-  lemma Lindenbaum.odd_nom_nocc_axioms [Encodable β] {x : β} {es : ExtendiblePremiseSet S s Λ}: ¬Λ.occurs (es.odd_nominal t x) := sorry
+  lemma Lindenbaum.odd_nom_nocc_axioms [Encodable γ] {x : γ} {es : ExtendiblePremiseSet S s Λ}: ¬Λ.occurs (es.odd_nominal t x) := sorry
 
-  lemma Lindenbaum.odd_nom_nocc_premises [Encodable β] {x : β} {es : ExtendiblePremiseSet S s Λ}: ¬es.set.occurs (es.odd_nominal t x) := sorry
+  lemma Lindenbaum.odd_nom_nocc_premises [Encodable γ] {x : γ} {es : ExtendiblePremiseSet S s Λ}: ¬es.set.occurs (es.odd_nominal t x) := sorry
 
-  lemma Lindenbaum.prod_even_nom_nocc_axioms [Encodable β] [Encodable γ] {x₁ : β} {x₂ : γ} {t : S.signature.S} {es : ExtendiblePremiseSet S s Λ}: ¬Λ.occurs (es.prod_even_nominal t x₁ x₂) := sorry
+  lemma Lindenbaum.prod_even_nom_nocc_axioms [Encodable γ] [Encodable δ] {x₁ : γ} {x₂ : δ} {t : S.signature.S} {es : ExtendiblePremiseSet S s Λ}: ¬Λ.occurs (es.prod_even_nominal t x₁ x₂) := sorry
 
-  lemma Lindenbaum.prod_even_nom_nocc_premises [Encodable β] [Encodable γ] {x₁ : β} {x₂ : γ} {es : ExtendiblePremiseSet S s Λ}: ¬es.set.occurs (es.prod_even_nominal t x₁ x₂) := sorry
+  lemma Lindenbaum.prod_even_nom_nocc_premises [Encodable γ] [Encodable δ] {x₁ : γ} {x₂ : δ} {es : ExtendiblePremiseSet S s Λ}: ¬es.set.occurs (es.prod_even_nominal t x₁ x₂) := sorry
 
 
 end ExtendiblePremiseSet

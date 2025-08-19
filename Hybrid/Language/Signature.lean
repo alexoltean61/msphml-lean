@@ -13,6 +13,7 @@ structure Signature (α : Type u) where
   nomCtbl (s)         : Encodable (N s)
 
   sNonEmpty : Inhabited S
+  nNonEmpty (s) : Inhabited (N s)
   -- Should you add further inhabitance constraints?
   -- Should you add disjointness constraints?
 

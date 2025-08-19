@@ -94,6 +94,7 @@ noncomputable instance Symbols.new_nominals (S₁ : Symbols α) : Σ S₂ : Symb
           . exact Set.Elem.preimage_injective
           . exact S₁_f_inj,
         sNonEmpty := ⟨S₁.signature.sNonEmpty.default.image⟩
+        nNonEmpty := λ st => ⟨(S₁.signature.nNonEmpty st.preimage).default.image⟩
       },
       prop := λ st =>
           (S₁.prop st.preimage).embed,

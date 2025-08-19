@@ -7,11 +7,11 @@ variable {symbs : Symbols α}
   Given a non-null list of sorts, and a denotation function that assignaturens a Lean type to each sort,
     `WProd` returns the product type of all sort denotations in the list.
 -/
-@[reducible] def WProd {signature : Signature α} (W : signature.S → Type) : List (signature.S) → Type
+@[reducible] def WProd {signature : Signature α} (W : signature.S → Type u) : List (signature.S) → Type u
   -- Modal operators have at least one sort (the range sort); formulas require a non-empty list of sorts.
-  -- If things are sound, the `[]` case below should never be reached. If it is reached, a term of type Empty
+  -- If things are sound, the `[]` case below should never be reached. If it is reached, a term of type Empty'
   -- will guarantee unsoundness.
-  | []      => Empty
+  | []      => PEmpty
   | [s]     => W s
   | s :: sorts  => W s × WProd W sorts
 
@@ -27,7 +27,7 @@ def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sort
   | .tail C' => ws.2.select C'
 
 structure Frame (signature : Signature α) where
-  W  : signature.S → Type
+  W  : signature.S → Type u
   R  : signature.Sig dom range → Set (WProd W (range :: dom))
   Nm : {s : signature.S} → signature.N s → W s
 
@@ -42,7 +42,7 @@ def Model.VNom (M : Model symbs) : symbs.nominal s → M.Fr.W s
 | .inl n => M.Fr.Nm n
 | .inr n => M.Vₙ n
 
-abbrev Assignment (M : Model symbs) : Type u := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
+abbrev Assignment (M : Model symbs) := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
 
 def Assignment.variant {M : Model symbs} (g' g : Assignment M) (x : symbs.svar s): Prop :=
   (∀ y : symbs.svar s, x ≠ y → g' y = g y) ∧

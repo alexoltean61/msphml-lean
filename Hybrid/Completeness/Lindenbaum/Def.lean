@@ -7,8 +7,8 @@ open Completeness
 open Encodable
 open Denumerable
 
-variable {α : Type u} [DecidableEq α]
-variable {β : Type v} [β_deq : DecidableEq β]
+variable {α β : Type u}
+variable [DecidableEq α] [β_deq : DecidableEq β]
 variable {S : Symbols α}
 variable {s : S.signature.S}
 variable (ext : @S.nominal_extension α β β_deq β)

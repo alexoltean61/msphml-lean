@@ -35,9 +35,9 @@ section Basic
   /--
     `Γₛ` is @-witnessed
   -/
-  def PremiseSet.at_witnessed := ∀ {s' t} {φ : Form symbs s'} {k : symbs.nominal s'} {x : symbs.svar t},
-    (ℋ@k (ℋ∃ x φ) ∈ Γ → ∃ j : symbs.nominal t, ℋ@k φ[j // x] ∈ Γ) ∧
-    (∃ jₓ : symbs.nominal t, ℋ@jₓ x ∈ Γ)
+  def PremiseSet.at_witnessed :=
+    (∀ {s' t} {x : symbs.svar t} {φ : Form symbs s'} {k : symbs.nominal s'}, (ℋ@k (ℋ∃ x φ) ∈ Γ → ∃ j : symbs.nominal t, ℋ@k φ[j // x] ∈ Γ)) ∧
+    (∀ {t} (x : symbs.svar t), ∃ jₓ : symbs.nominal t, ℋ@jₓ x ∈ Γ)
 
 end Basic
 

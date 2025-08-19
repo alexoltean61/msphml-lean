@@ -6,8 +6,8 @@ open Completeness
 open Encodable
 open Denumerable
 
-variable {α : Type u} [DecidableEq α]
-variable {β : Type v} [β_deq : DecidableEq β]
+variable {α β : Type u}
+variable [DecidableEq α] [β_deq : DecidableEq β]
 variable {S : Symbols α}
 variable {s : S.signature.S}
 variable {Λ : AxiomSet S}
@@ -469,9 +469,8 @@ lemma Lindenbaum.pasted (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ)
         . simp only [e]
 
 lemma Lindenbaum.witnessed (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).at_witnessed := by
-  intro s' t φ k x
   apply And.intro
-  . intro h2
+  . intro s' t x φ k h2
     simp [PremiseSet.LindenbaumExtension]
     let j_set : ExtendiblePremiseSet _ _ (ext.m+ Λ) := ⟨(Γ.Lindenbaum ext Λ (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ)))).set ∪ { ℋ@ k(ℋ∃ x φ) }, enough_nominals_singleton⟩
     exists j_set.even_nominal _ $ Prod.mk (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ))) 0
@@ -485,7 +484,8 @@ lemma Lindenbaum.witnessed (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext 
     unfold PremiseSet.Lindenbaum
     rw [ofNat_encode]
     simp [Γ'_def, h_cons, j_set]
-  . exists (Γ.embed ext Λ).odd_nominal _ x
+  . intro t x
+    exists (Γ.embed ext Λ).odd_nominal _ x
     exists 0
     unfold PremiseSet.Lindenbaum
     simp only [Set.mem_union, Set.mem_setOf_eq]

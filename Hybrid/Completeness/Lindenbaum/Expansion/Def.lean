@@ -5,15 +5,14 @@ namespace Completeness
 
 open Completeness
 
-variable {α : Type u}
-variable {β : Type v}
+variable {α β : Type u}
 
 /--
   TODO SECTION:
     Signature / Symbols extensions and embeddings.
     Properties preserved by embeddings.
 -/
-structure Symbols.morphism (S₁ : Symbols α) (S₂ : Symbols β) : Type max (u+1) (v+1) where
+structure Symbols.morphism (S₁ : Symbols α) (S₂ : Symbols β) where
   morph_sort : S₁.signature.S → S₂.signature.S
   morph_op {dom rng} : S₁.signature.Sig dom rng → S₂.signature.Sig (dom.map morph_sort) (morph_sort rng)
   morph_N    {st} : S₁.signature.N st → S₂.signature.N (morph_sort st)
@@ -30,7 +29,7 @@ structure Symbols.embedding (S₁ : Symbols α) (S₂ : Symbols β) where
   nom_inj  : ∀ st, (@m.morph_nom st).Injective
   svar_inj : ∀ st, (@m.morph_svar st).Injective
 
-structure Symbols.nominal_extension [DecidableEq β] (S : Symbols α) (β : Type v) where
+structure Symbols.nominal_extension [DecidableEq β] (S : Symbols α) (β : Type u) where
   target : Symbols β
   m : S.embedding target
   unused_nominals : { n₂ | ∀ n₁ : S.nom s, m.m.morph_nom n₁ ≠ n₂ } ≃ ℕ
