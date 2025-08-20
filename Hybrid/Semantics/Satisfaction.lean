@@ -360,6 +360,15 @@ section Lemmas
           simp [WProd.select] at this
           exact this
 
+  lemma Sat.context' {ψ : FormL symbs sorts} : (⟨M, g, ws⟩ ⊨ ψ) ↔ (∀ {e : ψ.Elem}, ⟨M, g, ws.select e.ctx⟩ ⊨ e.form) := by
+    rw [Sat.context]
+    simp only [FormL.Elem, FormL.Elem.ctx, FormL.Elem.form]
+    apply Iff.intro
+    . intro h ⟨e, φ, ctx⟩
+      exact h ctx
+    . intro h s φ ctx
+      exact @h ⟨s, ⟨φ, ctx⟩⟩
+
   lemma WProd.select_iso {φ ψ : Form symbs s} {χ τ : FormL symbs sorts} {C₁ : φ.Context χ} {C₂ : ψ.Context τ} {ws : WProd W sorts} (h : C₁.iso C₂) : ws.select C₁ = ws.select C₂ := by
     induction C₁
     . cases C₂

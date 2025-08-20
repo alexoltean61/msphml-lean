@@ -416,8 +416,10 @@ lemma Lindenbaum.named  : (Γ.LindenbaumExtension ext Λ).named := by
   simp [PremiseSet.Lindenbaum]
 
 lemma Lindenbaum.pasted (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).pasted := by
-  intro _ _ sᵢ σ k χ φ C h2
-  let e : χ.Elem := ⟨sᵢ, φ, C⟩
+  intro _ _ t σ k χ h2 e
+  let sᵢ := e.sort
+  let φ  := e.form
+  let C  := e.ctx
   let form : Form ext.target (ext.m+ s) := ℋ@ k(ℋ⟨σ⟩χ)
   let j_set : ExtendiblePremiseSet _ _ (ext.m+ Λ) := ⟨(Γ.Lindenbaum ext Λ (encode form)).set ∪ { form }, enough_nominals_singleton⟩
   let j : ext.target.nominal sᵢ := j_set.even_nominal sᵢ $ Prod.mk (encode form) e
@@ -445,10 +447,10 @@ lemma Lindenbaum.pasted (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ)
     apply And.intro
     . rw [ofNat_encode]
     . apply And.intro
-      . simp only [e]
+      . simp only [FormL.Elem.sort, sᵢ]
       . apply And.intro
         . rw [ofNat_encode]
-        . simp only [e]
+        . simp only [FormL.Elem.form, φ]
   . apply mcs_and_right is_mcs (ℋ@ k(ℋ⟨σ⟩C[ℋNom j]))
     -- From this point on, the whole proof is identical to the other And branch
     exists (encode form) + 1
@@ -463,10 +465,8 @@ lemma Lindenbaum.pasted (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ)
     apply And.intro
     . rw [ofNat_encode]
     . apply And.intro
-      . simp only [e]
-      . apply And.intro
-        . rw [ofNat_encode]
-        . simp only [e]
+      . rw [ofNat_encode]
+      . simp only
 
 lemma Lindenbaum.witnessed (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).at_witnessed := by
   apply And.intro

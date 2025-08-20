@@ -68,4 +68,8 @@ def exists_lemma_proof {i : symbs.nominal t} (h1 : ¬Λ.occurs i) (h2 : ¬Θ.occ
   have := generalize_nominals_proof y_fresh pf
   admit
 
+def bridge_proof {j : symbs.nominal t} {φ : Form symbs t} (C : (ℋNom j).Context χ) : Proof Λ s (ℋ⟨σ⟩ χ ⋀ ℋ@ j φ ⟶ ℋ⟨σ⟩ C[φ]) := by
+
+  admit
+
 end Proof
