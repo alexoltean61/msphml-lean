@@ -54,10 +54,10 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | broadcastS s₂ : Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ (ℋ@j φ)
   | genAt s₂ j : Proof Λ s₁ φ → Proof Λ s₂ (ℋ@j φ)
   | nameAt s₂ {j : symbs.nominal s₂} {φ : Form symbs s₂} :
-            Λ.occurs j = false → φ.occurs j = false →
+            ¬Λ.occurs j → φ.occurs j = false →
             Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ φ
   | paste (C : (ℋNom k).Context χ):
-          k ≠ₛ j → Λ.occurs k = false → φ.occurs k = false → ψ.occurs k = false → χ.occurs k = false →
+          k ≠ₛ j → ¬Λ.occurs k → ψ.occurs k = false → C[φ].occurs k = false →
           Proof Λ s (ℋ@j (ℋ⟨σ⟩ χ) ⋀ ℋ@k φ ⟶ ψ) → Proof Λ s ((ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ))
   | gen x : Proof Λ s φ → Proof Λ s (ℋ∀x φ)
 

@@ -362,11 +362,10 @@ section Lemmas
     If `M` belongs to the class of models that satisfy `Λ`, and `j` does not occur in `Λ`,
       then `M`'s v_variant which takes `j` to `w` also belongs to the class that satisfies `Λ`.
   -/
-  lemma Set.Elem.v_variant_modelclass_inv (Λ : AxiomSet symbs) (M : Λ.Models) (j : symbs.nominal s) (h : Λ.occurs j = false) (w : M.1.Fr.W s) : (M.1.v_variant j w) ∈ Λ.Models := by
+  lemma Set.Elem.v_variant_modelclass_inv (Λ : AxiomSet symbs) (M : Λ.Models) (j : symbs.nominal s) (h : ¬Λ.occurs j) (w : M.1.Fr.W s) : (M.1.v_variant j w) ∈ Λ.Models := by
     cases j <;>
     . simp only [AxiomSet.Models, Set.mem_setOf_eq, Model.valid]
-      simp only [AxiomSet.occurs, Bool.false_eq_true, eq_iff_iff, iff_false, not_exists,
-        Bool.not_eq_true] at h
+      simp only [AxiomSet.occurs, not_exists, Bool.not_eq_true] at h
       intro s φ φ_in_Λ g w
       specialize h s ⟨φ, φ_in_Λ⟩
       rw [←v_variant_agreement']

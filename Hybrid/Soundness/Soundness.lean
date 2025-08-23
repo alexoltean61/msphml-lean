@@ -224,8 +224,8 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       simp only [Sat.at]
       specialize h M g ((M.1).VNom j)
       exact h
-  | paste C neq noccΛ noccφ noccψ noccχ _ ih =>
-      rename_i sₜ k _ _ _ sⱼ j _ _ φ _ _
+  | paste C neq noccΛ noccψ noccCtx _ ih =>
+      rename_i sₜ k _ _ _ sⱼ j φ _ _ _ _
       intro M g w
       simp only [Sat.implies]
       intro h
@@ -258,9 +258,9 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
             have ⟨C', C'_iso⟩ := C.subst_not_iso Cᵤ h_symm φ
             specialize wsSat C'
             symm at C'_iso
-            rw [not_nominal_occurs_context] at noccχ
-            specialize noccχ Cᵤ
-            rw [←v_variant_agreement noccχ wₜ]
+            rw [not_nominal_occurs_context] at noccCtx
+            specialize noccCtx C'
+            rw [←v_variant_agreement noccCtx wₜ]
             rw [WProd.select_iso C'_iso] at wsSat
             exact wsSat
         . rw [←v_variant_acc_inv neq]
@@ -269,6 +269,8 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         have : M.1.Fr.W sₜ = M'.1.Fr.W sₜ := v_variant_world_inv sₜ
         conv =>
           lhs; simp [M', v_variant_valuation]
+        rw [not_nominal_occurs_context] at noccCtx
+        have noccφ := noccCtx (FormL.subst_to_ctx _ _)
         rw [←v_variant_agreement noccφ wₜ]
         exact wsSat t
   | @nameAt s₁ s₂ j φ noccΛ noccφ _ ih =>
