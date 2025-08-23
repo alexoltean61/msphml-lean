@@ -81,8 +81,8 @@ section Defs
   def FormL.Worlds (φ : Form symbs s) (M : Model symbs) (g : Assignment M) : Set (M.Fr.W s) :=
     λ w => Sat M g w φ
 
-  def FormL.satisfiable (φ : Form symbs s) (ModelClass : Set (Model symbs)) : Prop :=
-    ∃ M : ModelClass, ∀ g w, ⟨M, g, w⟩ ⊨ φ
+  def FormL.satisfiable (φ : FormL symbs sorts) (ModelClass : Set (Model symbs)) : Prop :=
+    ∃ M : ModelClass, ∃ g w, ⟨M, g, w⟩ ⊨ φ
 
   def Model.valid (M : Model symbs) (φ : Form symbs s) : Prop :=
     ∀ g w, ⟨M, g, w⟩ ⊨ φ
@@ -206,13 +206,13 @@ section Lemmas
   @[simp]
   lemma Sat.implies : (⟨M, g, w⟩ ⊨ φ ⟶ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) → ⟨M, g, w⟩ ⊨ ψ := by
     apply Iff.intro
-    . simp only [FormL.implies, Sat]
+    . simp only [FormL.implies]
       intro h _
       apply Or.elim h
       . intro
         contradiction
       . simp only [imp_self]
-    . simp only [FormL.implies, Sat]
+    . simp only [FormL.implies]
       intro h
       apply not_or_of_imp
       assumption
@@ -221,7 +221,7 @@ section Lemmas
   lemma Sat.and : (⟨M, g, w⟩ ⊨ φ ⋀ ψ) ↔ (⟨M, g, w⟩ ⊨ φ) ∧ ⟨M, g, w⟩ ⊨ ψ := by
     apply Iff.intro
     repeat {
-      simp only [FormL.and, Sat]
+      simp only [Sat]
       rw [not_or, not_not, not_not]
       simp only [imp_self]
     }
@@ -229,11 +229,11 @@ section Lemmas
   @[simp]
   lemma Sat.iff : (⟨M, g, w⟩ ⊨ φ ←→ ψ) ↔ ((⟨M, g, w⟩ ⊨ φ) ↔ ⟨M, g, w⟩ ⊨ ψ) := by
     apply Iff.intro
-    . simp only [FormL.iff, FormL.and, FormL.implies, Sat, not_or, not_not, not_and, and_imp]
+    . simp only [Sat, not_or, not_not, not_and, and_imp]
       intros
       apply Iff.intro
       repeat assumption
-    . simp only [FormL.iff, FormL.and, FormL.implies, Sat, not_or, not_not, not_and]
+    . simp only [Sat, not_or, not_not, not_and]
       intro h
       apply And.intro
       . exact h.mp
@@ -321,7 +321,6 @@ section Lemmas
   @[simp]
   lemma Sat.top : ⟨M, g, w⟩ ⊨ ℋ⊤ := by
     simp [FormL.top]
-    apply Classical.em
 
   @[simp]
   lemma Sat.bot : ⟨M, g, w⟩ ⊭ ℋ⊥ := by
@@ -441,38 +440,31 @@ section Lemmas
 
  lemma Valid.conjunction_entails {C : Set (Model symbs)} :
   (∃ ch : FiniteChoice Γ, ⊨(C) (ch.conjunction ⟶ φ)) → (Γ ⊨(C) φ) := by
-    intro ⟨ch, h⟩
+    intro ⟨⟨ch, nodup⟩, h⟩
     induction ch generalizing φ with
     | nil =>
         apply Entails.monotonicity
         . apply Set.empty_subset
         rw [Entails.no_premises]
-        simp only [FiniteChoice.conjunction] at h
+        simp only [FiniteChoice.conjunction, List.conjunction] at h
         intro M g w
         have := h M g w
-        simp only [Sat.implies, Sat.or, Sat.neg] at this
+        simp only [Sat.implies] at this
         apply this
-        apply Classical.em
+        exact Sat.top
     | cons ψ ch ih =>
         have : Γ = Γ ∪ {ψ.1} := by simp only [Set.union_singleton, Subtype.coe_prop,
           Set.insert_eq_of_mem]
         rw [this, Entails.deduction]
-        apply ih
+        apply ih (List.nodup_cons.mp nodup).2
         clear ih
-        cases ch
-        . simp only [FiniteChoice.conjunction] at h ⊢
-          intro M g w
-          rw [Sat.implies, Sat.implies]
-          intros
-          apply Sat.implies.mp (h M g w)
-          assumption
-        . simp only [FiniteChoice.conjunction] at h ⊢
-          intro M g w
-          rw [Sat.implies, Sat.implies]
-          intros
-          apply Sat.implies.mp (h M g w)
-          rw [Sat.and]
-          apply And.intro
-          repeat assumption
+        simp only [FiniteChoice.conjunction, List.conjunction] at h ⊢
+        intro M g w
+        rw [Sat.implies, Sat.implies]
+        intros
+        apply Sat.implies.mp (h M g w)
+        rw [Sat.and]
+        apply And.intro
+        repeat assumption
 
 end Lemmas

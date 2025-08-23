@@ -1,6 +1,7 @@
 import Hybrid.Proof
 import Hybrid.Semantics
-import Hybrid.Completeness.Lindenbaum.Lindenbaum
+import Hybrid.Completeness.Lindenbaum.Expansion
+import Hybrid.Completeness.Lindenbaum.Lemma
 import Hybrid.Completeness.Henkin.Truth
 
 variable {α : Type u}
@@ -37,7 +38,7 @@ theorem Completeness {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ 
   -- This is lemma SatLift above
   rw [←SatLift]
   . -- Next, apply SatSubset:
-    have ⟨Γ', incl⟩ := Lindenbaum h_cons
+    have ⟨Γ', incl⟩ := Lindenbaum nominal_extension.default h_cons
     apply SatSubset
     case Γ =>
       exact Γ'.set
@@ -51,6 +52,7 @@ theorem Completeness {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ 
       intro φ
       rw [Truth]
       apply gen_at_closed Γ'.mcs
+      exact j_in_Γ'
     . -- From the Lindenbaum lemma, we know Γ is a subset
       -- of Γ' (in the extended language)
       apply incl

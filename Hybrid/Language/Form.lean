@@ -11,6 +11,7 @@ inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
   | at   : symbs.nominal t → FormL symbs [t] → FormL symbs [s]
   | bind : symbs.svar t → FormL symbs [s] → FormL symbs [s]
   | cons : FormL symbs [s₁] → FormL symbs (s₂ :: t) → FormL symbs (s₁ :: s₂ :: t)
+deriving DecidableEq
 
 @[reducible] def Form (symbs : Symbols α) (s : symbs.signature.S) := FormL symbs [s]
 
@@ -32,14 +33,14 @@ def FormL.applDual {symbs : Symbols α}
                    (φ : FormL symbs (h :: t)) : FormL symbs [s] :=
   .neg (.appl σ φ.negAll)
 
-def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
-def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
-def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
-def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := ((φ.neg).bind x).neg
+@[match_pattern] def FormL.implies (φ ψ : FormL symbs [s]) : FormL symbs [s] := φ.neg.or ψ
+@[match_pattern] def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
+@[match_pattern] def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
+@[match_pattern] def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := ((φ.neg).bind x).neg
 abbrev FormL.default : Form symbs s := FormL.svar 0
-def FormL.top : Form symbs s := FormL.default.or FormL.default.neg
-def FormL.bot : Form symbs s := FormL.default.and FormL.default.neg
-abbrev FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
+@[match_pattern] def FormL.top : Form symbs s := FormL.default.implies $ FormL.default.implies FormL.default
+@[match_pattern] def FormL.bot : Form symbs s := FormL.top.neg
+@[match_pattern] abbrev FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
 
 prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
@@ -93,20 +94,32 @@ def HAt : FormL symbs s → Prop
 def FormHAt (symbs: Symbols α) s := {φ : Form symbs s // HAt φ}
 
 
+section PremiseSet
+
+variable {α : Type u}
+variable {symbs : Symbols α}
+variable {s : symbs.signature.S}
+
 -- Premise set is the type of premises Γₛ which may be used for deduction.
 -- Note that we will be defining a *local* deduction relation, which in this
 -- many-sorted setting involves sets of premises of the same sort.
 @[reducible] def PremiseSet (symbs : Symbols α) (s: symbs.signature.S): Type u := Set (Form symbs s)
 
-@[reducible] def FiniteChoice (Γ : PremiseSet symbs s): Type u := List Γ
-@[reducible] def FiniteChoice.conjunction {Γ: PremiseSet symbs s}: FiniteChoice Γ → Form symbs s
+@[reducible] def FiniteChoice  (Γ : PremiseSet symbs s) := (L : List Γ) ×' L.Nodup
+
+@[reducible, simp]
+def List.conjunction {Γ: PremiseSet symbs s}: List Γ → Form symbs s
   | []      => ℋ⊤
-  | [φ]     => φ
-  | φ :: ψs =>
-      let ψs_as_premiseSet : FiniteChoice Γ := ψs -- annoying
-      ψs_as_premiseSet.conjunction ⋀ φ
+  | φ :: ψs => ψs.conjunction ⋀ φ
 
+@[reducible, simp]
+def FiniteChoice.conjunction {Γ: PremiseSet symbs s}: FiniteChoice Γ → Form symbs s :=
+  λ ⟨ch, _⟩ => ch.conjunction
 
--- Do we need a DecidableEq instance for FormL?
+@[simp]
+instance {α : Type u} {symbs : Symbols α} {s : symbs.signature.S} {Γ : PremiseSet symbs s} : Membership (Γ.Elem) (FiniteChoice Γ) where
+  mem := λ ⟨ch, _⟩ φ => φ ∈ ch
 
 @[reducible] def AxiomSet (symbs : Symbols α) := (s: symbs.signature.S) → Set (Form symbs s)
+
+end PremiseSet

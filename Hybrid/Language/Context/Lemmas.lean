@@ -74,6 +74,36 @@ lemma if_iso {φ ψ : Form symbs s} {τ : FormL symbs sorts} (C₁ : φ.Context 
       | _ => cases C₂ with
              | _ => rfl
 
+lemma subst_as_id {φ : Form symbs s} {τ : FormL symbs sorts} {C : φ.Context τ} : C[φ] = τ := by
+  induction τ with
+  | cons _ _ _ ih =>
+      cases C
+      . rfl
+      . simp [subst, ih]
+  | _ =>
+      cases C
+      . rfl
+
+lemma subst_in_iso_helper {φ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : χ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[φ] = C₁[φ] := by
+  induction τ with
+  | cons _ _ _ ih =>
+      cases C₁
+      . cases C₂
+        . rfl
+        . simp [iso] at h
+      . cases C₂
+        . simp [iso] at h
+        . simp [iso] at h
+          simp [subst]
+          exact ih h
+  | _ =>
+      cases C₁ with
+      | _ => cases C₂ with
+             | _ => rfl
+
+lemma subst_in_iso {φ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : χ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[φ] = τ := by
+  rw [subst_in_iso_helper h, subst_as_id]
+
 lemma if_iso_sorts {φ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} (C₁ : φ.Context τ) (C₂ : ψ.Context τ) (h : C₁.iso C₂) : s = s' := by
   induction τ with
   | cons _ _ _ ih =>
