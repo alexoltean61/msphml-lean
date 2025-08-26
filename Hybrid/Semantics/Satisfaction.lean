@@ -4,7 +4,7 @@ variable {α : Type u}
 variable [DecidableEq α]
 variable {symbs : Symbols α}
 /--
-  Given a non-null list of sorts, and a denotation function that assignaturens a Lean type to each sort,
+  Given a non-null list of sorts, and a denotation function that assigns a Lean type to each sort,
     `WProd` returns the product type of all sort denotations in the list.
 -/
 @[reducible] def WProd {signature : Signature α} (W : signature.S → Type u) : List (signature.S) → Type u
@@ -28,7 +28,7 @@ def WProd.select {φ : Form symbs s} {ψ : FormL symbs sorts} (ws : WProd W sort
 
 structure Frame (signature : Signature α) where
   W  : signature.S → Type u
-  R  : signature.Sig dom range → Set (WProd W (range :: dom))
+  R  : signature.«Σ» dom range → Set (WProd W (range :: dom))
   Nm : {s : signature.S} → signature.N s → W s
 
   WNonEmpty : ∀ s, Inhabited (W s)
@@ -180,7 +180,7 @@ section Lemmas
     simp only [Sat]
 
   @[simp]
-  lemma Sat.appl {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} : (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ arg) ↔ ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ := by
+  lemma Sat.appl {w : M.Fr.W s} {σ : symbs.signature.«Σ» (s₁ :: t) s} : (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ arg) ↔ ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ := by
     simp only [Sat]
 
   @[simp]
@@ -296,7 +296,7 @@ section Lemmas
           exact h1
 
   @[simp]
-  lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.Sig (s₁ :: t) s} :
+  lemma Sat.applDual {w : M.Fr.W s} {σ : symbs.signature.«Σ» (s₁ :: t) s} :
     (⟨M, g, w⟩ ⊨ ℋ⟨σ⟩ᵈ args) ↔
       (∀ ws, ⟨w, ws⟩ ∈ (M.Fr.R σ) →
         ∃ (s' : symbs.signature.S) (φ : Form symbs s') (ctx : φ.Context args), ⟨M, g, ws.select ctx⟩ ⊨ φ) := by

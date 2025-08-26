@@ -5,17 +5,15 @@ structure Signature (α : Type u) where
   -- α: the carrier set of sorts
   --  e.g., if α is String, S may be {"nat", "bool"}
   S    : Set α
-  Sig  : List S → S → Set α
+  «Σ»  : List S → S → Set α
   N    : S → Set α
 
   sortsCtbl : Encodable S
-  opsCtbl (dom range) : Encodable (Sig dom range)
+  opsCtbl (dom range) : Encodable («Σ» dom range)
   nomCtbl (s)         : Encodable (N s)
 
   sNonEmpty : Inhabited S
   nNonEmpty (s) : Inhabited (N s)
-  -- Should you add further inhabitance constraints?
-  -- Should you add disjointness constraints?
 
 structure Symbols (α : Type u) where
   signature  : Signature α
@@ -27,8 +25,6 @@ structure Symbols (α : Type u) where
   propCtbl (s) : Encodable (prop s)
   nomCtbl  (s) : Encodable (nom s)
   svarCtbl (s) : Denumerable (svar s)
-
-  -- Should you add disjointness constraints?
 
 -- Often when dealing with syntax, we treat constant nominals and regular nominals uniformly.
 -- It helps to have their disjoint union defined as a standalone type.

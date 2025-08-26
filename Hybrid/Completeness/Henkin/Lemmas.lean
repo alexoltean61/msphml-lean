@@ -28,7 +28,7 @@ variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 variable {Λ : AxiomSet symbs}
 variable {Γ : PremiseSet symbs s}
-variable {s₁ ss t} {σ : symbs.signature.Sig (s₁ :: ss) t}
+variable {s₁ ss t} {σ : symbs.signature.«Σ» (s₁ :: ss) t}
 variable {χ : FormL symbs (s₁ :: ss)}
 
 def FormL.subst_wprod_til (φ : FormL symbs sorts) (til : Fin sorts.length): WProd symbs.nominal sorts → FormL symbs sorts := sorry

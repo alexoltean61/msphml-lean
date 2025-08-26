@@ -111,7 +111,7 @@ section Lemmas
     If `k ≠ j`, then the world assigned to `j` in any `v_variant` for `k` is connected to the same worlds
     via any accesibility relation as in the original model.
   -/
-  lemma v_variant_acc_inv {M : Model symbs} {k : symbs.nominal s} {j : symbs.nominal t} {σ : symbs.signature.Sig (s₁::ss) t} {w : WProd M.Fr.W ([s])} {ws : WProd M.Fr.W (s₁ :: ss)} (h : k ≠ₛ j) :
+  lemma v_variant_acc_inv {M : Model symbs} {k : symbs.nominal s} {j : symbs.nominal t} {σ : symbs.signature.«Σ» (s₁::ss) t} {w : WProd M.Fr.W ([s])} {ws : WProd M.Fr.W (s₁ :: ss)} (h : k ≠ₛ j) :
     ⟨(M.VNom j), ws⟩ ∈ M.Fr.R σ ↔ ⟨(M.v_variant k w).VNom j, ws.v_variant k w⟩ ∈ (M.v_variant k w).Fr.R σ := by
     cases k
     . cases j

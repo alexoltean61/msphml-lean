@@ -165,7 +165,7 @@ variable {s t u : symbs.signature.S}
 variable {sorts : List symbs.signature.S}
 variable {x y : symbs.svarType s}
 variable {i j : symbs.nominal s}
-variable {σ : symbs.signature.Sig (t :: sorts) u}
+variable {σ : symbs.signature.«Σ» (t :: sorts) u}
 
 @[simp]
 lemma subst_var_appl : (ℋ⟨σ⟩ φ)[y // x] = ℋ⟨σ⟩ (φ[y // x]) := by

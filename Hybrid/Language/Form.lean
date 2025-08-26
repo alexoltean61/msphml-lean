@@ -4,8 +4,8 @@ inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
   | prop : symbs.prop s → FormL symbs [s]
   | nom  : symbs.nominal s → FormL symbs [s]
   | svar : symbs.svar s → FormL symbs [s]
-  | appl : symbs.signature.Sig (h :: t) s → FormL symbs (h :: t) → FormL symbs [s]
---  | ct   : symbs.signature.Sig [] s → FormL symbs [s]
+  | appl : symbs.signature.«Σ» (h :: t) s → FormL symbs (h :: t) → FormL symbs [s]
+--  | ct   : symbs.signature.«Σ» [] s → FormL symbs [s]
   | or   : FormL symbs [s] → FormL symbs [s] → FormL symbs [s]
   | neg  : FormL symbs [s] → FormL symbs [s]
   | at   : symbs.nominal t → FormL symbs [t] → FormL symbs [s]
@@ -29,7 +29,7 @@ def FormL.negAll : FormL sig sorts → FormL sig sorts
 def FormL.applDual {symbs : Symbols α}
                    {s h : symbs.signature.S}
                    {t : List symbs.signature.S}
-                   (σ : symbs.signature.Sig (h :: t) s)
+                   (σ : symbs.signature.«Σ» (h :: t) s)
                    (φ : FormL symbs (h :: t)) : FormL symbs [s] :=
   .neg (.appl σ φ.negAll)
 

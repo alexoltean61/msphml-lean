@@ -29,7 +29,7 @@ section Basic
         `@k σ(φ₁, ... j, ..., φₙ) ∈ Γₛ` and
         `@j φ ∈ Γₛ`.
   -/
-  def PremiseSet.pasted := ∀ {s₁ ss t} {σ : symbs.signature.Sig (s₁ :: ss) t} {k : symbs.nominal t} {χ : FormL symbs (s₁ :: ss)},
+  def PremiseSet.pasted := ∀ {s₁ ss t} {σ : symbs.signature.«Σ» (s₁ :: ss) t} {k : symbs.nominal t} {χ : FormL symbs (s₁ :: ss)},
     ℋ@k (ℋ⟨σ⟩ χ) ∈ Γ →  ∀ (e : χ.Elem), ∃ j : symbs.nominal e.sort, ℋ@k (ℋ⟨σ⟩ e.ctx[j]) ∈ Γ ∧ ℋ@j e.form ∈ Γ
 
   /--

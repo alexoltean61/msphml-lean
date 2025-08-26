@@ -7,12 +7,13 @@ variable [DecidableEq α]
 inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signature.S) → Form symbs s → Type u
   -- Λ:
   | ax    : (φ : Λ s) → Proof Λ s φ
-  -- K:
+  -- Propositional:
   | prop1 φ ψ   : Proof Λ s (φ ⟶ (ψ ⟶ φ))
   | prop2 φ ψ χ : Proof Λ s ((φ ⟶ (ψ ⟶ χ)) ⟶ (φ ⟶ ψ) ⟶ (φ ⟶ χ))
   | prop3 φ ψ   : Proof Λ s ((∼ψ ⟶ ∼φ) ⟶ (φ ⟶ ψ))
+  -- K:
   | k φ ψ χ
-      (σ : symbs.signature.Sig _ s)
+      (σ : symbs.signature.«Σ» _ s)
       (C : (φ ⟶ ψ).Context χ):
             Proof Λ s (ℋ⟨σ⟩ᵈ χ ⟶ (ℋ⟨σ⟩ᵈ C[φ] ⟶ ℋ⟨σ⟩ᵈ C[ψ]))
   | mp    : Proof Λ s (φ ⟶ ψ) → Proof Λ s φ → Proof Λ s ψ
@@ -26,7 +27,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | selfDual j φ : Proof Λ s (ℋ@j φ ←→ ∼ ℋ@j (∼φ))
   | intro j φ    : Proof Λ s (ℋNom j ⟶ (φ ←→ ℋ@j φ))
   | back j φ ψ
-         (σ : symbs.signature.Sig _ s)
+         (σ : symbs.signature.«Σ» _ s)
          (C : (@FormL.at α symbs t sᵢ j ψ).Context φ):
       Proof Λ s (ℋ⟨σ⟩ φ ⟶ ℋ@j ψ)
   | ref j s₂ : Proof Λ s₂ (ℋ@j (ℋNom j))
@@ -41,7 +42,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   | name x : Proof Λ s (ℋ∃x (ℋVar x))
   -- 3. Barcan axioms
   | barcan x (φ : Form symbs s)
-      (σ : symbs.signature.Sig _ s)
+      (σ : symbs.signature.«Σ» _ s)
       (C : φ.Context ψ)
       (h : C.all_else_not_free x):
             Proof Λ s (ℋ∀x (ℋ⟨σ⟩ᵈ ψ) ⟶ (ℋ⟨σ⟩ᵈ C[ℋ∀x φ]))

@@ -75,7 +75,7 @@ abbrev ExtendiblePremiseSet.paste_args
     {t t' : S.signature.S}
     (Γ : ExtendiblePremiseSet S s Λ)
     (j : S.nominal t)
-    (σ : S.signature.Sig (t' :: ss) t)
+    (σ : S.signature.«Σ» (t' :: ss) t)
     (χ : FormL S (t' :: ss)) : ℕ → PremiseSet S s :=
   λ i => { ℋ@ j (ℋ⟨σ⟩ e.2.2[ℋNom (Γ.prod_even_nominal _ i e)]) ⋀ ℋ@ (Γ.prod_even_nominal _ i e) e.2.1 | e : χ.Elem }
 

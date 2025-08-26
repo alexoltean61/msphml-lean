@@ -85,9 +85,9 @@ def SMCCtNom : Sorts → Set String := λ s =>
     { "plus", "leq", "skip" }
   else { }
 
-def SMCSig : Signature String where
+def SMC«Σ» : Signature String where
   S   := Sorts
-  Sig := SMCOp
+  «Σ» := SMCOp
   N   := SMCCtNom
 
   sortsCtbl := by simp [Sorts]
@@ -121,24 +121,24 @@ def SMCSymb : Symbols String where
 
 
   -- == :: (SortNat, SortNat) -> SortBool
-def EqNat : (SMCSymb.signature.Sig [SortNat, SortNat] SortBool).Elem := ⟨"==", by simp [SMCSymb, SMCSig, SMCOp]⟩
+def EqNat : (SMCSymb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"==", by simp [SMCSymb, SMCSig, SMCOp]⟩
 -- <= :: (SortNat, SortNat) -> SortBool
-def LEqNat : (SMCSymb.signature.Sig [SortNat, SortNat] SortBool).Elem := ⟨"<=", by simp [SMCSymb, SMCSig, SMCOp]⟩
+def LEqNat : (SMCSymb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"<=", by simp [SMCSymb, SMCSig, SMCOp]⟩
 
 -- nat2AExp :: SortNat -> SortAExp
-def nat2AExp : (SMCSymb.signature.Sig [SortNat] SortAExp).Elem := ⟨"nat2AExp", by simp [SMCSymb, SMCSig, SMCOp]⟩
+def nat2AExp : (SMCSymb.signature.«Σ» [SortNat] SortAExp).Elem := ⟨"nat2AExp", by simp [SMCSymb, SMCSig, SMCOp]⟩
 -- var2AExp :: SortVar -> SortAExp
-def var2AExp : (SMCSymb.signature.Sig [SortVar] SortAExp).Elem := ⟨"var2AExp", by simp [SMCSymb, SMCSig, SortVar, SortNat, SMCOp]⟩
+def var2AExp : (SMCSymb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"var2AExp", by simp [SMCSymb, SMCSig, SortVar, SortNat, SMCOp]⟩
 
 -- + :: (SortAExp, SortAExp) -> SortAExp
-def PlusNat : (SMCSymb.signature.Sig [SortAExp, SortAExp] SortAExp).Elem := ⟨"+", by simp [SMCSymb, SMCSig, SortAExp, SortNat, SMCOp]⟩
+def PlusNat : (SMCSymb.signature.«Σ» [SortAExp, SortAExp] SortAExp).Elem := ⟨"+", by simp [SMCSymb, SMCSig, SortAExp, SortNat, SMCOp]⟩
 -- ++ :: SortVar -> SortAExp
-def PlusPlusVar : (SMCSymb.signature.Sig [SortVar] SortAExp).Elem := ⟨"++", by simp [SMCSymb, SMCSig, SortAExp, SortNat, SortVar, SMCOp]⟩
+def PlusPlusVar : (SMCSymb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"++", by simp [SMCSymb, SMCSig, SortAExp, SortNat, SortVar, SMCOp]⟩
 
 -- <= :: (SortAExp, SortAExp) -> SortBExp
 -- TODO: There is also a <= strictly between naturals, returning strictly booleans
 -- Why both?
-def LEqAExp : (SMCSymb.signature.Sig [SortAExp, SortAExp] SortBExp).Elem := ⟨"<=", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SMCOp]⟩
+def LEqAExp : (SMCSymb.signature.«Σ» [SortAExp, SortAExp] SortBExp).Elem := ⟨"<=", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SMCOp]⟩
 
 -- skip :: SortStmt
 -- skip is a nominal
@@ -149,42 +149,42 @@ def LEqAExp : (SMCSymb.signature.Sig [SortAExp, SortAExp] SortBExp).Elem := ⟨"
 --  Stmt ::= Var := AExp
 --
 -- := :: (SortVar, SortAExp) -> SortStmt
-def AsgnStmt : (SMCSymb.signature.Sig [SortVar, SortAExp] SortStmt).Elem := ⟨":=", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def AsgnStmt : (SMCSymb.signature.«Σ» [SortVar, SortAExp] SortStmt).Elem := ⟨":=", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- ite :: (SortBExp, SortStmt, SortStmt) -> SortStmt
-def IteStmt : (SMCSymb.signature.Sig [SortBExp, SortStmt, SortStmt] SortStmt).Elem := ⟨"ite", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def IteStmt : (SMCSymb.signature.«Σ» [SortBExp, SortStmt, SortStmt] SortStmt).Elem := ⟨"ite", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- seq :: (SortStmt, SortStmt) -> SortStmt
-def SeqStmt : (SMCSymb.signature.Sig [SortStmt, SortStmt] SortStmt).Elem := ⟨";", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def SeqStmt : (SMCSymb.signature.«Σ» [SortStmt, SortStmt] SortStmt).Elem := ⟨";", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- while :: (SortBExp, SortStmt) -> SortStmt
-def WhileStmt : (SMCSymb.signature.Sig [SortBExp, SortStmt] SortStmt).Elem := ⟨"while", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def WhileStmt : (SMCSymb.signature.«Σ» [SortBExp, SortStmt] SortStmt).Elem := ⟨"while", by simp [SMCSymb, SMCSig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 -- nat2Val :: SortNat -> SortVal
-def nat2Val : (SMCSymb.signature.Sig [SortNat] SortVal).Elem := ⟨"nat2Val", by simp [SMCSymb, SMCSig, SortVal, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def nat2Val : (SMCSymb.signature.«Σ» [SortNat] SortVal).Elem := ⟨"nat2Val", by simp [SMCSymb, SMCSig, SortVal, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- bool2Val :: SortBool -> SortVal
-def bool2Val : (SMCSymb.signature.Sig [SortBool] SortVal).Elem := ⟨"bool2Val", by simp [SMCSymb, SMCSig, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def bool2Val : (SMCSymb.signature.«Σ» [SortBool] SortVal).Elem := ⟨"bool2Val", by simp [SMCSymb, SMCSig, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 -- . :: (Val, ValStack) -> ValStack
-def consValStack : (SMCSymb.signature.Sig [SortVal, SortValStack] SortValStack).Elem := ⟨"·", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def consValStack : (SMCSymb.signature.«Σ» [SortVal, SortValStack] SortValStack).Elem := ⟨"·", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- set :: (Mem, Var, AExp) -> Mem
-def setMem : (SMCSymb.signature.Sig [SortMem, SortVar, SortVal] SortMem).Elem := ⟨"set", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def setMem : (SMCSymb.signature.«Σ» [SortMem, SortVar, SortVal] SortMem).Elem := ⟨"set", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 -- c :: AExp -> CtrlStack
-def cAExp : (SMCSymb.signature.Sig [SortAExp] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def cAExp : (SMCSymb.signature.«Σ» [SortAExp] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- c :: BExp -> CtrlStack
-def cBExp : (SMCSymb.signature.Sig [SortBExp] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def cBExp : (SMCSymb.signature.«Σ» [SortBExp] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- c :: Stmt -> CtrlStack
-def cStmt : (SMCSymb.signature.Sig [SortStmt] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def cStmt : (SMCSymb.signature.«Σ» [SortStmt] SortCtrlStack).Elem := ⟨"c", by simp [SMCSymb, SMCSig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- asgn :: Var -> CtrlStack
-def AsgnCtrlStack : (SMCSymb.signature.Sig [SortVar] SortCtrlStack).Elem := ⟨"asgn", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def AsgnCtrlStack : (SMCSymb.signature.«Σ» [SortVar] SortCtrlStack).Elem := ⟨"asgn", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- ? ::    Val -> CtrlStack
-def TestCtrlStack : (SMCSymb.signature.Sig [SortVal] SortCtrlStack).Elem := ⟨"?", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def TestCtrlStack : (SMCSymb.signature.«Σ» [SortVal] SortCtrlStack).Elem := ⟨"?", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 -- seq :: (CtrlStack, CtrlStack) -> CtrlStack
-def SeqCtrlStack : (SMCSymb.signature.Sig [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨";", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def SeqCtrlStack : (SMCSymb.signature.«Σ» [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨";", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 -- < > :: (ValStack, Mem) -> Config
-def mkConfig : (SMCSymb.signature.Sig [SortValStack, SortMem] SortConfig).Elem := ⟨"< >", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def mkConfig : (SMCSymb.signature.«Σ» [SortValStack, SortMem] SortConfig).Elem := ⟨"< >", by simp [SMCSymb, SMCSig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 -- PDL :: (CtrlStack, Config) -> Config
-def PDLOp : (SMCSymb.signature.Sig [SortCtrlStack, SortConfig] SortConfig).Elem := ⟨"[ ]", by simp [SMCSymb, SMCSig, SortConfig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
+def PDLOp : (SMCSymb.signature.«Σ» [SortCtrlStack, SortConfig] SortConfig).Elem := ⟨"[ ]", by simp [SMCSymb, SMCSig, SortConfig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, SMCOp]⟩
 
 abbrev SMCFormL := FormL SMCSymb
 abbrev SMCForm  := Form SMCSymb

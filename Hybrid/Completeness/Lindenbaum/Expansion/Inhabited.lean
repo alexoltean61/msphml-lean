@@ -63,8 +63,8 @@ noncomputable instance Symbols.new_nominals (S₁ : Symbols α) : Σ S₂ : Symb
     {
       signature := {
         S := S₁.signature.S.embed
-        Sig := λ dom rng =>
-          (S₁.signature.Sig dom.preimage rng.preimage).embed,
+        «Σ» := λ dom rng =>
+          (S₁.signature.«Σ» dom.preimage rng.preimage).embed,
         N := λ st =>
           (S₁.signature.N st.preimage).embed,
         sortsCtbl := by
@@ -80,7 +80,7 @@ noncomputable instance Symbols.new_nominals (S₁ : Symbols α) : Σ S₂ : Symb
           apply @Encodable.ofInj _ ℕ
           let S₁_f := (S₁.signature.opsCtbl dom.preimage rng.preimage).encode
           let S₁_f_inj := (S₁.signature.opsCtbl dom.preimage rng.preimage).encode_injective
-          let f : (S₁.signature.Sig dom.preimage rng.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
+          let f : (S₁.signature.«Σ» dom.preimage rng.preimage).embed → ℕ := S₁_f ∘ Set.Elem.preimage
           rw [Function.Injective.of_comp_iff]
           . exact Set.Elem.preimage_injective
           . exact S₁_f_inj,

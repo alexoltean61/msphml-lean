@@ -82,7 +82,7 @@ section ClassicalRequired
     R := λ {dom₂} {rng₂} σ₂ =>
           if h : ∃ dom₁ : List S₁.signature.S, dom₁.map m.morph_sort = dom₂ then
             if h' : ∃ rng₁ : S₁.signature.S, m.morph_sort rng₁ = rng₂ then
-              if h'' : ∃ σ₁ : S₁.signature.Sig h.choose h'.choose, h.choose_spec ▸ h'.choose_spec ▸ m.morph_op σ₁ = σ₂ then
+              if h'' : ∃ σ₁ : S₁.signature.«Σ» h.choose h'.choose, h.choose_spec ▸ h'.choose_spec ▸ m.morph_op σ₁ = σ₂ then
                 h.choose_spec ▸ h'.choose_spec ▸ { m.morph_wprod ws F.WNonEmpty | ws ∈ F.R h''.choose }
               else { }
             else { }

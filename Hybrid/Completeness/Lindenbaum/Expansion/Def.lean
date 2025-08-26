@@ -14,7 +14,7 @@ variable {α β : Type u}
 -/
 structure Symbols.morphism (S₁ : Symbols α) (S₂ : Symbols β) where
   morph_sort : S₁.signature.S → S₂.signature.S
-  morph_op {dom rng} : S₁.signature.Sig dom rng → S₂.signature.Sig (dom.map morph_sort) (morph_sort rng)
+  morph_op {dom rng} : S₁.signature.«Σ» dom rng → S₂.signature.«Σ» (dom.map morph_sort) (morph_sort rng)
   morph_N    {st} : S₁.signature.N st → S₂.signature.N (morph_sort st)
   morph_prop {st} : S₁.prop st → S₂.prop (morph_sort st)
   morph_nom  {st} : S₁.nom st → S₂.nom (morph_sort st)
