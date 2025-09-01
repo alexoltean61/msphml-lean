@@ -186,4 +186,6 @@ lemma Truth {t : symbs.signature.S} {j : symbs.nominal t} {φ : Form symbs t} : 
       -- so in fact this reduces to the negation case.
       admit
 
+lemma HenkinInΛ : Γ.HenkinModel ∈ Λ.Models := sorry
+
 end Completeness

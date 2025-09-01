@@ -77,6 +77,9 @@ section Coercions
   instance : Coe (symbs.nominal s) (Form symbs s) where
     coe := FormL.nom
 
+  instance : Coe (symbs.prop s) (Form symbs s) where
+    coe := FormL.prop
+
 end Coercions
 
 -- Define H(@), the fragment of H(@, ∀) without binders, as a subtype of Form

@@ -7,11 +7,6 @@ open Completeness
 
 variable {α β : Type u}
 
-/--
-  TODO SECTION:
-    Signature / Symbols extensions and embeddings.
-    Properties preserved by embeddings.
--/
 structure Symbols.morphism (S₁ : Symbols α) (S₂ : Symbols β) where
   morph_sort : S₁.signature.S → S₂.signature.S
   morph_op {dom rng} : S₁.signature.«Σ» dom rng → S₂.signature.«Σ» (dom.map morph_sort) (morph_sort rng)

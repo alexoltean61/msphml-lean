@@ -54,7 +54,7 @@ def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ
     W  := λ s => Quotient (Γ.nominalSetoid s),
     R  := λ {dom _} σ =>
         match dom with
-        | [ ]    => { } -- constant σ case. TODO: make sure to support constant operators as formulas as well
+        | [ ]    => { }
         | _ :: _ => { ⟨q, qs⟩ | ∃ j, ∃ (js : WProd symbs.nominal _), ℋ@ j (ℋ⟨σ⟩ js.to_args) ∈ Γ.set ∧ (⟦j⟧ = q ∧ js.to_quotient Γ = qs) },
     Nm := λ n => ⟦.inl n⟧,
     WNonEmpty := λ s => ⟨⟦(symbs.signature.nNonEmpty s).default⟧⟩

@@ -31,6 +31,7 @@ section Basic
   -/
   def PremiseSet.pasted := ∀ {s₁ ss t} {σ : symbs.signature.«Σ» (s₁ :: ss) t} {k : symbs.nominal t} {χ : FormL symbs (s₁ :: ss)},
     ℋ@k (ℋ⟨σ⟩ χ) ∈ Γ →  ∀ (e : χ.Elem), ∃ j : symbs.nominal e.sort, ℋ@k (ℋ⟨σ⟩ e.ctx[j]) ∈ Γ ∧ ℋ@j e.form ∈ Γ
+  -- TODO: j must be STRICTLY NON-CONSTANT
 
   /--
     `Γₛ` is @-witnessed
@@ -38,6 +39,7 @@ section Basic
   def PremiseSet.at_witnessed :=
     (∀ {s' t} {x : symbs.svar t} {φ : Form symbs s'} {k : symbs.nominal s'}, (ℋ@k (ℋ∃ x φ) ∈ Γ → ∃ j : symbs.nominal t, ℋ@k φ[j // x] ∈ Γ)) ∧
     (∀ {t} (x : symbs.svar t), ∃ jₓ : symbs.nominal t, ℋ@jₓ x ∈ Γ)
+-- TODO: j must be STRICTLY NON-CONSTANT
 
 end Basic
 
