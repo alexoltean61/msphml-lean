@@ -65,15 +65,16 @@ lemma Lindenbaum.i_increasing : ∀ {i j}, i ≤ j → (Γ.Lindenbaum ext Λ i).
 
 lemma Lindenbaum.zero_named_consistent {t} {Λ : AxiomSet S} {Γ : PremiseSet S t} (i : S.nominal t) (h1 : Γ.consistent Λ) (h2 : ¬Λ.occurs i) (h3 : ¬Γ.occurs i) :
   (Γ ∪ {ℋNom i}).consistent Λ := by
-    apply And.intro h1.1
-    rw [Proof.deduction_set']
-    intro ⟨Θ_list, habs⟩
-    rw [Proof.deduction_singleton] at habs
-    apply h1.2
-    exists Θ_list
-    refine Proof.name' h2 ?nocc_pf habs
-    . simp only [FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
-      apply nominal_not_occurs_premise h3
+    intro habs
+    rw [Proof.deduction_set'] at habs
+    match habs with
+    | ⟨Θ_list, habs⟩ =>
+      rw [Proof.deduction_singleton] at habs
+      apply h1
+      exists Θ_list
+      refine Proof.name' h2 ?nocc_pf habs
+      . simp only [FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
+        apply nominal_not_occurs_premise h3
 
 lemma Lindenbaum.nominal_nocc_at_witness_vars [DecidableEq γ] {symbs : Symbols γ} {s t : symbs.signature.S} {x : symbs.svar t} {Λ : AxiomSet symbs} {Γ : ExtendiblePremiseSet symbs s Λ} {φ : Γ.at_witness_vars} {L : List (Γ.at_witness_vars)} (h : φ.1 = Γ.at_witness x) : φ ∉ L → L.conjunction.occurs (Γ.odd_nominal t x) = false := by
   intro h2
@@ -107,33 +108,34 @@ lemma Lindenbaum.nominal_nocc_at_witness_vars [DecidableEq γ] {symbs : Symbols 
 
 lemma Lindenbaum.zero_witness_consistent (h : Γ.consistent Λ) : ((Γ.embed ext Λ).set ∪ (Γ.embed ext Λ).at_witness_vars).consistent (ext.m+ Λ) := by
   have Γ_plus_consistent : (ext.m+ Γ).consistent (ext.m+ Λ) := ConsistentLift.mpr h
-  refine And.intro (AxiomConsistentLift.mpr h.1) ?bot_pf
-  rw [Proof.deduction_set']
-  intro ⟨Θ_list, ⟨⟨witness_list, nodup⟩, habs⟩⟩
-  induction witness_list with
-  | nil =>
-      apply Γ_plus_consistent.2
-      exists Θ_list
-      exact ⟨Proof.mp (Classical.choice habs) Proof.top_proof⟩
-  | cons φ φs ih =>
-      have := φ.2
-      simp only [ExtendiblePremiseSet.at_witness_vars, Sigma.exists, Set.mem_setOf_eq] at this
-      have ⟨t, ⟨x, h_x⟩⟩ := this
-      clear this
-      simp only [FiniteChoice.conjunction, List.conjunction, Proof.impex] at habs
-      rw [Proof.imp_com, ←h_x] at habs
-      -- We will prove the goal by applying q2_nom' and the induction hypothesis
-      apply ih (List.nodup_cons.mp nodup).2
-      . refine Proof.q2_nom' ?_ ?_ habs
-        . apply odd_nom_nocc_axioms
-        . simp only [Set.coe_setOf, FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false,
-          Bool.or_eq_false_iff]
-          apply And.intro
-          . rw [List.nodup_cons] at nodup
-            simp only [FiniteChoice.conjunction]
-            apply nominal_nocc_at_witness_vars h_x.symm nodup.1
-          . apply nominal_not_occurs_premise
-            apply odd_nom_nocc_premises
+  intro habs
+  rw [Proof.deduction_set'] at habs
+  match habs with
+  | ⟨Θ_list, ⟨⟨witness_list, nodup⟩, habs⟩⟩ =>
+    induction witness_list with
+    | nil =>
+        apply Γ_plus_consistent
+        exists Θ_list
+        exact ⟨Proof.mp (Classical.choice habs) Proof.top_proof⟩
+    | cons φ φs ih =>
+        have := φ.2
+        simp only [ExtendiblePremiseSet.at_witness_vars, Sigma.exists, Set.mem_setOf_eq] at this
+        have ⟨t, ⟨x, h_x⟩⟩ := this
+        clear this
+        simp only [FiniteChoice.conjunction, List.conjunction, Proof.impex] at habs
+        rw [Proof.imp_com, ←h_x] at habs
+        -- We will prove the goal by applying q2_nom' and the induction hypothesis
+        apply ih (List.nodup_cons.mp nodup).2
+        . refine Proof.q2_nom' ?_ ?_ habs
+          . apply odd_nom_nocc_axioms
+          . simp only [Set.coe_setOf, FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false,
+            Bool.or_eq_false_iff]
+            apply And.intro
+            . rw [List.nodup_cons] at nodup
+              simp only [FiniteChoice.conjunction]
+              apply nominal_nocc_at_witness_vars h_x.symm nodup.1
+            . apply nominal_not_occurs_premise
+              apply odd_nom_nocc_premises
 
 lemma Lindenbaum.i_exists_consistent
   (Γ : ExtendiblePremiseSet S s Λ)
@@ -151,72 +153,72 @@ lemma Lindenbaum.i_paste_consistent
   (i : ℕ) (h : Γ.set.consistent Λ)
   (h_mem : ℋ@ j (ℋ⟨σ⟩ φ) ∈ Γ.set)
   : (Γ.set ∪ Γ.paste_args j σ φ i ).consistent Λ := by
-  apply And.intro h.1
-  rw [Proof.deduction_set]
-  intro ⟨⟨Θ, nodup⟩, habs⟩
-  induction Θ with
-  | nil =>
-      apply h.2
-      apply Proof.premise_mp habs
-      apply Proof.theorem_premises
-      exact ⟨Proof.top_proof⟩
-  | cons χ_elem Θ ih =>
-      -- Obtain χ in a manageable form
-      have ⟨χ, χ_mem⟩ := χ_elem
-      simp at χ_mem
-      have ⟨e, χ_eq⟩ := χ_mem
-      clear χ_mem χ_elem
-      -- Use the induction hypothesis to show consistency
-      -- of previous conjunctions
-      simp at nodup
-      specialize ih nodup.2
-      simp [-Set.union_singleton, ←Proof.deduction] at ih
-      -- By paste_consistent lemma, derive a contradiction with habs
-      --have : ℋ@ j (ℋ⟨σ⟩ φ) ∈ (PremiseSetLindenbaum Γ Λ i).set ∪ { ℋ@ j (ℋ⟨σ⟩ φ) } ∪ { Θ.conjunction } := by simp
-      apply (Proof.paste_consistent ⟨h.1, ih⟩ ?mem ?nocc_ax ?nocc_g).2
-      . rw [χ_eq, Proof.deduction, Proof.deduction]
-        apply Proof.premise_mp _ habs
+  intro habs
+  rw [Proof.deduction_set] at habs
+  match habs with
+  | ⟨⟨Θ, nodup⟩, habs⟩ =>
+    induction Θ with
+    | nil =>
+        apply h
+        apply Proof.premise_mp habs
         apply Proof.theorem_premises
-        exact ⟨Proof.export_theorem_proof⟩
-      case nocc_ax =>
-        apply prod_even_nom_nocc_axioms
-      case nocc_g =>
-        simp
-        apply And.intro
-        . rw [nominal_not_occurs_conjunction]
-          intro ψ ψ_mem
-          have := ψ.2
-          simp [-Subtype.coe_prop, ExtendiblePremiseSet.paste_args] at this
-          have ⟨e', h_e'⟩ := this
-          rw [←h_e'] ; clear this h_e'
-          simp [FormL.occurs, Term.occurs, FormL.nom_occurs]
+        exact ⟨Proof.top_proof⟩
+    | cons χ_elem Θ ih =>
+        -- Obtain χ in a manageable form
+        have ⟨χ, χ_mem⟩ := χ_elem
+        simp at χ_mem
+        have ⟨e, χ_eq⟩ := χ_mem
+        clear χ_mem χ_elem
+        -- Use the induction hypothesis to show consistency
+        -- of previous conjunctions
+        simp at nodup
+        specialize ih nodup.2
+        simp [-Set.union_singleton, ←Proof.deduction] at ih
+        -- By paste_consistent lemma, derive a contradiction with habs
+        --have : ℋ@ j (ℋ⟨σ⟩ φ) ∈ (PremiseSetLindenbaum Γ Λ i).set ∪ { ℋ@ j (ℋ⟨σ⟩ φ) } ∪ { Θ.conjunction } := by simp
+        apply (Proof.paste_consistent ih ?mem ?nocc_ax ?nocc_g)
+        . rw [χ_eq, Proof.deduction, Proof.deduction]
+          apply Proof.premise_mp _ habs
+          apply Proof.theorem_premises
+          exact ⟨Proof.export_theorem_proof⟩
+        case nocc_ax =>
+          apply prod_even_nom_nocc_axioms
+        case nocc_g =>
+          simp
           apply And.intro
-          . apply And.intro
-            . admit
-            . intro heq
-              subst heq
-              simp only
-              admit
-          . apply And.intro
-            . admit
-            . -- Here you should finally reach a contradiction with nodup
-              intro heq
-              admit
-        . have : ¬Γ.set.occurs (Γ.prod_even_nominal e.fst i e ) := by apply Lindenbaum.prod_even_nom_nocc_premises
-          simp at this
-          exact this
-      case mem =>
-        simp only [Set.union_singleton, Set.mem_insert_iff, h_mem, or_true]
+          . rw [nominal_not_occurs_conjunction]
+            intro ψ ψ_mem
+            have := ψ.2
+            simp [-Subtype.coe_prop, ExtendiblePremiseSet.paste_args] at this
+            have ⟨e', h_e'⟩ := this
+            rw [←h_e'] ; clear this h_e'
+            simp [FormL.occurs, Term.occurs, FormL.nom_occurs]
+            apply And.intro
+            . apply And.intro
+              . admit
+              . intro heq
+                subst heq
+                simp only
+                admit
+            . apply And.intro
+              . admit
+              . -- Here you should finally reach a contradiction with nodup
+                intro heq
+                admit
+          . have : ¬Γ.set.occurs (Γ.prod_even_nominal e.fst i e ) := by apply Lindenbaum.prod_even_nom_nocc_premises
+            simp at this
+            exact this
+        case mem =>
+          simp only [Set.union_singleton, Set.mem_insert_iff, h_mem, or_true]
 
 lemma Lindenbaum.i_consistent (h : Γ.consistent Λ) : ∀ i, (Γ.Lindenbaum ext Λ i).set.consistent (ext.m+ Λ) := by
   intro i
   induction i with
   | zero =>
-      apply And.intro (AxiomConsistentLift.mpr h.1)
       unfold PremiseSet.Lindenbaum
       intro habs
       simp [-Set.union_singleton] at habs
-      apply (zero_named_consistent ?i (zero_witness_consistent ext h) _ _).2
+      apply zero_named_consistent ?i (zero_witness_consistent ext h) _ _
       . exact habs
       . apply prod_even_nom_nocc_axioms
       . apply prod_even_nom_nocc_premises
@@ -321,7 +323,6 @@ lemma Lindenbaum.conj_mem_at_idx (h : Γ.consistent Λ) (φ_list : FiniteChoice 
     -- Hence Γ.Lindenbaum ext Λ m is inconsistent, which contradicts an earlier lemma.
     exfalso
     simp [PremiseSet.consistent] at h_cons
-    specialize h_cons (AxiomConsistentLift.mpr h.1)
     simp only [Γ_conj, Proof.deduction] at h_cons
     have ⟨j, h_j⟩ := elems_mem_at_idx ext φ_list
     have ⟨φ_list', h'⟩ := choice_swap h_j
@@ -334,16 +335,13 @@ lemma Lindenbaum.conj_mem_at_idx (h : Γ.consistent Λ) (φ_list : FiniteChoice 
     have : (Γ.Lindenbaum ext Λ j).set ⊆ (Γ.Lindenbaum ext Λ m).set := i_increasing ext m_geq.2
     have h_cons' := Proof.monotonicity this h_cons'
     have pf_bot := Proof.premise_mp h_cons h_cons'
-    apply (i_consistent ext h m).2
+    apply i_consistent ext h m
     exact pf_bot
 
 lemma Lindenbaum.consistent (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).consistent (ext.m+ Λ) := by
-  apply And.intro
-  . rw [AxiomConsistentLift]
-    exact h.1
-  . intro ⟨φ_list, habs⟩
+    intro ⟨φ_list, habs⟩
     have ⟨idx, h_mem⟩ := conj_mem_at_idx ext h φ_list
-    apply (i_consistent ext h idx).2
+    apply i_consistent ext h idx
     have : (Γ.Lindenbaum ext Λ idx).set = (Γ.Lindenbaum ext Λ idx).set ∪ { φ_list.conjunction } := by
       simp_all only [Set.union_singleton, Set.insert_eq_of_mem]
     rw [this, Proof.deduction]
@@ -355,7 +353,6 @@ lemma Lindenbaum.mcs (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).ma
   . intro Γ'
     intro h2
     simp [PremiseSet.consistent]
-    intro lam_plus_consistent
     rw [Set.ssubset_iff_exists] at h2
     have ⟨l, ⟨φ, ⟨h21, h22⟩⟩⟩ := h2
     clear h2
@@ -389,7 +386,7 @@ lemma Lindenbaum.mcs (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext Λ).ma
             Set.mem_setOf_eq]
           | _ => simp only [Set.union_singleton, Set.mem_insert_iff, true_or]
       | _ => simp only [Set.union_singleton, Set.mem_insert_iff, true_or]
-    . simp [PremiseSet.consistent, lam_plus_consistent] at h_cons
+    . simp [PremiseSet.consistent] at h_cons
       apply Proof.monotonicity _ h_cons
       simp only [Γ'', Set.union_subset_iff, Set.singleton_subset_iff]
       apply And.intro _ h21
@@ -402,8 +399,7 @@ lemma Lindenbaum.consistent_union (h : Γ.consistent Λ) (h2 : φ ∈ Γ.Lindenb
     by_contra h_not_cons
     have is_mcs := mcs ext h
     apply mcs_em is_mcs
-    simp only [PremiseSet.consistent, not_and, Classical.not_not] at h_not_cons
-    specialize h_not_cons (AxiomConsistentLift.mpr $ h.1)
+    simp only [PremiseSet.consistent, Classical.not_not] at h_not_cons
     rw [Proof.deduction, Proof.pf_not] at h_not_cons
     exact ⟨h2, (mcs_pf is_mcs).mp $ Proof.monotonicity (incl ext i) h_not_cons⟩
 
