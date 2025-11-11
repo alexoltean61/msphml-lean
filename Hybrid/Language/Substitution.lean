@@ -142,10 +142,17 @@ def nom_subst {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.s
   | ℋ@k φ   => ℋ@k (nom_subst i y φ)
   | φ => φ
 
-
 instance {symbs : Symbols α} : Term symbs symbs.nominal where
   occurs := nom_occurs
   subst  := nom_subst
+
+instance {symbs : Symbols α} : Term symbs symbs.nomType where
+  occurs := nom_occurs ∘ .nom
+  subst  := nom_subst  ∘ .nom
+
+instance {symbs : Symbols α} : Term symbs symbs.ctNomType where
+  occurs := nom_occurs ∘ .ctNom
+  subst  := nom_subst  ∘ .ctNom
 
 instance {symbs : Symbols α} : @Term α symbs symbs.svarType where
   occurs := var_occurs
@@ -166,6 +173,18 @@ variable {sorts : List symbs.signature.S}
 variable {x y : symbs.svarType s}
 variable {i j : symbs.nominal s}
 variable {σ : symbs.signature.«Σ» (t :: sorts) u}
+
+@[simp]
+lemma occ_nom {k : symbs.nomType s} {φ : FormL symbs ss} : φ.occurs k = φ.occurs (Symbols.nominal.nom k) := by simp [occurs, Term.occurs]
+
+@[simp]
+lemma occ_ct_nom {k : symbs.ctNomType s} {φ : FormL symbs ss} : φ.occurs k = φ.occurs (Symbols.nominal.ctNom k) := by simp [occurs, Term.occurs]
+
+@[simp]
+lemma subst_nom {k : symbs.nomType s} {φ : FormL symbs ss} : φ[k // x] = φ[(Symbols.nominal.nom k) // x] := by simp [Term.subst]
+
+@[simp]
+lemma subst_ct_nom {k : symbs.ctNomType s} {φ : FormL symbs ss} : φ[k // x] = φ[(Symbols.nominal.ctNom k) // x] := by simp [Term.subst]
 
 @[simp]
 lemma subst_var_appl : (ℋ⟨σ⟩ φ)[y // x] = ℋ⟨σ⟩ (φ[y // x]) := by

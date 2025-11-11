@@ -191,12 +191,12 @@ abbrev SMCFormL := FormL Symb
 abbrev SMCForm  := Form Symb
 
 instance : Coe ℕ (SMCForm SortNat) where
-  coe := λ n => ℋNom (Sum.inl ⟨n.repr, ⟨n, rfl⟩⟩)
+  coe := λ n => ℋNom (.ctNom ⟨n.repr, ⟨n, rfl⟩⟩)
 instance : Coe Bool (SMCForm SortBool) where
   coe := λ b =>
     match b with
-    | true => ℋNom (Sum.inl ⟨"true", by simp [Symb, Sig, CtNom, SortBool, SortNat]⟩)
-    | false => ℋNom (Sum.inl ⟨"false", by simp [Symb, Sig, CtNom, SortBool, SortNat]⟩)
+    | true => ℋNom (.ctNom  ⟨"true", by simp [Symb, Sig, CtNom, SortBool, SortNat]⟩)
+    | false => ℋNom (.ctNom ⟨"false", by simp [Symb, Sig, CtNom, SortBool, SortNat]⟩)
 instance : Coe (SMCForm SortNat) (SMCForm SortAExp) where
   coe := λ n => ℋ⟨nat2AExp⟩ n
 instance : Coe (SMCForm SortNat) (SMCForm SortVal) where
@@ -248,13 +248,13 @@ notation:102 "++" x:101 => ℋ⟨PlusPlusVar⟩ x
 notation:102 a1:99 "+" a2:100 => ℋ⟨PlusNat⟩ (a1, a2)
 notation:100 a1:99 "<=" a2:100 => ℋ⟨LEqAExp⟩ (a1, a2)
 
-def plus : SMCForm SortCtrlStack := ℋNom (Sum.inl ⟨"plus", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def plus : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"plus", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
 notation:100 "plus" => plus
 
-def leq : SMCForm SortCtrlStack := ℋNom (Sum.inl ⟨"leq", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def leq : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"leq", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
 notation:100 "leq" => leq
 
-def skip : SMCForm SortCtrlStack := ℋNom (Sum.inl ⟨"skip", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def skip : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"skip", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
 notation:100 "skip" => skip
 
 end SMC

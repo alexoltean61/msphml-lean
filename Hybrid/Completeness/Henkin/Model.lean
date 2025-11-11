@@ -61,7 +61,7 @@ def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ
     WDisjoint := sorry
   }
   Vₚ   := λ {t} p => { q | ∃ j : symbs.nominal t, ℋ@ j (ℋProp p) ∈ Γ.set ∧ ⟦j⟧ = q }
-  Vₙ   := λ j => ⟦.inr j⟧
+  Vₙ   := λ j => ⟦.nom j⟧
 
 noncomputable def NamedPastedWitnessedMCS.HenkinAsgn (Γ : NamedPastedWitnessedMCS symbs s Λ) : Assignment Γ.HenkinModel :=
   λ x => ⟦Classical.choose $ Γ.witnessed.2 x⟧

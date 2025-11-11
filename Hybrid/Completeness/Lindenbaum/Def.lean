@@ -21,7 +21,7 @@ open Classical
 noncomputable def PremiseSet.Lindenbaum (Λ : AxiomSet S) (Γ : PremiseSet S s) : ℕ → ExtendiblePremiseSet ext.target (ext.m+ s) (ext.m+ Λ)
 | 0       =>
     let Γ' : ExtendiblePremiseSet _ _ (ext.m+ Λ) := ⟨(Γ.embed ext Λ).set ∪ (Γ.embed ext Λ).at_witness_vars, enough_nominals_at_witness⟩
-    ⟨Γ'.set ∪ { ℋNom (Γ'.prod_even_nominal _ 0 0) }, enough_nominals_singleton⟩
+    ⟨Γ'.set ∪ { ℋNom (.nom $ Γ'.prod_even_nominal _ 0 0) }, enough_nominals_singleton⟩
 | .succ i =>
     let φ_i : Form ext.target (ext.m+ s) := ofNat _ i
     let Γ' : ExtendiblePremiseSet ext.target (ext.m+ s) (ext.m+ Λ) := ⟨(PremiseSet.Lindenbaum Λ Γ i).set ∪ { φ_i }, enough_nominals_singleton⟩
