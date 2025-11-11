@@ -107,10 +107,6 @@ def ATestTrue (v : SMCForm SortVal)
          (mem : SMCForm SortMem) : SMCForm SortConfig :=
         ⟨v ⬝ vs, mem⟩ ←→ [v ?] ⟨vs, mem⟩
 
--- TODO: Take a look here.
---  What if v is not a nominal, but a different kind of formula of sort SortVal?
---  You cannot use the ℋ@ binder then.
--- The paper asks for v being a state variable. That also doesn't work.
 def ATestFalse (v : Symb.nominal SortVal)
          (v' : SMCForm SortVal)
          (vs : SMCForm SortValStack)
