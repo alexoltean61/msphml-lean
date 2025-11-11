@@ -308,57 +308,59 @@ section Lindenbaum
     {x : symbs.svar t} {i : symbs.nominal t} (h1 : Γ.consistent Λ) (h2 : ℋ@ j (ℋ∃ x φ) ∈ Γ)
     (h3 : ¬Λ.occurs i) (h4 : ¬Γ.occurs i) :
     (Γ ∪ {ℋ@ j (φ[i // x])}).consistent Λ := by
-      apply And.intro h1.1
-      rw [Proof.deduction_set']
-      intro ⟨Γ_list, habs⟩
-      rw [Proof.deduction_singleton, Proof.imp_com] at habs
-      have l1 : Γ ⊢(Λ) (ℋ@ j φ[i//x] ⟶ ℋ⊥) := ⟨Γ_list, habs⟩
-      have l2 : Γ ⊢(Λ) (ℋ@ j(ℋ∃ x φ)) := premise_provable h2
-      apply h1.2
-      have l3 := exists_lemma h3 h4 l1
-      have l4 := premise_mp l3 l2
-      exact l4
+      intro habs
+      rw [Proof.deduction_set'] at habs
+      match habs with
+      | ⟨Γ_list, habs⟩ =>
+        rw [Proof.deduction_singleton, Proof.imp_com] at habs
+        have l1 : Γ ⊢(Λ) (ℋ@ j φ[i//x] ⟶ ℋ⊥) := ⟨Γ_list, habs⟩
+        have l2 : Γ ⊢(Λ) (ℋ@ j(ℋ∃ x φ)) := premise_provable h2
+        apply h1
+        have l3 := exists_lemma h3 h4 l1
+        have l4 := premise_mp l3 l2
+        exact l4
 
   lemma paste_consistent {s} {Λ : AxiomSet symbs} {Γ : PremiseSet symbs s}
     (h1 : Γ.consistent Λ) (h2 : ℋ@ j (ℋ⟨σ⟩ φ) ∈ Γ) {e : φ.Elem}
     {i : symbs.nominal e.1} (h3 : ¬Λ.occurs i) (h4 : ¬Γ.occurs i):
     (Γ ∪ {ℋ@ j (ℋ⟨σ⟩ e.2.2[ℋNom i]) ⋀ ℋ@ i e.2.1}).consistent Λ := by
       rename_i t _ _
-      apply And.intro h1.1
-      rw [deduction_set']
-      intro ⟨Γ_list, habs⟩
-      rw [deduction_singleton] at habs
-      have ⟨l1⟩ := habs
-      let C := (ℋNom i).subst_to_ctx e.2.2
-      /- Proving restrictions for Paste rule -/
-      have subst_is_φ : C[e.2.1] = φ := e.2.2.subst_in_iso $ (ℋNom i).subst_to_ctx_iso e.2.2
-      have neq_nom : i ≠ₛ j := by
-        intro heq
-        by_cases trivial : e.1 = t
-        . subst trivial
-          simp only [ne_eq]; intro habs
-          subst habs
-          apply h4
-          exists (ℋ@ i(ℋ⟨σ⟩φ))
-          apply And.intro h2
-          simp [FormL.occurs, Term.occurs, FormL.nom_occurs]
-        . contradiction
-      have nocc_conj : (Γ_list.conjunction ⟶ ℋ⊥).occurs i = false := by
-        simp only [FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
-        apply nominal_not_occurs_premise h4
-      have nocc_φ : C[e.2.1].occurs i = false := by
-        rw [subst_is_φ]
-        simp at h4
-        specialize h4 _ h2
-        simp only [FormL.occurs, Term.occurs, FormL.nom_occurs, Bool.or_eq_false_iff] at h4
-        exact h4.1
-      /- Done, now applying Paste rule  -/
-      have l2 := subst_is_φ ▸ paste C neq_nom h3 nocc_conj nocc_φ l1
-      have l3 : Γ ⊢(Λ) (_ ⟶ ℋ⊥) := ⟨Γ_list, ⟨imp_com_proof l2⟩⟩
-      have l4 : Γ ⊢(Λ) _ := premise_provable h2
-      have l4 := premise_mp l3 l4
-      apply h1.2
-      exact l4
+      intro habs
+      rw [deduction_set'] at habs
+      match habs with
+      | ⟨Γ_list, habs⟩ =>
+        rw [deduction_singleton] at habs
+        have ⟨l1⟩ := habs
+        let C := (ℋNom i).subst_to_ctx e.2.2
+        /- Proving restrictions for Paste rule -/
+        have subst_is_φ : C[e.2.1] = φ := e.2.2.subst_in_iso $ (ℋNom i).subst_to_ctx_iso e.2.2
+        have neq_nom : i ≠ₛ j := by
+          intro heq
+          by_cases trivial : e.1 = t
+          . subst trivial
+            simp only [ne_eq]; intro habs
+            subst habs
+            apply h4
+            exists (ℋ@ i(ℋ⟨σ⟩φ))
+            apply And.intro h2
+            simp [FormL.occurs, Term.occurs, FormL.nom_occurs]
+          . contradiction
+        have nocc_conj : (Γ_list.conjunction ⟶ ℋ⊥).occurs i = false := by
+          simp only [FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
+          apply nominal_not_occurs_premise h4
+        have nocc_φ : C[e.2.1].occurs i = false := by
+          rw [subst_is_φ]
+          simp at h4
+          specialize h4 _ h2
+          simp only [FormL.occurs, Term.occurs, FormL.nom_occurs, Bool.or_eq_false_iff] at h4
+          exact h4.1
+        /- Done, now applying Paste rule  -/
+        have l2 := subst_is_φ ▸ paste C neq_nom h3 nocc_conj nocc_φ l1
+        have l3 : Γ ⊢(Λ) (_ ⟶ ℋ⊥) := ⟨Γ_list, ⟨imp_com_proof l2⟩⟩
+        have l4 : Γ ⊢(Λ) _ := premise_provable h2
+        have l4 := premise_mp l3 l4
+        apply h1
+        exact l4
 
 end Lindenbaum
 
