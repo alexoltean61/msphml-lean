@@ -54,12 +54,11 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
   -- Hybrid proof rules
   | broadcastS s₂ : Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ (ℋ@j φ)
   | genAt s₂ j : Proof Λ s₁ φ → Proof Λ s₂ (ℋ@j φ)
-  | nameAt s₂ {j : symbs.nominal s₂} {φ : Form symbs s₂} :
-            ¬Λ.occurs j → φ.occurs j = false →
+  | nameAt s₂ {j : symbs.nomType s₂} {φ : Form symbs s₂} (nocc : φ.occurs j = false) :
             Proof Λ s₁ (ℋ@j φ) → Proof Λ s₂ φ
-  | paste (C : (ℋNom k).Context χ):
-          k ≠ₛ j → ¬Λ.occurs k → ψ.occurs k = false → C[φ].occurs k = false →
-          Proof Λ s (ℋ@j (ℋ⟨σ⟩ χ) ⋀ ℋ@k φ ⟶ ψ) → Proof Λ s ((ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ))
+  | paste {k : symbs.nomType s₂} {φ : Form symbs s₂} (C : (ℋNom k).Context χ):
+          .nom k ≠ₛ j → ψ.occurs k = false → C[φ].occurs k = false →
+          Proof Λ s₁ (ℋ@j (ℋ⟨σ⟩ χ) ⋀ ℋ@k φ ⟶ ψ) → Proof Λ s₁ ((ℋ@j (ℋ⟨σ⟩ C[φ]) ⟶ ψ))
   | gen x : Proof Λ s φ → Proof Λ s (ℋ∀x φ)
 
 def Provable {symbs : Symbols α} (Λ : AxiomSet symbs) (s : symbs.signature.S) (φ : Form symbs s) : Prop := Nonempty (Proof Λ s φ)

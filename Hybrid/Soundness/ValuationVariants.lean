@@ -16,7 +16,7 @@ section Defs
   -/
   def Model.v_variant (M : Model symbs) (n : symbs.nominal s) (w : M.Fr.W s) : Model symbs :=
     match n with
-    | .inl n =>
+    | .ctNom n =>
       {
         «Fr» :=
           {
@@ -29,12 +29,13 @@ section Defs
                 else
                   M.Fr.Nm m
               else M.Fr.Nm m,
-            WNonEmpty := M.Fr.WNonEmpty
+            WNonEmpty := M.Fr.WNonEmpty,
+            WDisjoint := M.Fr.WDisjoint
           },
         Vₚ := M.Vₚ
         Vₙ := M.Vₙ
       }
-    | .inr n =>
+    | .nom n =>
       {
         «Fr» := M.Fr
         Vₚ := M.Vₚ
@@ -53,8 +54,8 @@ section Defs
   -/
   def Assignment.v_variant (g : Assignment M) (n : symbs.nominal s) (w : M.Fr.W s) : Assignment (M.v_variant n w) := λ x =>
     match n with
-    | .inl _ => g x
-    | .inr _ => g x
+    | .ctNom _ => g x
+    | .nom _ => g x
 
   /--
     This function exists because Lean is not able to unfold inside pattern matching.
@@ -62,8 +63,8 @@ section Defs
   -/
   def Assignment.v_variant_inverse (n : symbs.nominal s) (w : M.Fr.W s) (g : Assignment (M.v_variant n w)) : Assignment M := λ x =>
     match n with
-    | .inl _ => g x
-    | .inr _ => g x
+    | .ctNom _ => g x
+    | .nom _ => g x
 
   /--
     This function exists because Lean is not able to unfold inside pattern matching.
@@ -71,8 +72,8 @@ section Defs
   -/
   def WProd.v_variant {M : Model symbs} (ws : WProd M.Fr.W sorts) (n : symbs.nominal s) (w : M.Fr.W s) : WProd (M.v_variant n w).Fr.W sorts :=
     match n with
-  | .inl _ => ws
-  | .inr _ => ws
+  | .ctNom _ => ws
+  | .nom _ => ws
 
   /--
     This function exists because Lean is not able to unfold inside pattern matching.
@@ -80,8 +81,8 @@ section Defs
   -/
   def WProd.v_variant_inverse {M : Model symbs} (n : symbs.nominal s) (w : M.Fr.W s) (ws : WProd (M.v_variant n w).Fr.W sorts) : WProd M.Fr.W sorts :=
     match n with
-  | .inl _ => ws
-  | .inr _ => ws
+  | .ctNom _ => ws
+  | .nom _ => ws
 
 
   lemma WProd.v_variant_surj {M : Model symbs} {n : symbs.nominal s} {w : M.Fr.W s} (ws' : WProd (M.v_variant n w).Fr.W sorts) : ∃ ws : WProd M.Fr.W sorts, ws.v_variant n w = ws' := by
@@ -92,6 +93,12 @@ section Defs
 end Defs
 
 section Lemmas
+
+  /--
+    TODO: This lemma should be unnecessary!
+  -/
+  lemma v_variant_nom_fr {M : Model symbs} {j : symbs.nomType s} {w : WProd M.Fr.W ([s])} : (M.v_variant j w).Fr = M.Fr := by
+    simp [Model.v_variant]
 
   /--
     A `v_variant` for `j` and `w` evaluates nominal `j` to world `w`.
@@ -118,8 +125,7 @@ section Lemmas
       . by_cases same_sorts : t = s
         . subst same_sorts
           simp [Symbols.nominal.ne] at h
-          conv at h =>
-            rhs ; rw [Sum.inl.injEq, eq_comm]
+          rw [eq_comm] at h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, h]
         . clear h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
@@ -129,8 +135,7 @@ section Lemmas
       . by_cases same_sorts : t = s
         . subst same_sorts
           simp [Symbols.nominal.ne] at h
-          conv at h =>
-            rhs ; rw [Sum.inr.injEq, eq_comm]
+          rw [eq_comm] at h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, h]
         . clear h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
@@ -149,8 +154,7 @@ section Lemmas
       . by_cases same_sorts : t = s
         . subst same_sorts
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
-          conv at h =>
-            rhs ; rw [Sum.inl.injEq, eq_comm]
+          rw [eq_comm] at h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, h]
         . clear h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
@@ -160,8 +164,7 @@ section Lemmas
       . by_cases same_sorts : t = s
         . subst same_sorts
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
-          conv at h =>
-            rhs ; rw [Sum.inr.injEq, eq_comm]
+          rw [eq_comm] at h
           simp [Model.v_variant, Model.VNom, WProd.v_variant, h]
         . simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
 
@@ -175,8 +178,7 @@ section Lemmas
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
           have ⟨h1, h2⟩ := h
           clear h
-          conv at h2 =>
-            rhs ; rw [Sum.inl.injEq, eq_comm]
+          rw [eq_comm] at h2
           simp [Model.v_variant, Model.VNom, h2]
           apply ih
         . simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
@@ -191,8 +193,7 @@ section Lemmas
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
           have ⟨h1, h2⟩ := h
           clear h
-          conv at h2 =>
-            rhs ; rw [Sum.inr.injEq, eq_comm]
+          rw [eq_comm] at h2
           simp [Model.v_variant, Model.VNom, h2]
           apply ih
         . simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
@@ -211,8 +212,7 @@ section Lemmas
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
           have ⟨h1, h2⟩ := h
           clear h
-          conv at h2 =>
-            rhs ; rw [Sum.inl.injEq, eq_comm]
+          rw [eq_comm] at h2
           simp [Model.v_variant, Model.VNom, h2]
           apply ih
         . simp [Model.v_variant, Model.VNom, same_sorts]
@@ -227,8 +227,7 @@ section Lemmas
           simp [FormL.occurs, Term.occurs, FormL.nom_occurs] at h
           have ⟨h1, h2⟩ := h
           clear h
-          conv at h2 =>
-            rhs ; rw [Sum.inr.injEq, eq_comm]
+          rw [eq_comm] at h2
           simp [Model.v_variant, Model.VNom, h2]
           apply ih
         . simp [Model.v_variant, Model.VNom, same_sorts]
@@ -267,7 +266,7 @@ section Lemmas
           simp
           apply Iff.intro
           . intro ⟨ws', ⟨sat, wsRws'⟩⟩
-            first | exists ws'.v_variant (.inl j) w | exists ws'.v_variant (.inr j) w
+            first | exists ws'.v_variant (.ctNom j) w | exists ws'.v_variant (.nom j) w
             apply And.intro _ wsRws'
             specialize @ih ws' g h
             rw [ih] at sat

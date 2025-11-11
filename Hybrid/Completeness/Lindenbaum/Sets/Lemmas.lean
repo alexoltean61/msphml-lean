@@ -54,13 +54,13 @@ section ExtendiblePremiseSet
   variable {Λ : AxiomSet S}
   variable {Γ : PremiseSet S s}
 
-  def enough_nominals_embed {ext : @S.nominal_extension α β β_deq β} {u : ext.target.signature.S} : { n : ext.target.nominal u | ¬(ext.m+ Λ).occurs n ∧ ¬(ext.m+ Γ).occurs n } ≃ ℕ := sorry
+  def enough_nominals_embed {ext : @S.nominal_extension α β β_deq β} {u : ext.target.signature.S} : { n : ext.target.nomType u | ¬(ext.m+ Λ).occurs n ∧ ¬(ext.m+ Γ).occurs n } ≃ ℕ := sorry
 
-  def enough_nominals_singleton {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nominal t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ { φ }).occurs n } ≃ ℕ := sorry
+  def enough_nominals_singleton {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nomType t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ { φ }).occurs n } ≃ ℕ := sorry
 
-  def enough_nominals_at_witness {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nominal t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ Γ.at_witness_vars).occurs n } ≃ ℕ := sorry
+  def enough_nominals_at_witness {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nomType t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ Γ.at_witness_vars).occurs n } ≃ ℕ := sorry
 
-  def enough_nominals_paste {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nominal t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ Γ.paste_args j σ χ i).occurs n } ≃ ℕ := sorry
+  def enough_nominals_paste {Γ : ExtendiblePremiseSet S s Λ} : { n : S.nomType t | ¬Λ.occurs n ∧ ¬(Γ.set ∪ Γ.paste_args j σ χ i).occurs n } ≃ ℕ := sorry
 
   lemma Lindenbaum.odd_nominal_inj [inst : Encodable β] {Γ : ExtendiblePremiseSet symbs sort ax} : (@Γ.odd_nominal α _ _ _ _ _ inst t).Injective :=
     λ _ _ h => sorry

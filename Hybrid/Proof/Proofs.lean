@@ -39,11 +39,11 @@ def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ
 
 def alpha_conversion_proof {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) : Proof Λ s (ℋ∀ y φ[y // x]) → Proof Λ s (ℋ∀ x φ) := sorry
 
-def name'_proof {i : symbs.nominal s} (h1 : ¬Λ.occurs i) (h2 : φ.occurs i = false) (pf : Proof Λ s (i ⟶ φ)) : Proof Λ s φ :=
+def name'_proof {i : symbs.nomType s} (h2 : φ.occurs i = false) (pf : Proof Λ s (i ⟶ φ)) : Proof Λ s φ :=
   have l1 := genAt s i pf
   have l2 := mp (kAt _ _ _) l1
   have l3 := mp l2 (ref _ _)
-  have l4 := nameAt _ h1 h2 l3
+  have l4 := nameAt _ h2 l3
   l4
 
 def q2_nom'_proof {x : symbs.svar t} (h1 : ¬Λ.occurs i) (h2 : φ.occurs i = false) (pf : Proof Λ s (ℋ@ i (ℋVar x) ⟶ φ)) : Proof Λ s φ :=

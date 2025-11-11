@@ -99,22 +99,22 @@ lemma Truth {t : symbs.signature.S} {j : symbs.nominal t} {φ : Form symbs t} : 
               exists ws
               simp only [nominal_eq_refl, and_self, and_true]
               exact left
-  | ℋ@ (.inl k) φ =>
+  | ℋ@ (.ctNom k) φ =>
       simp only [Sat.at, Model.VNom]
       conv =>
         lhs ; lhs
         simp only [HenkinModel.eq_1, nominalSetoid.eq_1]
       apply Iff.intro
       . intro h
-        have := (@Truth _ (Sum.inl k) φ).mp h
+        have := (@Truth _ (.ctNom k) φ).mp h
         -- Rewrite the goal using Agree, since Γ is maximal consistent
         -- Goal will be closed by exact this.
         admit
       . intro h
-        apply (@Truth _ (Sum.inl k) φ).mpr
+        apply (@Truth _ (.ctNom k) φ).mpr
         -- Same as above
         admit
-  | ℋ@ (.inr k) φ =>
+  | ℋ@ (.nom k) φ =>
       simp only [Sat.at, Model.VNom]
       conv =>
         lhs ; lhs
@@ -122,12 +122,12 @@ lemma Truth {t : symbs.signature.S} {j : symbs.nominal t} {φ : Form symbs t} : 
           nominalSetoid.eq_1]
       apply Iff.intro
       . intro h
-        have := (@Truth _ (Sum.inr k) φ).mp h
+        have := (@Truth _ (.nom k) φ).mp h
         -- Rewrite the goal using Agree, since Γ is maximal consistent
         -- Goal will be closed by exact this.
         admit
       . intro h
-        apply (@Truth _ (Sum.inr k) φ).mpr
+        apply (@Truth _ (.nom k) φ).mpr
         -- Same as above
         admit
   | ℋ∃ x φ =>

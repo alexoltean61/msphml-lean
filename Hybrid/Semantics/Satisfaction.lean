@@ -45,8 +45,8 @@ structure Model (symbs : Symbols α) where
   Vₙ  : symbs.nom s → Fr.W s
 
 def Model.VNom (M : Model symbs) : symbs.nominal s → M.Fr.W s
-| .inl n => M.Fr.Nm n
-| .inr n => M.Vₙ n
+| .nom n   => M.Vₙ n
+| .ctNom n => M.Fr.Nm n
 
 abbrev Assignment (M : Model symbs) := {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
 

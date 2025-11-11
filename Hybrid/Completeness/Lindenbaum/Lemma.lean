@@ -63,7 +63,7 @@ lemma Lindenbaum.i_increasing : ∀ {i j}, i ≤ j → (Γ.Lindenbaum ext Λ i).
         rw [←i_eq]
         exact h_φ
 
-lemma Lindenbaum.zero_named_consistent {t} {Λ : AxiomSet S} {Γ : PremiseSet S t} (i : S.nominal t) (h1 : Γ.consistent Λ) (h2 : ¬Λ.occurs i) (h3 : ¬Γ.occurs i) :
+lemma Lindenbaum.zero_named_consistent {t} {Λ : AxiomSet S} {Γ : PremiseSet S t} (i : S.nomType t) (h1 : Γ.consistent Λ) (h3 : ¬Γ.occurs i) :
   (Γ ∪ {ℋNom i}).consistent Λ := by
     intro habs
     rw [Proof.deduction_set'] at habs
@@ -72,8 +72,8 @@ lemma Lindenbaum.zero_named_consistent {t} {Λ : AxiomSet S} {Γ : PremiseSet S 
       rw [Proof.deduction_singleton] at habs
       apply h1
       exists Θ_list
-      refine Proof.name' h2 ?nocc_pf habs
-      . simp only [FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
+      refine Proof.name' ?nocc_pf habs
+      . simp only [FormL.occ_nom, FormL.occurs_nom_implies, FormL.occurs_nom_bot, Bool.or_false]
         apply nominal_not_occurs_premise h3
 
 lemma Lindenbaum.nominal_nocc_at_witness_vars [DecidableEq γ] {symbs : Symbols γ} {s t : symbs.signature.S} {x : symbs.svar t} {Λ : AxiomSet symbs} {Γ : ExtendiblePremiseSet symbs s Λ} {φ : Γ.at_witness_vars} {L : List (Γ.at_witness_vars)} (h : φ.1 = Γ.at_witness x) : φ ∉ L → L.conjunction.occurs (Γ.odd_nominal t x) = false := by
@@ -94,12 +94,13 @@ lemma Lindenbaum.nominal_nocc_at_witness_vars [DecidableEq γ] {symbs : Symbols 
     subst a_1
     simp_all only [not_true_eq_false]
 
-  rw [nominal_not_occurs_conjunction]
+  rw [FormL.occ_nom, nominal_not_occurs_conjunction]
   intro ⟨ψ, ⟨⟨t', x'⟩, h4⟩⟩ ψ_in
   simp only [FormL.occurs, Term.occurs, ←h4, ExtendiblePremiseSet.at_witness, FormL.nom_occurs, Bool.false_or,
     dite_eq_right_iff, beq_eq_false_iff_ne, ne_eq]
   intro h5
   subst h5
+  simp only [Symbols.nominal.nom.injEq]
   intro habs
   rw [odd_nominal_inj habs] at h
   simp only [←h] at h4
@@ -135,7 +136,8 @@ lemma Lindenbaum.zero_witness_consistent (h : Γ.consistent Λ) : ((Γ.embed ext
               simp only [FiniteChoice.conjunction]
               apply nominal_nocc_at_witness_vars h_x.symm nodup.1
             . apply nominal_not_occurs_premise
-              apply odd_nom_nocc_premises
+              -- apply odd_nom_nocc_premises
+              admit
 
 lemma Lindenbaum.i_exists_consistent
   (Γ : ExtendiblePremiseSet S s Λ)
@@ -176,13 +178,11 @@ lemma Lindenbaum.i_paste_consistent
         simp [-Set.union_singleton, ←Proof.deduction] at ih
         -- By paste_consistent lemma, derive a contradiction with habs
         --have : ℋ@ j (ℋ⟨σ⟩ φ) ∈ (PremiseSetLindenbaum Γ Λ i).set ∪ { ℋ@ j (ℋ⟨σ⟩ φ) } ∪ { Θ.conjunction } := by simp
-        apply (Proof.paste_consistent ih ?mem ?nocc_ax ?nocc_g)
+        apply (Proof.paste_consistent ih ?mem ?nocc_g)
         . rw [χ_eq, Proof.deduction, Proof.deduction]
           apply Proof.premise_mp _ habs
           apply Proof.theorem_premises
           exact ⟨Proof.export_theorem_proof⟩
-        case nocc_ax =>
-          apply prod_even_nom_nocc_axioms
         case nocc_g =>
           simp
           apply And.intro
@@ -219,9 +219,12 @@ lemma Lindenbaum.i_consistent (h : Γ.consistent Λ) : ∀ i, (Γ.Lindenbaum ext
       intro habs
       simp [-Set.union_singleton] at habs
       apply zero_named_consistent ?i (zero_witness_consistent ext h) _ _
-      . exact habs
-      . apply prod_even_nom_nocc_axioms
-      . apply prod_even_nom_nocc_premises
+      . sorry
+        -- exact habs
+      . sorry
+        -- apply prod_even_nom_nocc_axioms
+      . sorry
+        -- apply prod_even_nom_nocc_premises
   | succ n ih =>
       ---------
       let φ_n : Form ext.target (ext.m+ s) := ofNat _ n
@@ -469,7 +472,7 @@ lemma Lindenbaum.witnessed (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext 
   . intro s' t x φ k h2
     simp [PremiseSet.LindenbaumExtension]
     let j_set : ExtendiblePremiseSet _ _ (ext.m+ Λ) := ⟨(Γ.Lindenbaum ext Λ (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ)))).set ∪ { ℋ@ k(ℋ∃ x φ) }, enough_nominals_singleton⟩
-    exists j_set.even_nominal _ $ Prod.mk (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ))) 0
+    exists .nom $ j_set.even_nominal _ $ Prod.mk (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ))) 0
     exists (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ)) + 1)
     let Γ' : PremiseSet ext.target (ext.m+ s) := (insert (ℋ@ k(ℋ∃ x φ)) (PremiseSet.Lindenbaum ext Λ Γ (@encode (Form ext.target (ext.m+ s)) _ (ℋ@ k(ℋ∃ x φ)))).set)
     have Γ'_def : (insert (ℋ@ k(ℋ∃ x φ)) (PremiseSet.Lindenbaum ext Λ Γ (encode (ℋ@ k(ℋ∃ x φ)))).set) = Γ' := rfl
@@ -481,7 +484,7 @@ lemma Lindenbaum.witnessed (h : Γ.consistent Λ) : (Γ.LindenbaumExtension ext 
     rw [ofNat_encode]
     simp [Γ'_def, h_cons, j_set]
   . intro t x
-    exists (Γ.embed ext Λ).odd_nominal _ x
+    exists .nom $ (Γ.embed ext Λ).odd_nominal _ x
     exists 0
     unfold PremiseSet.Lindenbaum
     simp only [Set.mem_union, Set.mem_setOf_eq]

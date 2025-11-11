@@ -11,8 +11,8 @@ variable {s : S₁.signature.S}
 
 def Symbols.morphism.morph_nominal (nom : S₁.nominal s) (m : S₁.morphism S₂) : S₂.nominal (m.morph_sort s) :=
   match nom with
-  | .inl n => m.morph_N n
-  | .inr n => m.morph_nom n
+  | .nom n => m.morph_nom n
+  | .ctNom n => m.morph_N n
 
 def Symbols.morphism.morph_formula {sorts : List S₁.signature.S} (φ : FormL S₁ sorts) (m : S₁.morphism S₂) : FormL S₂ (sorts.map m.morph_sort) :=
   match φ with

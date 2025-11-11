@@ -12,13 +12,17 @@ variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 
-theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
+theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
   intro ⟨pf⟩
   induction pf with
   | ax ψ =>
       intro M g w
-      apply M.2
-      exact ψ.2
+      have M_in_fr := Set.mem_setOf_eq ▸ M.2
+      specialize M_in_fr _ ψ.1 ψ.2
+      simp [Frame.valid] at M_in_fr
+      specialize M_in_fr M
+      simp [Models.Fr] at M_in_fr
+      apply M_in_fr
   | prop1 =>
       intro M g w
       simp only [Sat.implies]
@@ -224,8 +228,8 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       simp only [Sat.at]
       specialize h M g ((M.1).VNom j)
       exact h
-  | paste C neq noccΛ noccψ noccCtx _ ih =>
-      rename_i sₜ k _ _ _ sⱼ j φ _ _ _ _
+  | paste C neq noccψ noccCtx _ ih =>
+      rename_i sₜ _ _ _ _ sⱼ j _ _ k φ _
       intro M g w
       simp only [Sat.implies]
       intro h
@@ -235,7 +239,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       let t  := φ.subst_to_ctx C
       have t_iso_C := φ.subst_to_ctx_iso C
       let wₜ := ws.select t
-      let M' : Λ.Models := ⟨M.1.v_variant k wₜ, Set.Elem.v_variant_modelclass_inv Λ M k noccΛ wₜ⟩
+      let M' : Models.Fr Λ.Frames := ⟨M.1.v_variant k wₜ, by simp [Models.Fr, v_variant_nom_fr]; exact M.2⟩
       let g' : Assignment M'.1 := g.v_variant k wₜ
       let w' := w.v_variant k wₜ
       specialize ih M' g' w'
@@ -258,7 +262,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
             have ⟨C', C'_iso⟩ := C.subst_not_iso Cᵤ h_symm φ
             specialize wsSat C'
             symm at C'_iso
-            rw [not_nominal_occurs_context] at noccCtx
+            rw [FormL.occ_nom, not_nominal_occurs_context] at noccCtx
             specialize noccCtx C'
             rw [←v_variant_agreement noccCtx wₜ]
             rw [WProd.select_iso C'_iso] at wsSat
@@ -269,13 +273,13 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
         have : M.1.Fr.W sₜ = M'.1.Fr.W sₜ := v_variant_world_inv sₜ
         conv =>
           lhs; simp [M', v_variant_valuation]
-        rw [not_nominal_occurs_context] at noccCtx
+        rw [FormL.occ_nom, not_nominal_occurs_context] at noccCtx
         have noccφ := noccCtx (FormL.subst_to_ctx _ _)
         rw [←v_variant_agreement noccφ wₜ]
         exact wsSat t
-  | @nameAt s₁ s₂ j φ noccΛ noccφ _ ih =>
+  | @nameAt s₁ s₂ j φ noccφ _ ih =>
       intro M g w
-      let M' : Λ.Models := ⟨M.1.v_variant j w, Set.Elem.v_variant_modelclass_inv Λ M j noccΛ w⟩
+      let M' : Models.Fr Λ.Frames := ⟨M.1.v_variant j w, by simp [Models.Fr, v_variant_nom_fr]; exact M.2⟩
       let g' : Assignment M'.1 := g.v_variant j w
       let w' := (M'.1.Fr.WNonEmpty s₁).default
       specialize ih M' g' w'
@@ -339,17 +343,12 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Mod(Λ) φ := by
       rw [SubstitutionNominal g'_variant g'_value]
       exact h g' g'_variant
 
--- Strong model soundness
-theorem ModelSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Mod(Λ) φ := by
+-- Strong frame soundness
+theorem StrongSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) φ := by
   intro ⟨forms, pf⟩
   apply Valid.conjunction_entails
   exists forms
   apply Soundness
   exact pf
 
--- Strong frame soundness
-theorem FrameSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) φ := by
-  intro pf
-  apply Entails.if_model_frame
-  apply ModelSoundness
-  exact pf
+#print axioms StrongSoundness
