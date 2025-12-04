@@ -11,7 +11,11 @@ open Completeness
 
 lemma SatFormLift {φ : Form S₁ s} {M : Model S₁} {g : Assignment M} {w : M.Fr.W s} :
   (⟨M, g, w⟩ ⊨ φ) ↔ ⟨m+ M, m+ g, m.m.morph_world w⟩ ⊨ (m+ φ) := by
-  sorry
+  apply Iff.intro
+  . intro h
+    admit
+  . intro h
+    admit
 
 lemma ClassLift {M : Model S₁} : (m+ M) ∈ (m+ Λ).Models ↔ M ∈ Λ.Models := sorry
 

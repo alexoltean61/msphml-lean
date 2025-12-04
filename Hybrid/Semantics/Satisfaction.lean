@@ -32,6 +32,12 @@ structure Frame (signature : Signature α) where
   Nm : {s : signature.S} → signature.N s → W s
 
   WNonEmpty : ∀ s, Inhabited (W s)
+  -- For all sorts s₁, s₂,
+  --  the set of s₁-sorted worlds and
+  --  the set of s₂-sorted worlds
+  -- must be disjoint.
+  -- This translates to the injectivity of W:
+  WDisjoint : W.Injective
 
 structure Model (symbs : Symbols α) where
   Fr  : Frame symbs.signature

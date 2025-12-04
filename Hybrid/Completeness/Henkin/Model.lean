@@ -56,8 +56,9 @@ def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ
         match dom with
         | [ ]    => { }
         | _ :: _ => { ⟨q, qs⟩ | ∃ j, ∃ (js : WProd symbs.nominal _), ℋ@ j (ℋ⟨σ⟩ js.to_args) ∈ Γ.set ∧ (⟦j⟧ = q ∧ js.to_quotient Γ = qs) },
-    Nm := λ n => ⟦.inl n⟧,
-    WNonEmpty := λ s => ⟨⟦(symbs.signature.nNonEmpty s).default⟧⟩
+    Nm := λ n => ⟦.ctNom n⟧,
+    WNonEmpty := λ s => ⟨⟦(symbs.signature.nNonEmpty s).default⟧⟩,
+    WDisjoint := sorry
   }
   Vₚ   := λ {t} p => { q | ∃ j : symbs.nominal t, ℋ@ j (ℋProp p) ∈ Γ.set ∧ ⟦j⟧ = q }
   Vₙ   := λ j => ⟦.inr j⟧
