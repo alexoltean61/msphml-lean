@@ -99,6 +99,7 @@ section ClassicalRequired
           else by
             simp only [morph_worlds, h, ↓reduceDIte]
             exact ⟨⟩
+    WDisjoint := sorry
   }
 
   noncomputable def Symbols.morphism.morph_world {F : Frame S₁.signature} (w : F.W s₁) (m : S₁.morphism S₂) : (m.morph_frame F).W (m.morph_sort s₁) :=
