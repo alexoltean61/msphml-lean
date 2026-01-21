@@ -1,0 +1,432 @@
+\chapter{Soundness and Completeness}\label{ch:soundnes-completeness}
+
+The effort of rigorously verifying soundness and completeness in Lean led us to discover a few missing conditions in the original presentation given in \cite{leustean_operational_2019}. Fortunately, none of these slight slips had a great effect on the overall standing of the system. We believe, nonetheless, that it is to the system's gain that such slight errors have been now spotted. In the following, we will report only the places where our proofs differ from the original. Some of the other proofs can be found in the technical appendix (Chapter \ref{appendix}).
+
+\section{Soundness}
+In this section, all statements we give have been machine-checked.
+
+As is standard, soundness is proved by structural induction on formulas. Before that, we will require some lemmas.
+
+\begin{lemma}[Agreement]\label{agreement}
+    Let $\mathcal{M} = (W, R, N, V)$ be a model, $\varphi$ a formula of sort $s \in S$, $w \in W_s$ a world, and $g, g'$ assignment functions. If $g$ and $g'$ agree on all variables occurring freely in $\varphi$, then:
+    \begin{equation*}
+        \mathcal{M}, g, w \vDash^s \varphi \text{ iff } \mathcal{M}, g', w \vDash^s \varphi
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    By induction on the structure of $\varphi$.
+\end{proof}
+
+\begin{lemma}[Valuation Agreement]\label{vvariantagreement}
+    Let $\varphi$ be a formula of sort $s \in S$ and $j \in NOM_t \cup N_t$ a nominal of sort $t \in S$. Assume $j$ does not occur in $\varphi$. If $\mathcal{M}$ and $\mathcal{M'}$ are models such that $V(j) \neq V'(j)$ but otherwise agree, then for all $w \in W_s$, $g$:
+    \begin{equation*}
+        \mathcal{M}, g, w \vDash^s \varphi \text{ iff } \mathcal{M'}, g, w \vDash^s \varphi
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    By induction on the structure of $\varphi$.
+\end{proof}
+
+\begin{lemma}[Substitution]\label{substitution}
+    Let $\mathcal{M} = (W, R, N, V)$ be a model, $\varphi$ a formula of sort $s \in S$, $w \in W_s$ a world, and $g, g'$ assignment functions. Let $x, y \in SVAR_t$ such that $y$ is substitutable for $x$ in $\varphi$. If $g \rightsquigarrow^x g'$, then:
+    \begin{itemize}
+        \item $M, g, w \vDash^s \varphi$ iff $M, g', w \vDash^s \varphi[y / x]$, where $g(x) = g'(y)$
+        \item $M, g, w \vDash^s \varphi$ iff $M, g', w \vDash^s \varphi[j / x]$, where $g(x) = g'(j)$
+    \end{itemize}
+\end{lemma}
+\begin{proof}
+    By induction on the structure of $\varphi$.
+\end{proof}
+
+\begin{theorem}[Soundness]\label{soundness}
+    Let $\Lambda$ be an $S$-sorted set of axioms. The following propositions are true:
+    \begin{enumerate}
+        \item If $\vdash^s_{\Lambda} \varphi$, then $\vDash^s_{Fr(\Lambda)} \varphi$;
+        \item If $\Gamma \vdash^s_{\Lambda} \varphi$, then $\Gamma \vDash^s_{Fr(\Lambda)} \varphi$.
+    \end{enumerate}
+\end{theorem}
+\begin{proof}
+    2. is an immediate consequence of 1. For 1., we only show the following cases. All others can be found in Chapter \ref{appendix}. Let $\mathcal{M} \in Fr(\Lambda)$, $g$ be an assignment function, $w$ be a world of the right sort.
+
+    (Barcan): Assume $\mathcal{M}, g, w \vDash^s \forall x \sigma^{\Box}(\varphi_1, \dots, \varphi_i, \dots \varphi_n)$. After swapping the (implicit) universal quantifiers, this is equivalent to: for all $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ such that $(w, w_1, \dots, w_n) \in R_\sigma$, and for all $g' \rightsquigarrow^x g$, there exists an index $j$ such that $\mathcal{M}, g', w_j$ satisfies the $j$-th formula in $\varphi_1, \dots, \varphi_i, \dots, \varphi_n$.
+    
+    Since we want to prove $\mathcal{M}, g, w \vDash^s \sigma^{\Box}(\varphi_1, \dots, \varphi_i, \dots, \varphi_n)$, let $w_1, \dots, w_n$ be worlds of the right sorts accessible from $w$. By assumption, there is some $j$ such that the $j$-th formula in $\varphi_1, \dots, \varphi_i, \dots, \varphi_n$ is satisfied by assignment $g'$. Now, we further know that $x$ does not occur free in $\varphi_l$ for all $l \neq i$. So we do case analysis on $j$.
+
+    If $j = i$, then since $\mathcal{M}, g', w_j \vDash \varphi_i$, it follows that $\mathcal{M}, g, w_j \vDash \forall x \varphi_i$, QED.
+
+    If $j \neq i$, then since $x$ is not free in $\varphi_j$, and $g$, $g'$ otherwise agree; we apply the Agreement Lemma (\ref{agreement}) to $\mathcal{M}, g', w_j \vDash \varphi_j$ and obtain $\mathcal{M}, g, w_j \vDash \forall x \varphi_j$, QED.\\
+
+    (Name@): Assume $\vDash^{s}_{Fr(\Lambda)} @_j \varphi$. We want to show $\mathcal{M}, g, w \vDash^{s'} \varphi$, for any $\mathcal{M} \in Fr(\Lambda)$, $g$, $w$. Let us refer to the valuation function of $\mathcal{M}$ as $V$, and let us consider a model $M'$ identical to $\mathcal{M}$, except for its own valuation $V'$, which we take to be $V'(j) = w$ and $V'(s) = V(s)$ for any $s \neq j$. By hypothesis, $j$ is not a constant nominal: $j \not\in N_{s'}$. Therefore, its valuation is not part of the frame; and since $\mathcal{M} \in Fr(\Lambda)$, we are then guaranteed to have $\mathcal{M'} \in Fr(\Lambda)$ as well. Thus, by the initial assumption, $\mathcal{M'}, g, w \vDash @_j \varphi$, iff $\mathcal{M'}, g, V'(j) \vDash \varphi$, iff $\mathcal{M'}, g, w \vDash \varphi$. We apply Valuation Agreement (Lemma \ref{vvariantagreement}) and obtain $\mathcal{M}, g, w \vDash \varphi$. \\
+
+    (Paste): Assume $\vDash^{s}_{Fr(\Lambda)} @_j \sigma(\dots, k, \dots) \wedge @_k \varphi \to \psi$, let $\mathcal{M} \in Fr(\Lambda)$, $g$, $w$, and assume further $\mathcal{M}, g, w \vDash^{s} @_j \sigma (\dots, \varphi, \dots)$. We want to show $\mathcal{M}, g, w \vDash^s \psi$.
+    
+    By the second assumption, there exist $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ such that \\ $(V(j), w_1, \dots, w_n) \in R_\sigma$; and for all $l$, we know that $\mathcal{M}, g, w_l$ satisfy the $l$-th formula among $\varphi_1, \dots, \varphi, \dots, \varphi_n$. We will denote the position that $\varphi$ occurs among these formulas by $m$, so the corresponding world where it is satisfied will be $w_m$. 
+
+    Let us refer to the valuation function of $\mathcal{M}$ as $V$, and let us consider a model $M'$ identical to $\mathcal{M}$, except for its own valuation $V'$, which we take to be $V'(k) = w_m$ and $V'(s) = V(s)$ for any $s \neq k$. The argument for $\mathcal{M'} \in Fr(\Lambda)$ is identical to the one given in the (Name@) case; since we have a similar hypothesis that $k$ is not a constant nominal. Next, by the first assumption, we obtain proposition \textit{(P)}: $\mathcal{M'}, g, w \vDash^s @_j \sigma(\dots, k, \dots) \wedge @_k \varphi \to \psi$. We will show the left-hand side of this implication is satisfied, allowing us to obtain the satisfaction of the right-hand side.
+
+    We show $\mathcal{M'}, g, w \vDash^s @_k \varphi$ first. This is equivalent to $\mathcal{M'}, g, V'(k) \vDash^{s'} \varphi$, which by our choice of $V'$ means $\mathcal{M'}, g, w_m \vDash^{s'} \varphi$. By a hypothesis to Paste rule, we know that $k$ does not occur in $\varphi$, so we are allowed to apply Valuation Variant (Lemma \ref{vvariantagreement}). This means our goal is equivalent to $\mathcal{M}, g, w_m \vDash^{s'} \varphi$, which we already know to be true.
+    
+    For the other case, we show $\mathcal{M'}, g, w \vDash^s @_j \sigma(\dots, k, \dots)$. This is the same as proving $\mathcal{M'}, g, V'(j) \vDash^s \sigma(\dots, k, \dots)$. Further, we know by hypothesis that $j \neq k$, and so $V'(j) = V(j)$, which means we will prove $\mathcal{M'}, g, V(j) \vDash^s \sigma(\dots, k, \dots)$. Take $w_1, \dots, w_n$ from earlier, for which we know $(V(j), w_1, \dots, w_n) \in R_\sigma$. Each of these worlds must satisfy the corresponding argument to $\sigma$. First, consider $w_m$: we must show that $\mathcal{M'}, g, w_m \vDash^{s'} k$, which is immediately true by the way we took $V'(k)$. Next, consider $w_l$, for $l \neq k$. We know already that $M, g, w_l \vDash^{s_l} \varphi_l$. By a Paste rule hypothesis, we know $k$ does not occur in $\varphi_l$. So by Valuation Variant (Lemma \ref{vvariantagreement}), we get $M', g, w_l \vDash^{s_l} \varphi_l$, as expected. 
+
+    So the antecedent to proposition \textit{(P)} is proved. Therefore, we obtain $\mathcal{M'}, g, w \vDash^s \psi$. Once again, a Paste rule hypothesis guarantees that $k$ does not occur in $\psi$. So we apply Valuation Variant one more time and get $\mathcal{M}, g, w \vDash^s \psi$, QED.
+\end{proof}
+
+\section{Proving Soundness in Lean}
+The three lemmas are proved in the module \texttt{Soundness.Lemmas}. The formal statements of our soundness theorems are:
+
+\begin{leancode}
+    theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ
+    theorem StrongSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) φ
+\end{leancode}
+
+Our mathematical presentation given above was written following the verified Lean implementation, while leaving aside some of the technical, implementation-specific work. Consider the proof for Name@:
+\begin{leancode}
+| @nameAt s₁ s₂ j φ noccφ _ ih =>
+    intro M g w
+    let M' := ⟨M.1.v_variant j w, Set.Elem.v_variant_modelclass_inv Λ M j w⟩
+    let g' : Assignment M'.1 := g.v_variant j w
+    let w' := (M'.1.Fr.WNonEmpty s₁).default
+    specialize ih M' g' w'
+    simp only [Sat.at, M', v_variant_valuation] at ih
+    rw [v_variant_agreement noccφ w]
+    exact ih
+\end{leancode}
+
+It proceeds by defining the $M'$ model with the valuation variant, while also introducing $g'$ and $w'$ definitions (identical to $g$ and $w$, but made to match $M'$'s set of worlds; Lean cannot tell that $M$ and $M'$'s set of worlds have not changed). It then specializes the inductive hypothesis (namely, $\vDash^s_{Fr(\Lambda)} @_j \varphi$) to $M'$, $g'$, and $w'$, and after simplification with the satisfaction clauses of the $@$ operator, obtains $M', g', V'(j) \vDash^s \varphi$. Finally, using the variant agreement lemma, it rewrites this to $M, g, w \vDash^s \varphi$, which is exactly the statement we intended to prove.
+
+Of the technical work that was left aside, we mention that singling out formulas occurring at a specific index within a list was somewhat complex in Lean, due to our handling of \texttt{Contexts}. We were forced to define a notion of \textit{context isomorphism}, and prove various lemmas that amounted to the fact that isomorphic contexts behave identically (e.g., substituting a formula in two isomorphic contexts produces the result).
+
+To get an idea of what we mean by "technical statement", consider the one below:
+
+\begin{leancode}
+    def subst_not_iso {φ : Form symbs s} {ψ : Form symbs s'}
+        {τ : FormL symbs sorts} {C₁ : φ.Context τ}
+        (C₂ : ψ.Context τ) (h : ¬C₁.iso C₂) :
+    (δ : Form symbs s) → Σ' C₃ : ψ.Context C₁[δ], C₂.iso C₃
+\end{leancode}
+
+It says that if $\varphi$ occurs somewhere among a list $\tau_1, \dots, \varphi, \dots, \tau_n$, and $\psi$ occurs somewhere \textit{else} among the same list (their contexts are not isomorphic), then there exist a formula $\delta$ of the same sort as $\varphi$ and an occurrence of $\delta$ within $\tau_1, \dots, \delta, \dots, \tau_n$, such that $\delta$ occurs at the same index as $\varphi$ (their contexts are isomorphic). Moreover, we proved this constructively by actually \textit{producing} a \texttt{Context} for $\delta$ within said list, not just claiming its existence.
+
+This kind of complexity is not very welcome, as it goes against our third slogan, "Representational distance should be minimized". However, for the time being, it allowed us to and formally reason about these axioms, and prove soundness of the system. The net result was that we currently have a complete, \texttt{sorry}-free proof of the statements above.
+
+Crucially, the effort to formalize soundness in Lean uncovered several issues in the original axiomatization that led to unsoundness. We have resolved these issues via the sideconditions to axiom Barcan, and to rules Name@ and Paste that have been mentioned in a footnote in Chapter~\ref{ch:soundnes-completeness}, where the proof system is introduced. Thanks to machine-checked theorem proving, we have managed to correct the logic of \texttt{MSPHML}.
+
+\section{Completeness}
+
+The outline of the proof is identical to the one in \cite{leustean_operational_2019}, but in certain places we reformulate the argument.
+
+\begin{definition}[Named models]
+    A model $\mathcal{M} = (W, (R_\sigma)_{\sigma \in \Sigma}, N, V)$ is \textit{named} if, for all $s \in S$ and $w \in W_s$, there exists some $k \in NOM_s \cup N_s$ such that $w = V(k)$.
+\end{definition}
+
+In other words, in a named model, all worlds are guaranteed to be named by a nominal (constant or non-constant).
+
+\begin{definition}[Pure formulas]
+    A formula is \textit{pure} if it does not contain propositional variables. A \textit{pure instance} of a formula is obtained by substituting nominals with nominals of the same sort. A formula is $\forall \exists$\textit{-pure} if it is pure, or it has the form $\forall x_1 \dots \forall x_n \exists y_1 \dots \exists x_n \psi$, where $\psi$ is pure and $ \{ x \in SVAR \; \vert \; x \text{ occurs in } \psi \} \subseteq \{x_1, \dots, x_n, y_1, \dots, y_n\}$.
+\end{definition}
+
+\begin{definition}[Named, pasted and @-witnessed sets]
+    Let $s \in S$ and $\Gamma$ be a set of formulas of sort $s$. We say that:
+    \begin{itemize}
+        \item $\Gamma$ is \textit{named} if $j \in \Gamma$ for some $j \in NOM_s \cup N_s$;
+        \item $\Gamma$ is \textit{pasted} if, whenever $@_k \sigma(\dots, \varphi, \dots) \in \Gamma$, there exists $j \in NOM_{s_i}$ such that $@_k \sigma(\dots, j, \dots) \in \Gamma$ and $@_j^s \varphi \in \Gamma$; for all $t \in S$, $\sigma \in \Sigma_{s_1\dots s_n, t}, k \in NOM_t \cup N_t$, and $\varphi$ of sort $s_i$;
+        \item $\Gamma$ is \textit{@-witnessed} if, cumulatively:
+        \begin{itemize}
+            \item If $@_k^s \exists \varphi \in \Gamma$, then there exists $j \in NOM_t$ such that $@_k^s \phi[j / x] \in \Gamma$; for all $s', t \in S$, $x \in SVAR_t$, $k \in NOM_{s'} \cup N_{s'}$ and $\varphi$ of sort $s'$:
+            \item For all $t \in S$, $x \in SVAR_t$, $@_{j_x}^s x \in \Gamma$ for some $j_x \in NOM_t$.
+        \end{itemize}
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Maximal consistent sets]
+    Let $\Lambda$ be a set of axioms, $s \in S$ and $\Gamma$ a set of formulas of sort $s$.
+    
+    We say that $\Gamma$ is $\Lambda$\textit{-maximal consistent} if it is $\Lambda$-consistent, and any $\Gamma'$ such that $\Gamma \subsetneq \Gamma'$ is not $\Lambda$-consistent.
+\end{definition}
+
+In the following, we will abbreviate "$\Lambda$-maximal consistent set" by "$\Lambda$-MCS". $\Lambda$-MCS's have the following property we will make use of: for any $\Lambda$-MCS $\Gamma$, $@_j^s k \in \Gamma$ is an equivalence relation on nominals:
+
+\begin{proposition}\label{lemma:equivalence}
+    Let $j, k, u \in NOM_t \cup N_t$, and $\Gamma$ a set of formulas of sort $s$ which is a $\Lambda$-MCS. The following properties hold:
+    \begin{enumerate}
+        \item $@_j j \in \Gamma$;
+        \item If $@_j k \in \Gamma$, then $@_k j \in \Gamma$;
+        \item If $@_j k \in \Gamma$ and $@_k u \in \Gamma$, then $@_j u \in \Gamma$.
+    \end{enumerate}
+\end{proposition}
+\begin{proof}
+    Immediate using theorems (Nom), (Bridge) and (Sym) in \cite{leustean_operational_2019}, Lemma 1.
+\end{proof}
+
+\begin{definition}[Lindenbaum extension]\label{def:lindenbaum}
+    Let $\Gamma$ be a $\Lambda$-consistent set. We define a sequence of sets $(\Gamma_n)_{n \in \mathbb{N}}$ in a language extended with denumerably many new nominals. Let $\varphi_1, \dots$ be an enumeration of all formulas of sort $s$ in the extended language. We have:
+    \begin{itemize}
+        \item $\Gamma^0$ = $\Gamma \cup \{ k_s \} \cup \{ @_{j_x}^s x \; \vert \; x \in SVAR_t, t \in S \}$, where $k_s$ is a new nominal of sort $s$, and $j_x \neq k_s$ is a distinct new nominal of sort $t$ for each variable $x$;
+        \item If $\Gamma^n \cup \{ \varphi_{n+1} \}$ is inconsistent, $\Gamma^{n+1} = \Gamma^n$;
+        \item Otherwise, $
+            \Gamma^{n+1} =
+                \begin{cases}
+                    \Gamma^n \cup \{ \varphi_{n+1} \} \cup \{ @_j \sigma(\dots, \psi_{i-1}, k_i, \psi_{i+1}, \dots) \wedge @_k \psi_i \; \vert \; i \leq n \}, \\[-6pt] \qquad \text{if } \varphi \text{ has the form } @_j \sigma(\psi_1, \dots, \psi_n) \text{ and } \\[-12pt] \qquad k_i \text{ is a distinct new nominal for each } \psi_i;\\
+                    \Gamma^n \cup \{ \varphi_{n+1} \} \cup \{ @_j \psi[k / x] \}, \\[-6pt] \quad \text{if } \varphi \text{ has the form } @_j \exists x \psi \text{ and } \\[-12pt] \quad k \text{ is a new nominal}; \\
+                    \Gamma^n \cup \{ \varphi_{n+1} \}, \text{otherwise}.
+                \end{cases}
+            $
+    \end{itemize}
+
+    Note that the sets above are well-defined, since there will always be enough new nominals in the extended language.
+
+    Furthermore, we let $\Gamma^{+} = \bigcup\limits_{n \in \mathbb{N}} \Gamma^n$. We call $\Gamma^{+}$ the \textit{Lindenbaum extension} of $\Gamma$.
+\end{definition}
+
+\begin{lemma}[Extended Lindenbaum Lemma]\label{lemma:lindenbaum}
+    Let $\Gamma$ be a $\Lambda$-consistent set of formulas of sort $s \in S$. There exists a named, pasted, @-witnessed $\Lambda$-MCS $\Gamma^+$ in an extended language such that $\Gamma \subseteq \Gamma^+$.
+\end{lemma}
+\begin{proof}
+    See \cite{leustean_operational_2019}, Lemma 2.
+\end{proof}
+
+\begin{definition}[Henkin model]
+    Let $\Gamma$ be a $\Lambda$-MCS of formulas of sort $s \in S$. For all $t \in S$, let $j, k \in NOM_t \cup N_t$, and let $\sim$ denote the relation $@_j^s k \in \Gamma$. We showed in Lemma~\ref{lemma:equivalence} that $\sim$ is an equivalence relation.
+    
+    The \textit{Henkin model} $\mathcal{M^\Gamma} = (W^\Gamma, (R^\Gamma_\sigma)_{\sigma \in \Sigma}, N^\Gamma, V^\Gamma)$ is defined thus:
+
+    \begin{itemize}
+        \item $W^\Gamma_t = (NOM_t \cup N_t)/{\sim}$, for all $t \in S$;
+        \item $(|j|, |j_1|, \dots, |j_n|) \in R^\Gamma_\sigma$ iff $@_j^s \sigma(j_1, \dots, j_n) \in \Gamma$, for all $\sigma \in \Sigma_{t_1\dots t_n,t}$;
+        \item $N^\Gamma_t = \{ |c| \}$, for all $c \in N_t$ and $t \in S$;
+        \item $V^\Gamma_t(j) = \{ |j| \}$, for all $j \in NOM_t$ and $t \in S$;
+        \item $V^\Gamma_t(p) = \{ |j| \; \vert \; @_j^s p \in \Gamma_s \}$, for all $p \in PROP_t$ and $t \in S$.
+    \end{itemize}
+
+    Additionally, assuming $\Gamma$ is @-witnessed, the \textit{Henkin assignment function} $g^\Gamma : SVAR \to W^\Gamma$ is defined as:
+    \begin{itemize}
+        \item $g^\Gamma(x) = |j|$, where $@_j^s x \in \Gamma$, for all $x \in SVAR_t, j \in NOM_t, t \in S$.
+    \end{itemize}
+    By the definition of @-witnessed sets, this function is guaranteed to be well-defined.
+\end{definition}
+
+\begin{lemma}[Truth lemma]
+    Given a named, pasted, @-witnessed $\Lambda$-MCS $\Gamma$ of formulas of sort $s \in S$, the following equivalence holds for any $\varphi$ of sort $t \in S$ and $j \in NOM_t \cup N_t$: 
+    \begin{equation*}
+        \mathcal{M}^\Gamma, g^\Gamma, |j| \vDash^t \varphi \quad \text{ iff } \quad @_j^s \varphi \in \Gamma
+    \end{equation*}
+\end{lemma}
+
+We need one more very important piece. We refer the reader to the original paper \cite{leustean_operational_2019}, Proposition 1, for its proof.
+\begin{proposition}[Pure formulas in $\mathcal{H}$(@, $\forall$)]\label{pureforms}
+    Let $\mathcal{M} = (\mathcal{F}, V)$ be a named model and let $\varphi$ be a $\forall\exists$-pure formula of sort $s \in S$. Then $\mathcal{M} \vDash^s \varphi$ iff $\mathcal{F} \vDash^s \varphi$.
+\end{proposition}
+
+With all these preliminary lemmas in place, we are able to prove:
+\begin{theorem}[Strong frame-completeness for pure extensions]
+    Let $\Lambda$ be an $S$-sorted set of pure formulas, which we take as axioms, let $\Gamma$ be a set of formulas of sort $s \in S$, and let $\varphi$ be a formula of sort $s$. The following implication holds:
+
+    \begin{equation*}
+        \Gamma \vDash^s_{Fr(\Lambda)} \varphi \text{ implies } \Gamma \vdash^s_{\Lambda} \varphi
+    \end{equation*}
+\end{theorem}
+
+\section{Proving Completeness in Lean}
+
+Mechanizing the completeness theorem is a complex task. To the best of our knowledge, the only complete Lean implementation of a Henkin-style completeness theorem for a language with first-order capabilities (in fact, FOL itself) was in \cite{han_formal_2020}. We took a top-down approach, focusing on first on the high-level flow of the proof and ensuring each step has a formal statement; before reaching down to the low-level details of actual \texttt{MSPHML} and proofs therein. Due to this reason, it should be noted that various results proved in \cite{leustean_operational_2019} that pertain to the \texttt{MSPHML} proof system itself, are at this moment still \textit{unverified} (for example, the theorems required in the proof of Proposition~\ref{lemma:equivalence}).
+
+Let us break down this task into smaller subtasks, and discuss our approach and progress on each of them.
+
+\subsection{Language Extensions}\label{extensions}
+A crucial part in the completeness proof outlined above lies in the existence of extended languages, particularly languages with denumerably many new nominals. In order to tackle this problem, we took the following approach. In module \texttt{Lindenbaum.Expansion.Def}, we defined a notion of \textit{symbols morphism}. This is a set of functions that map the symbols of one language (its signature $(S, \Sigma, N)$, along with the sets $PROP$, $NOM$ and $SVAR$) to the symbols of another:
+\begin{leancode}
+structure Symbols.morphism (S₁ : Symbols α) (S₂ : Symbols β) where
+  morph_sort : S₁.signature.S → S₂.signature.S
+  morph_op {dom rng} : S₁.signature.«Σ» dom rng →
+        S₂.signature.«Σ» (dom.map morph_sort) (morph_sort rng)
+  morph_N    {st} : S₁.signature.N st → S₂.signature.N (morph_sort st)
+  morph_prop {st} : S₁.prop st → S₂.prop (morph_sort st)
+  morph_nom  {st} : S₁.nom st → S₂.nom (morph_sort st)
+  morph_svar {st} : S₁.svar st → S₂.svar (morph_sort st)
+\end{leancode}
+
+In particular, we called a \textit{symbols embedding} a morphism such that each of the functions above are injective:
+\begin{leancode}
+structure Symbols.embedding (S₁ : Symbols α) (S₂ : Symbols β) where
+  m : S₁.morphism S₂
+  sort_inj : m.morph_sort.Injective
+  op_inj   : ∀ dom rng, (@m.morph_op dom rng).Injective
+  N_inj    : ∀ st, (@m.morph_N st).Injective
+  prop_inj : ∀ st, (@m.morph_prop st).Injective
+  nom_inj  : ∀ st, (@m.morph_nom st).Injective
+  svar_inj : ∀ st, (@m.morph_svar st).Injective
+\end{leancode}
+
+A symbols embedding formalizes our notion of "extending the language". In module \texttt{Lindenbaum.Expansion.Helpers}, we defined functions that fold a larger structure (e.g., a formula, or a frame, or a model) using a morphism. For brevity we give the signatures of three such functions:
+\begin{leancode}
+def morph_formula (φ : FormL S₁ sorts) (m : S₁.morphism S₂) :
+    FormL S₂ (sorts.map m.morph_sort)
+def morph_frame (F : Frame S₁.signature) (m : S₁.morphism S₂) :
+    Frame S₂.signature
+def morph_model (M : Model S₁) (m : S₁.morphism S₂) :
+    Model S₂
+\end{leancode}
+
+In particular, if \texttt{m} is an embedding of $S_1$ into $S_2$, then the Lean term \texttt{morph\char`_formula φ m} denotes \textit{$\varphi$ viewed as a formula in the extended language given by $S_2$}. Similarly for frames and models.
+
+These definitions leave us with three main objectives:
+\begin{enumerate}
+    \item Showing that for each set of symbols $S_1$, there exists an embedding of $S_1$ into some $S_2$, such that $S_2$ contains denumerably many new nominals;
+\end{enumerate}
+
+\textit{We have a proof of this fact}, that used a little bit of constructive creativity. We show the statement below. The \texttt{S₁ ↪ S₂} shown is our notation for \texttt{S₁.embedding S₂}:
+\begin{leancode}
+    instance Symbols.new_nominals (S₁ : Symbols α) :
+        Σ S₂ : Symbols (ℕ ⊕ α), Inhabited (S₁ ↪ S₂) :=
+\end{leancode}
+
+The trick is simple. If $S_1$'s alphabet is based on type $\alpha$, we let $S_2$ be based on type $\mathbb{N} \oplus \alpha$ (the disjoint sum type of $\mathbb{N}$ with $\alpha$). By construction, $\mathbb{N} \oplus \alpha$ contains \textit{denumerably many more terms than} $\alpha$. Defining the embedding is then an easy task. We embed all of $S_1$'s symbols into $S_2$ by \texttt{Sum.inr}. The set of nominals $NOM$ of $S_2$ is the union of $S_1$'s nominals, and \texttt{Sum.inl n} for every \texttt{n : ℕ}. The actual definition is:
+\begin{leancode}
+    nom := λ st => (S₁.nom st.preimage).embed ∪ { Sum.inl n | n : ℕ },
+\end{leancode} 
+Which evidently provides us with denumerably many new nominals.
+
+Remember that in the beginning of Chapter ~\ref{ch:lean-mechanization}, we stated one of our slogans as: "Syntax should be modular by definition". This result showcases precisely the sort of modularity we sought to enable. \\
+
+Let us resume to the other two objectives regarding language extensions.
+\begin{enumerate}[resume]
+    \item Showing that satisfaction of a formula is preserved by considering the formula and model in an expanded language.
+\end{enumerate}
+
+\textit{There is less progress on this side}. The formal statement of the above is:
+\begin{leancode}
+lemma SatFormLift {m : S₁ ↪ S₂} : (⟨M, g, w⟩ ⊨ φ) ↔ ⟨m+ M, m+ g, m+ w⟩ ⊨ (m+ φ)
+\end{leancode}
+
+While encouraging that we can formally state this property, more work is needed to prove it. In particular with the definitions of the \texttt{morph\char`_frame}, \texttt{morph\char`_world} and \texttt{morph\char`_model} functions we referenced earlier. These are currently very hard to reason about, as currently their \textit{definitions} rely on non-trivial proofs of heterogenous equality. \\
+
+Finally,
+\begin{enumerate}[resume]
+    \item Showing that satisfaction of a formula is preserved by considering the formula and model in an expanded language.
+\end{enumerate}
+Similarly, \textit{little progress has been made in this direction}, due to the very same reasons as above. The formal statement is:
+\begin{leancode}
+lemma ProvableLift {m : S₁ ↪ S₂} : ⊢(m+ Λ, m+ s) (m+ φ) ↔ ⊢(Λ, s) φ
+\end{leancode}
+
+\subsection{Countability of the Language}
+In order to prove Lindenbaum's Lemma, we additionally need to enumerate all formulas in the extended language. The fact that formulas are denumerable is currently just an unimplemented stub, which lives in module \texttt{Lindenbaum.Enumeration.Def}. But we are confident that this is within the realm of possibility. Our previous Lean work for mono-sorted hybrid logic \cite{oltean_formalization_2023} gave a proof of denumerability. We know also that this was done in Lean 3 for propositional modal logic \cite{bentzen_henkin-style_2021}. We therefore assigned low priority to this particular issue.
+
+\subsection{Lindenbaum's Lemma}
+Stating and proving Lindenbaum's lemma was another area that required careful design. In the mathematical presentation of Definition \ref{def:lindenbaum}, we are building a chain of \textit{sets} and taking its least uppper bound. Yet beyond defining plain sets, it is very helpful to observe a simple invariant of each Lindenbaum iteration: the set defined at each step is moreover \textit{guaranteed to} not \textit{contain infinitely many nominals} in the language. In Lean, we defined a structure that corresponds to sets with this property. We called it \texttt{ExtendiblePremiseSet}:
+
+\begin{leancode}
+structure ExtendiblePremiseSet (S : Symbols α) (s: S.signature.S)
+  (Λ : AxiomSet S) where
+  set : PremiseSet S s
+  unused_nominals : { n : S.nominal t | ¬set.occurs n } ≃ ℕ
+\end{leancode}
+
+Therefore, our mechanized Lindenbaum iterations define not just sets, but \\ \texttt{ExtendiblePremiseSet}s. The definition thus comes with a \textit{proof} that the required invariant is satisfied by the defined set.
+
+Moreover, all our Lindenbaum work is done in the context of a \texttt{nominal\_extension} variable:
+\begin{leancode}
+    variable (ext : @S.nominal_extension α β β_deq β)
+\end{leancode}
+This encapsulates a symbols embedding to a signature that has countably many new nominals. We already \textit{constructed} such an embedding earlier, but it is cleaner to work with a general structure that has the required property, instead of a particular construction.
+
+We give the full definition of Lindenbaum sets below.
+\begin{leancode}
+noncomputable def PremiseSet.Lindenbaum (Λ : AxiomSet S) (Γ : PremiseSet S s) :
+    ℕ → ExtendiblePremiseSet ext.target (ext.m+ s) (ext.m+ Λ)
+| 0       =>
+    let Γ' : ExtendiblePremiseSet _ _ (ext.m+ Λ) :=
+        ⟨(Γ.embed ext Λ).set ∪ (Γ.embed ext Λ).at_witness_vars, enough_nominals_at⟩
+    ⟨Γ'.set ∪ { ℋNom (Γ'.prod_even_nominal _ 0 0) }, enough_nominals_singleton⟩
+| .succ i =>
+    let φ_i : Form ext.target (ext.m+ s) := ofNat _ i
+    let Γ' : ExtendiblePremiseSet ext.target (ext.m+ s) (ext.m+ Λ) :=
+        ⟨(PremiseSet.Lindenbaum Λ Γ i).set ∪ { φ_i }, enough_nominals_singleton⟩
+    if Γ'.set.consistent (ext.m+ Λ) then
+      match φ_i with
+      | ℋ@ j (ℋ∃ x φ) =>
+        ⟨Γ'.set ∪ { ℋ@ j φ[(Γ'.prod_even_nominal _ i 0) // x]},
+            enough_nominals_singleton⟩
+      | ℋ@ j (ℋ⟨σ⟩ χ) =>
+        ⟨Γ'.set ∪ Γ'.paste_args j σ χ i, enough_nominals_paste⟩
+      | _ => Γ'
+    else PremiseSet.Lindenbaum Λ Γ i
+
+def PremiseSet.LindenbaumExtension (Λ : AxiomSet S) (Γ : PremiseSet S s) :
+    PremiseSet ext.target (ext.m+ s) :=
+  { φ | ∃ i : ℕ, φ ∈ (Γ.Lindenbaum ext Λ i).set }
+\end{leancode}
+
+In module \texttt{Completeness.Lindenbaum.Lemma} we have a proof of Lindenbaum's lemma using this definition. Its statement is:
+\begin{leancode}
+lemma Lindenbaum (h : Γ.consistent Λ) :
+    ∃ Γ' : NamedPastedWitnessedMCS ext.target
+        (ext.m+ s) (ext.m+ Λ), (ext.m+ Γ) ⊆ Γ'.set
+\end{leancode}
+
+The only missing pieces of the argument are the invariants in the Lindenbaum definition, as well as proofs that the new nominals are indeed fresh. Furthermore, additional work is needed to formalize certain \texttt{MSPHML} proof system properties, such as properties of maximal consistent sets, and the generalization on nominals metatheorem.
+
+\subsection{Henkin Model. Truth Lemma}
+The natural design choice for the Henkin model was to use Quotient types. Given an equivalence relation on a type (which in Lean is called a setoid), Lean provides a way to weaken \textit{equality} to \textit{equivalence}, in effect factoring the original type by the equivalence relation. We therefore defined a \texttt{Setoid} instance on nominals, given a named, pasted, @-witnessed MCS $\Gamma$:
+
+\begin{leancode}
+abbrev NamedPastedWitnessedMCS.nominal_eq (Γ : NamedPastedWitnessedMCS symbs t Λ)
+    (s : symbs.signature.S) (i j : symbs.nominal s) : Prop := ℋ@ i j ∈ Γ.set
+
+instance NamedPastedWitnessedMCS.nominalSetoid (Γ : NamedPastedWitnessedMCS symbs t Λ)
+    (s : symbs.signature.S) : Setoid (symbs.nominal s) where
+    r := Γ.nominal_eq s
+    iseqv := nominal_eq.eqv
+\end{leancode}
+
+Using this quotient, the definition of the Henkin model can be cleanly formalized, keeping it close to its mathematical formulation:
+\begin{leancode}
+def NamedPastedWitnessedMCS.HenkinModel (Γ : NamedPastedWitnessedMCS symbs s Λ) :
+    Model symbs where
+  «Fr» := {
+    W  := λ s => Quotient (Γ.nominalSetoid s),
+    R  := λ {dom _} σ =>
+        match dom with
+        | [ ]    => { }
+        | _ :: _ => { ⟨q, qs⟩ |
+            ∃ j, ∃ (js : WProd symbs.nominal _),
+                ℋ@ j (ℋ⟨σ⟩ js.to_args) ∈ Γ.set ∧
+                    (⟦j⟧ = q ∧ js.to_quotient Γ = qs) },
+    Nm := λ n => ⟦.inl n⟧,
+    WNonEmpty := λ s => ⟨⟦(symbs.signature.nNonEmpty s).default⟧⟩
+  }
+  Vp   := λ {t} p => { q | ∃ j : symbs.nominal t, ℋ@ j (ℋProp p) ∈ Γ.set ∧ ⟦j⟧ = q }
+  Vn   := λ j => ⟦.inr j⟧
+\end{leancode}
+
+The Truth lemma is currently the most recent piece of work that we started. Not all of the inductive cases are currently completed. Particularly, the applicative case proves to be labour intensive, due once again to our reliance on \texttt{Contexts} for picking out formulas in a list. We provide the statement of the Truth lemma below:
+
+\begin{leancode}
+lemma Truth : (⟨Γ.HenkinModel, Γ.HenkinAsgn, ⟦j⟧⟩ ⊨ φ) ↔ (ℋ@j φ) ∈ Γ.set
+\end{leancode}
+
+\subsection{Completeness}
+Proof gaps earlier described notwithstanding, we give the proof of completeness in a full below:
+\begin{leancode}
+theorem Completeness {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊢(Λ) φ := by
+  rw [ModelExistence]
+  intro h_cons
+  rw [←SatLift]
+  . have ⟨Γ', incl⟩ := Lindenbaum nominal_extension.default h_cons
+    apply SatSubset
+    case Γ =>
+      exact Γ'.set
+    . exists ⟨Γ'.HenkinModel, HenkinInΛ⟩
+      exists Γ'.HenkinAsgn
+      have ⟨j, j_in_Γ'⟩ := Γ'.named
+      exists ⟦j⟧
+      intro φ
+      rw [Truth]
+      apply gen_at_closed Γ'.mcs
+      exact j_in_Γ'
+    . apply incl
+\end{leancode}
+
+\bigskip
+
+As you can see, many of the implementation details are still work-in-progress. What we have definitely achieved, though, was laying a strong foundation that ensures all current unsolved tasks have a definite, narrow scope. Moreover, our prior experience of \cite{oltean_formalization_2023} strongly suggests that some of these tasks are feasible within a short timestamp, as we have already implemented something similar previously (an example would be proving the language countable). For all other unimplemented details, the path forward is discussed in the final chapter.

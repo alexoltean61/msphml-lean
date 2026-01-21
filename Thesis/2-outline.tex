@@ -1,0 +1,129 @@
+\chapter{Preliminaries}\label{ch:outline}
+Throughout this thesis, we will often abbreviate \textit{many-sorted polyadic hybrid modal logic} by \texttt{MSPHML}.
+
+\section{Many-Sorted Polyadic Hybrid Modal Logic}
+The language of \texttt{MSPHML} extends in several ways the basic modal language. (See \cite{blackburn_modal_2001} for the main reference on modal logics in general.) First, it is \textit{polyadic}, that is, it may contain several modal operators, each of which may have arbitrary arity. Second, it is \textit{many-sorted}; which means formulas are partitioned by sorts, and operators constrain the sorts of arguments they can be applied to (much like data in programming contexts is partitioned by \textit{data types}, and functions expect their parameters to have specific types). Finally, it is \textit{hybrid}, using nominal and variable symbols to reference the Kripke model states. In particular, we will present the syntax of $\mathcal{H}_{\Sigma}(@, \forall)$, which introduces the $@$ and $\forall$ binders for nominals and variables, respectively.
+
+Many-sorted languages have been extensively studied from the viewpoint of universal algebra (see \cite{goguen_theorem_2021}, \cite{sannella_universal_2012}), so it should come as little surprise that in our modal setting we inherit the formulation of many-sorted signatures from the former. However, we note that \texttt{MSPHML} extends the usual definition of signatures to also include \textit{constant nominals}, for reasons which have to do with the modal semantics of operators.
+
+\section{A Primer to Lean}
+Lean is a functional programming language, as well as a proof assistant based on the calculus of inductive constructions. It features dependent typing, inductive types and metaprogramming. Its dependent type system is classified along a non-cumulative hierarchy of universes, also known as sorts. The bottom-most universe is that of \textit{propositions}, \texttt{Prop}. By the Curry-Howard isomorphism, a term \texttt{stmt : Prop} corresponds to a mathematical statement; and a term \texttt{pf : stmt} corresponds to a proof of the respective statement. All other universes apart from the bottom-most contain \textit{data types}. Some data types are familiar to regular programming contexts, such as \texttt{Nat} or \texttt{Bool}. These types usually live in the second to bottom-most type universe. Other types may not be as easily expressible in standard languages; take, e.g., \texttt{(α : Type) → List α}, which corresponds to functions taking a data type and returning a list of elements of that type, as a value.
+
+\subsection{A Hands-on Example: Propositional Logic}
+We give a hands-on example of some of the Lean features we will abundantly use: dependent types, inductive definitions, and indexed families of types. Consider the Lean code below:
+\begin{leancode}
+inductive Propositional : Type → Type where
+  | prop : α → Propositional α
+  | bot  : Propositional α
+  | imp  : Propositional α → Propositional α → Propositional α
+\end{leancode}
+
+It defines a family of types for propositional logic formulas. If you wish, you may consider the \textit{indices} to this family of types (the \texttt{α} parameter) as serving as the terminal symbols of our propositional grammar. Non-terminals are represented by each of the three constructors, \texttt{prop}, \texttt{bot} and \texttt{imp}.
+
+We can therefore construct propositional formulas with terminals taken from the type of characters, or from the type of natural numbers:
+\begin{leancode}
+example : Propositional Char := .imp (.prop 'p') (.prop 'q')
+example : Propositional Nat  := .imp (.prop 61) (.prop 11)
+\end{leancode}
+
+But also we can use less orthodox types as terminals, such as functions from naturals to naturals:
+\begin{leancode}
+example : Propositional (Nat → Nat)  := .imp (.prop (· + 1)) (.prop (2 * ·))
+\end{leancode}
+
+We can also give a simple semantics for this propositional grammar. If we have a function \texttt{e : α → Bool} that maps terminals to boolean values, we can extend this to a mapping of full formulas to booleans. The Lean snippet below makes use of pattern matching over the \texttt{Propositional α} type to define such a mapping. Atomic formulas are mapped to their value under \texttt{e}, the bottom formula is mapped to boolean false, and implications make use of recursive calls to implement boolean "not $\varphi$ or $\psi$":
+\begin{leancode}
+def e_plus (e : α → Bool) : Propositional α → Bool
+  | .prop p  => e p
+  | .bot     => false
+  | .imp φ ψ => !(e_plus e φ) || e_plus e ψ
+\end{leancode}
+
+\subsection{Simple Proofs. Sigma and Pi Types}
+This very simple formalism already allows us to check prove some properties in Lean. The code below shows that $\varphi \to \varphi$ is a tautology. Lean makes no distinction between universal statements and functions to \texttt{Prop}, so the proof below is given as a function definition in functional programming style:
+\begin{leancode}
+theorem id_taut {φ : Propositional α} : ∀ e, e_plus e (.imp φ φ) = true :=
+  -- Note: this invokes a theorem in the standard library,
+  -- Bool.not_or_self : ∀ (x : Bool), (!x || x)
+  λ e => (e_plus e φ).not_or_self
+\end{leancode}
+
+The same may also be proved using so-called tactics, which are a higher-level interface to writing proof terms:
+\begin{leancode}
+theorem id_taut' {φ : Propositional α} : ∀ e, e_plus e (.imp φ φ) = true :=
+  by
+    intro e       -- Mathematically, says: "Let e be an evaluation"
+    unfold e_plus -- Unfolds the definition of e_plus
+    simp -- Invokes Lean's simplifier to look for equalities that match the goal
+\end{leancode}
+
+Let us try to prove an existential statement: "there exists a formula which is a tautology". An existential is proved by providing a \textit{witness} (in our case, we provide $\bot \to \bot$), and a \textit{proof} that the witness satisfies the required property (in our case, we reference \texttt{id\_taut} we proved earlier):
+\begin{leancode}
+theorem exists_taut : ∃ φ : Propositional α, (∀ e, e_plus e φ = true) :=
+  ⟨.imp .bot .bot, id_taut⟩
+\end{leancode}
+
+The proof above is a very good example of dependent typing. Notice that the proof we provided as second element in the tuple above \textit{depends} on the formula we provided as first element. For if we had chosen $\bot \to (\bot \to \bot)$ as our witness instead, the proof given in \texttt{id\_taut} would no longer have applied.
+
+In fact, this example showcases both dependent products ($\Sigma$ types, which are almost identical to existential statements) and dependent arrows ($\Pi$ types, which are the syntactic sugar behind universal statements \textit{and} functions). We can rewrite the previous example in the following form, making all dependent types fully explicit:
+\begin{leancode}
+def exists_taut_constructive :
+  Σ' φ : Propositional α, (Π (e : α → Bool), e_plus e φ = true) :=
+    ⟨.imp .bot .bot, id_taut⟩
+\end{leancode}
+In simple terms, $\Sigma$ types define pairs where the type of the second element depends on the value of the first. Complementarily, $\Pi$ types define functions whose return types depend on the input value.
+
+\subsection{Universe Polymorphism. Type Classes}
+Additionally, we will make use of Lean's support for \textit{universe polymorphism}: definitions over types living in arbitrary universes. At the declarative level, this is enabled by means of \textit{universe-level variables}, e.g., the variable \texttt{u} between curly braces in the example below. The example also makes use of \textit{type-class instance synthesis}, the unnamed parameter of type \texttt{Inhabited α} between square brackets. \texttt{Inhabited} ensures that a type has at least one element, accessible via \texttt{Inhabited.default}. The square brackets indicate to Lean that it should try to automatically search for a proof of inhabitance among the proofs that it knows about, instead of requiring the user to provide it explicitly. So the function below takes an inhabited type in any universe, and returns the list containing only its default element:
+\begin{leancode}
+def default_list.{u} (α : Type u) [Inhabited α] : List α :=
+    [Inhabited.default]
+\end{leancode}
+
+An example of an inhabited type is \texttt{Nat}, the natural numbers. Moreover, \texttt{Nat} lives in universe level 1, that of data types. If we check the type of applying \texttt{default\_list} to \texttt{Nat}, we see that it is \texttt{List Nat}, as expected:
+\begin{leancode}
+#check Nat
+-- Output: Nat : Type
+#check default_list Nat
+-- Output: default_list Nat : List Nat
+\end{leancode}
+
+To understand where universe polymorphism comes into play, let us write an \texttt{Inhabited} instance for \texttt{Type 2 → Nat}, which lives in a higher universe than \texttt{Nat}, and notice that \texttt{default\_list} still successfully applies to this new type:
+\begin{leancode}
+#check (Type 2 → Nat)
+-- Output: Type 2 → ℕ : Type 3
+instance : Inhabited (Type 2 → Nat) where
+    default := λ _ => 0
+#check default_list (Type 2 → Nat)
+-- Output: default_list (Type 2 → ℕ) : List (Type 2 → ℕ)
+\end{leancode}
+
+\section{Our Design Principles}\label{ch:lean-mechanization}
+
+In the implementation of the language, we tried to follow a few guiding principles. 
+
+First, from our earlier experience with formalizing mono-sorted hybrid logic \cite{oltean_formalization_2023} we learned that simplicity in defining the syntax comes at the cost of sacrificing generality. In this previous implementation, the sets which make up the signature of the language were fixed, implemented as structures around the $Nat$ type. While this was adequate for basic purposes, e.g. proving theorems in the deductive system and even proving soundness, this approach proved insufficiently general to support the Henkin-style completeness theorem we needed. This would be unsurprising: in effect the implementation was limited to just \textit{one} hybrid language, while the techniques required in the completeness proof called for \textit{expanding} the language with new symbols.
+
+For this renewed effort at implementing a hybrid language in Lean, we were therefore guided by a simple first slogan:
+
+\begin{center}
+    \textit{Syntax should be modular by definition.}
+\end{center}
+
+It should be relatively easy to define different languages around different signatures; to define language expansions or restrictions; and concrete types should not, wherever possible, be built into the definition. Universe polymorphism is preferred.
+
+The second slogan is:
+
+\begin{center}
+    \textit{Well-sorted formula = Well-typed term}
+\end{center}
+
+Lean's rich dependent typing system makes it a very promising choice for mechanizing many-sorted syntax like \texttt{MSPHML}'s. We intend to make complete use of its potential, striving to ensure well-sortedness of formulas is guaranteed entirely by Lean's type checker. Formulas should be sorted \textit{by design}, as they are on paper, and no proofs of well-sortedness should ever be required to be separately supplied.
+
+Finally:
+
+\begin{center}
+    \textit{Representational distance should be minimized.}
+\end{center}
+
+As much as possible, the system defined in Lean should not lose its original modal flavour. It may be tempting, for example, to allow partial application of polyadic operators, as in lambda calculus, as such a choice may ease the task of defining the syntax. We strived to resist such temptations. 

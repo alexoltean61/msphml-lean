@@ -1,0 +1,429 @@
+\chapter{Syntax and Semantics}\label{ch:syntax-semantics}
+In the sequel, we will be following the presentation in \cite{leustean_operational_2019}, where many-sorted polyadic hybrid logic is introduced, to define its syntax and semantics. After laying down the definitions, we will discuss our design choices for implementing this system in Lean 4.
+
+\section{Syntax}
+We begin by providing the definition of \textit{signatures with constant nominals}, as will be used throughout this thesis.
+
+\begin{definition}[Signatures with constant nominals]
+    A \textbf{signature with constant nominals} is a triple $(S, \Sigma, N)$, where:
+    \begin{itemize}
+        \item $S$ is a non-empty, countable set, called the \textbf{sort set};
+        \item $\Sigma$ is an $S^*\times S$-indexed family of countable sets; i.e., $\Sigma = (\Sigma_{w,s})_{w \in S^*, s \in S}$. Each element of these sets is called an \textbf{operator};
+        \item $N$ is an $S$-indexed family of non-empty, countable sets; i.e. $N = (N_s)_{s \in S}$. Each element of these sets is called a \textbf{constant nominal}.
+    \end{itemize}
+\end{definition}
+
+In the definition above, by $S^*$ we mean the set of \textit{words} given by $S$: the finite (possibly empty) sequences of elements in $S$. We will denote the empty sequence by $\lambda$.
+
+\begin{comment}
+For all $s \in S$, $w \in S^*$, we assume $\Sigma_{w,s}$ to be disjoint; as well as $N_s$ to be disjoint.
+\end{comment}
+
+Given a signature $(S, \Sigma, N)$, in order to define a full-fledged hybrid language, we require three more $S$-sorted sets, consisting of the \textit{propositional}, (non-constant) \textit{nominal}, and \textit{state variable} symbols, respectively: $(PROP)_{s \in S}$, $(NOM)_{s \in S}$ and $(SVAR)_{s \in S}$. We require that $PROP_s$ and $NOM_s$ are countable; and $SVAR_s$ is denumerably infinite.
+
+Having fixed these, we can introduce the grammar of $\mathcal{H}_{\Sigma}(@, \forall)$, the \texttt{MSPHML} language which is our object of study.
+
+\begin{definition}[$\mathcal{H}_{\Sigma}(@, \forall)$ formulas]
+    The set of formulas of sort $s \in S$ is:
+    \begin{equation*}
+        \varphi_s := p \; | \; j \; | \; y \; | \; \neg \varphi_s \; | \; \varphi_s \lor \varphi_s \; | \; \sigma(\varphi_{s_1}, \dots, \varphi_{s_n}) \; | \; @_k^s \varphi_t \; | \; \forall x \varphi_s
+    \end{equation*}
+\end{definition}
+
+Where the signature $\Sigma$ is otherwise clear, we will often silently drop the subscript and speak of "$\mathcal{H}(@, \forall)$ formulas".
+
+Where $p \in PROP_s$, $j \in NOM_s \cup N_s$, $k \in NOM_t \cup N_t$, $y \in SVAR_s$, $x \in SVAR_t$ and $\sigma \in \Sigma_{s_1...s_n,s}$. Derived propositional operators are defined as usual. The dual binder $\exists$ is defined as $\exists x \varphi := \neg \forall x \neg \varphi$. For all operators $\sigma \in \Sigma_{s_1...s_n, s}$, the dual operator $\sigma^{\Box}$ is defined as $\sigma^{\Box}(\varphi_1,\dots,\varphi_n) = \neg \sigma(\neg \varphi_1,\dots,\neg \varphi_n)$.
+
+Notice that interaction between sorts happens in several ways. First, the satisfaction operator $@$ acts also as a "sort-casting" operator, with taking a nominal and a formula living in some sort $s$, and living in an arbitrary sort $t$. Next, we have modal operators and FOL-like binders. When applied to arguments with sorts that match their domains, modal operators produce formulas living in the sort given by their range. Furthermore, the bound variables in universal or existential formulas are allowed to take any sort.
+
+With the exception of requiring substitution to be sorted, substitution and substitutability are defined as usual in hybrid logics with binders (see \cite{blackburn_hybrid_1998}, besides the original paper \cite{leustean_operational_2019}). Similarly, the idea of free and bound variables is standard.
+
+\section{Syntax Definition in Lean}
+Let us look at our choices for defining syntax. The crux of this is implemented in the $Language.Signature$ and $Language.Form$ modules.
+
+We fix an arbitrary type \texttt{α} to serve as the alphabet of our language. All symbols, including ones used for sorts, modal operators, and variables, will be taken from type \texttt{α}. Moreover, we impose no restriction on the universe of type \texttt{α}, making all syntax definitions universe polymorphic.
+
+The definition of $(S, \Sigma, N)$-signatures is given below.\footnote{We are required to use guillemets in \texttt{«Σ»} to distinguish the variable name from the reserved keyword \texttt{Σ}, the type constructor for dependent products.} For brevity, we omit the countability and non-emptiness restrictions on $S$, $\Sigma$ and $N$, but we note that the actual Lean implementation requires them.
+
+\begin{leancode}
+  structure Signature (α : Type u) where
+    S    : Set α
+    «Σ»  : List S → S → Set α
+    N    : S → Set α
+\end{leancode}
+
+We use \texttt{S} as the set of sorts. For this reason, we also make heavy usage of dependent functions from \texttt{S} to some other type to define the $S$-indexed families we require. Let us focus briefly on the \texttt{«Σ»} field, which we use as our set of modal operators. For each operator domain (the \texttt{List S} parameter) and range (the \texttt{S} parameter), it defines a set of operator symbols (\texttt{Set α}). As an example, consider the following context:
+
+\begin{leancode}
+  variable (sig : Signature String)
+  variable (s₁ s₂ : sig.S)
+  variable (σ : sig.«Σ» [s₁, s₂] s₂)
+\end{leancode}
+
+It assumes a $(S, \Sigma, N)$-signature named \texttt{sig}, two sorts $s_1$, $s_2 \in S$ and an operator $\sigma \in \Sigma_{s_1s_2, s_2}$. Similarly, a variable typed as below denotes a constant nominal $c \in N_{s_2}$:
+
+\begin{leancode}
+  variable (c : sig.N s₂)    
+\end{leancode}
+
+We also note that a different approach is possible:
+\begin{leancode}
+  structure Signature' (α : Type u) where
+    S      : Set α
+    «Σ»    : Set α
+    arity  : «Σ» → ℕ
+    domain : (σ : «Σ») → (Fin (arity σ)) → S
+    range  : «Σ» → S
+    -- and so on
+\end{leancode}
+
+We decided against this method, primarily because it introduces a lot of definitional overhead. We believe we found a cleaner and more natural representation.
+
+We keep track of the $PROP$, $NOM$ and $SVAR$ sets of symbols in a structure called \texttt{Symbols}:
+\begin{leancode}
+  structure Symbols (α : Type u) where
+    signature  : Signature α
+    prop : (s : signature.S) → Set α
+    nom  : (s : signature.S) → Set α
+    svar : (s : signature.S) → Set α
+\end{leancode}
+
+Note the many-sorted signature being itself part of this structure. With a \texttt{Symbols} structure on hand, we are almost ready to give the definition of \texttt{MSPHML} formulas.
+
+Before doing so, however, we start with a comment on our design choices. In line with the "Well-sorted formula = Well-typed term" slogan, we intend to specify an \textit{indexed family of types}: for each sort, its own type of formulas. But a difficult problem then arises: how do we specify the type of the polyadic application constructor? Let us think of our operator $\sigma \in \Sigma_{s_1s_2,s}$ from earlier. Intuitively, we apply $\sigma$ to a list of formulas $\varphi_1, \varphi_2$, with $\varphi_1$ of sort $s_1$ and $\varphi_2$ of sort $s_2$, and obtain $\sigma(\varphi_1, \varphi_2)$ of sort $s$.
+
+It's unclear how we could specify this argument list, since its elements are supposed to have \textit{different types}, while lists must be type homogenous. Dependent arrows from a finite type would be a possible solution; but earlier we rejected such an approach for introducing definitional overhead.
+
+We settled for the following design. We defined a family of types for \textit{lists of formulas}, indexed by \textit{lists of sorts}. Proper formulas, as defined mathematically in Chapter~\ref{ch:syntax-semantics}, are \textit{singleton} lists of formulas. Extending on the grammar given in Chapter~\ref{ch:syntax-semantics}, we introduce an additional \texttt{cons} constructor, used to construct non-singleton formula lists. Fulfilling our intuition, an operator $\sigma \in \Sigma_{s_1...s_n,s}$ will expect to be applied to a formula list of sorts $s_1, ..., s_n$, constructing a formula list of sorts $s$. Since this is a singleton list, such an operator application is guaranteed to be a proper formula.
+
+We give the Lean definition of formula lists (\texttt{FormL}) and of proper formulas (\texttt{Form}) below:
+\begin{leancode}
+inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
+| prop : symbs.prop s → FormL symbs [s]
+| nom  : symbs.nominal s → FormL symbs [s]
+| svar : symbs.svar s → FormL symbs [s]
+| appl : symbs.signature.«Σ» (h :: t) s → FormL symbs (h :: t) → FormL symbs [s]
+| or   : FormL symbs [s] → FormL symbs [s] → FormL symbs [s]
+| neg  : FormL symbs [s] → FormL symbs [s]
+| at   : symbs.nominal t → FormL symbs [t] → FormL symbs [s]
+| bind : symbs.svar t → FormL symbs [s] → FormL symbs [s]
+| cons : FormL symbs [s₁] → FormL symbs (s₂ :: t) → FormL symbs (s₁ :: s₂ :: t)
+
+abbrev Form (symbs : Symbols α) (s : symbs.signature.S) := FormL symbs [s]
+\end{leancode}
+
+From the definition above, note that it is impossible to construct \textit{unsorted} formulas: terms of type \texttt{FormL symbs []}. Derived operators are defined as expected. Using notations defined via Lean metaprogramming, formulas were made to resemble as much as possible their usual mathematical representation.
+
+Let us exemplify the grammar and its notations. Building on our previous example, consider the following variable context:
+\begin{leancode}
+  variable (symbs : Symbols String)
+  variable (s₁ s₂ : symbs.signature.S)
+  variable (σ : symbs.signature.«Σ» [s₁, s₂] s₂)
+  variable (j : symbs.nominal s₁)
+  variable (k : symbs.nominal s₂)
+  variable (p : symbs.prop s₂)
+\end{leancode}
+
+We have $\sigma \in \Sigma_{s_1s_2,s_2}$, $j \in NOM_{s_1} \cup N_{s_1}$, $k \in NOM_{s_2} \cup N_{s_2}$ and $p \in PROP_{s_2}$. We construct the (well-sorted) formula $p \wedge \sigma(j, k)$, and we query Lean for its type:
+\begin{leancode}
+  #check p ⋀ ℋ⟨σ⟩ (j, k)
+\end{leancode}
+
+The Lean infoview will correctly let us know the term has type \texttt{FormL symbs [s₂]}. By stripping this term off its notational sugar and exposing the bare constructor applications, we would obtain:
+\begin{leancode}
+  #check (FormL.prop p).and $ FormL.appl σ ((FormL.nom j).cons (FormL.nom k))
+\end{leancode}
+
+As expected, attempting to check the type of $p \wedge \sigma(j, j)$ will fail:
+\begin{leancode}
+  #check p ⋀ ℋ⟨σ⟩ (j, j)
+\end{leancode}
+
+With Lean complaining, correctly, that the second argument to $\sigma$ has sort $s_1$ instead of required sort $s_2$.
+
+A final note on this sorted syntax. If we have \texttt{φ : Form symbs s₁}, \texttt{ψ : Form symbs s₂}, and further a proof \texttt{pf : s₁ = s₂}, \texttt{φ} and \texttt{ψ} will nonetheless be terms of \textit{different} types. When this happened, we used the \texttt{▸} macro (see \cite{avigad_quantifiers_nodate}) to cast them to the same type. Its usage, however, is generally \textit{not} recommended due to difficulty in constructing proofs with casted terms. In the future, a principled solution that avoids using the cast macro should be developed. While reasoning with casts per-se did not prove problematic in the particular instances that we resorted to it, equality between types of formulas did lead to problems when we defined syntax extensions. A more thorough discussion on this topic is provided in Section~\ref{extensions}.
+
+\section{Semantics}
+We outline the Kripke-style semantics for the language just introduced.
+
+\begin{definition}[Frames]
+    A $(S, \Sigma, N)$-frame is a tuple $\mathcal{F} = (W, (R_\sigma)_{\sigma \in \Sigma}, N^{\mathcal{F}})$, where:
+    \begin{itemize}
+        \item $W = (W_s)_{s \in S}$ is an $S$-sorted set of \textbf{worlds}, each set assumed non-empty;
+        \item $R_\sigma \subseteq W_s \times W_{s_1} \times \dots \times W_{s_n}$, for all $\sigma \in \Sigma_{s_1...s_n,s}$, is the \textbf{accessibility relation} of operator $\sigma$;
+        \item  $N^{\mathcal{F}} = (N^{\mathcal{F}}_{s})_{s \in S}$ is an $S$-sorted function, with $N_{s} : N_s \to \mathcal{P}(W_s)$ for all $s$, and $N_{s}(c)$ a \textit{singleton} for all $c \in N_s$. This is the \textbf{valuation} of constant nominals.
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Models]
+    A $(S, \Sigma, N)$-model based on a frame $\mathcal{F} = (W, (R_\sigma)_{\sigma \in \Sigma}, N^{\mathcal{F}})$ is a tuple $\mathcal{M} = (\mathcal{F}, V)$, where $V =(V_s)_{s \in S}$ is an $S$-sorted function (the \textbf{valuation} function), with $V_s : PROP_s \cup NOM_s \to \mathcal{P}(W_s)$. For all $k \in NOM_s$, $V_s(k)$ is required to be a \textit{singleton}.
+
+    We will often specify the frame together with the model, writing $\mathcal{M} = (W, (R_\sigma)_{\sigma \in \Sigma}, N, V)$.
+\end{definition}
+
+While the valuation function interprets nominals and propositional variables, in the case of state variables we define a Tarski-style assignment function, as customary in hybrid settings:
+\begin{definition}[Assignment function]
+    Given a $(S, \Sigma, N)$-frame $\mathcal{F} = (W, (R_\sigma)_{\sigma \in \Sigma}, N^{\mathcal{F}})$, an assignment is an $S$-sorted function $(g_s)_{s \in S}$, $g_s : SVAR_s \to W_s$.
+\end{definition}
+
+\begin{definition}[Satisfaction relation]
+    Given a model $\mathcal{M} = (W, (R_\sigma)_{\sigma \in \Sigma}, N, V)$, an assignment function $g$ and $w \in W_s$:
+
+    \begin{itemize}
+        \item $\mathcal{M}, g, w \vDash^s a$ iff $w \in V_s(a)$, for $a \in PROP_s \cup NOM_s$;
+        \item $\mathcal{M}, g, w \vDash^s c$ iff $w \in N^{\mathcal{F}}_s(c)$, for $c \in N_s$;
+        \item $\mathcal{M}, g, w \vDash^s x$ iff $w = g_s(x)$, for $x \in SVAR_s$;
+        \item $\mathcal{M}, g, w \vDash^s \neg \varphi$ iff $\mathcal{M}, g, w \nvDash^s \varphi$;
+        \item $\mathcal{M}, g, w \vDash^s \varphi \lor \psi$ iff $\mathcal{M}, g, w \vDash^s \varphi$ or $\mathcal{M}, g, w \vDash^s \psi$;
+        \item $\mathcal{M}, g, w \vDash^s \sigma(\varphi_{s_1},\dots,\varphi_{s_n})$ iff there exist $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ such that $(w, w_1, \dots, w_n) \in R_\sigma$ and $\mathcal{M}, g, w_i \vDash^{s_i} \varphi_i$ for all $1 \leq i \leq n$;
+        \item $\mathcal{M}, g, w \vDash^s @^s_k \varphi$ iff $\mathcal{M}, g, u \vDash^t \varphi$, where $k$ and $\varphi$ have sort $t$ and $V_t^N(k) = \{ u \}$;
+        \item $\mathcal{M}, g, w \vDash^s \forall x \varphi$ iff $\mathcal{M}, g', w \vDash^s \varphi$ for all $g'\rightsquigarrow^x g$.
+    \end{itemize}
+\end{definition}
+
+\begin{remark}
+    The satisfaction of derived propositional operators follows immediately from this definition and is standard. Similarly, it readily follows that:
+    \begin{itemize}
+        \item $\mathcal{M}, g, w \vDash^s \exists x \varphi$ iff there exists $g' \rightsquigarrow^x g$ such that $\mathcal{M}, g', w \vDash^s \varphi$
+    \end{itemize}
+\end{remark}
+
+\begin{remark}
+    It is important to pay attention to the satisfaction of dual operators. While $\sigma$ can be seen as a generalization of $diamond$ in the basic modal language, $\sigma^{\Box}$ does not generalize $\Box$ in quite the same way:
+    \begin{itemize}
+        \item $\mathcal{M}, g, w \vDash^s \sigma^{\Box}(\varphi_{s_1},\dots,\varphi_{s_n})$ iff for all $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ such that $(w, w_1, \dots, w_n) \in R_\sigma$, there exists $1 \leq i \leq n$ such that $\mathcal{M}, g, w_i \vDash^{s_i} \varphi_i$.
+    \end{itemize}
+    \begin{proof}
+        Unfold the definition of the $\sigma^{\Box}$ and use the satisfaction clauses for negations and operator applications.
+    \end{proof}
+\end{remark}
+
+In the sequel, we will frequently treat constant and non-constant nominals unitarily, speaking of "nominals" as $NOM \cup N^{\mathcal{F}}$. As well, to avoid notational kludge, we will talk of a single valuation function $V : PROP \cup NOM \cup N$.
+
+\begin{remark}
+    At this point, we should be able to see the reason for introducing the constant nominals $N$ into the usual many-sorted signatures $(S, \Sigma)$. Modally, we interpret constant operators $\sigma \in \Sigma_{\lambda,s}$ into \textit{sets} of worlds. Yet from an algebraic point of view, we expect constant to denote a \textit{single} object. This is what hybridization and nominals guarantee: nominals are constrained to be true at a \textit{single} world. Furthermore, the interpretation of constant nominals does not vary across models, being fixed in the frame.
+\end{remark}
+
+\medskip
+
+\begin{definition}[Validity]
+    Let $\mathbb{C}$ be a class of models. We write $\vDash^s_{\mathbb{C}} \varphi$ and say "$\varphi$ is \textit{valid in class} $\mathbb{C}$", if, for any model $\mathcal{M} \in \mathbb{C}$, and any $w \in W$ and assignment $g$, we have $\mathcal{M}, g, w \vDash^s \varphi$.
+
+    We say $\varphi$ is \textit{valid in a model} $\mathcal{M}$ if, for all $w \in W$ and assignments $g$, we have $\mathcal{M}, g, w \vDash^s \varphi$.
+
+    We say $\varphi$ is \textit{valid in a a frame} $\mathcal{F}$ if, for all models $\mathcal{M}$ based on $\mathcal{F}$, we have that $\mathcal{M} \vDash^s \varphi$.
+\end{definition}
+\begin{definition}[Local entailment]    
+    If $\Gamma$ is a set of formulas of sort $s \in S$, we say that "$\Gamma$ \textit{entails} $\varphi$ in class $\mathbb{C}$", if, for all models $\mathcal{M} \in \mathbb{C}$ and all $w \in W$ and assignments $g$, whenever $\mathcal{M}, g, w \vDash^s \psi$ for all $\psi \in \Gamma$, we have $\mathcal{M}, g, w \vDash^s \varphi$. This is the \textit{local entailment} relation.
+\end{definition}
+    Note that entailment may also be defined globally thus: For all $\mathcal{M} \in \mathbb{C}$, whenever $\mathcal{M} \vDash^s \psi$ for all $\psi \in \Gamma$, we have $\mathcal{M} \vDash^s \varphi$. This is a different relation, which will not be the focus of our work.
+
+\begin{definition}
+    Let $\Lambda$ be an $S$-sorted set of $\mathcal{H}(@, \forall)$ formulas. By $Mod(\Lambda)$ we mean the class of models in which every formula in $\Lambda$ is valid. By $Fr(\Lambda)$ we mean the class of models based on frames where every formula in $\Lambda$ is valid. Clearly, $Fr(\Lambda) \subseteq Mod(\Lambda)$.
+\end{definition}
+
+\section{Semantics Definition in Lean}
+Let us turn to the definition of frames, models and the satisfaction relation. The first aspect we will pay attention to lies in the many-sorted accessibility relation. For an operator $\sigma \in \Sigma_{s_1...s_n,s}$, we introduced $R_\sigma$ earlier as a subset of $W_s \times W_{s_1} \times ... \times W_{s_n}$. Formalizing this product required a bit of machinery. We defined the type \texttt{WProd} as below, that takes a sorted family of types (the \texttt{W} argument) and a list of sorts, maps the list with \texttt{W} and computes the \textit{product type} of the resulting list of types:
+
+\begin{leancode}
+  abbrev WProd {signature : Signature α} (W : signature.S → Type u) :
+    List (signature.S) → Type u
+    | []      => PEmpty
+    | [s]     => W s
+    | s :: sorts  => W s × WProd W sorts
+\end{leancode}
+
+In effect, given $W$ and a non-empty list $[s_1, ..., s_n]$\texttt{ : List (signature.S)}, applying the list to \texttt{WProd W} will compute exactly the type $W_{s_1} \times ... \times W_{s_n}$. If the list is empty, the computed product will be the empty type. \texttt{WProd} is heavily used in our semantics as the \textit{product of sorted worlds} type (hence its name); in essence all it does is a list fold.
+
+With this out of the way, we give the definition of frames below.
+\begin{leancode}
+structure Frame (signature : Signature α) where
+  W  : signature.S → Type u
+  R  : signature.«Σ» dom range → Set (WProd W (range :: dom))
+  Nm : {s : signature.S} → signature.N s → W s
+\end{leancode}
+
+Notice \texttt{W} is a sorted family of types \textit{in universe level $u$}, which is in fact the same universe level as \texttt{α}, the alphabet of our language. Later on (see Chapter~\ref{ch:soundnes-completeness}), we will define worlds using a quotient of the set of nominals. Due to this reason, it was necessary to ensure the levels of \texttt{W} and \texttt{α} coincide.
+
+Models and assignment functions are defined straightforwardly:
+\begin{leancode}
+structure Model (symbs : Symbols α) where
+  Fr  : Frame symbs.signature
+  Vp  : symbs.prop s → Set (Fr.W s)
+  Vn  : symbs.nom s → Fr.W s
+abbrev Assignment (M : Model symbs) :=
+  {s: symbs.signature.S} → symbs.svar s → M.Fr.W s
+\end{leancode}
+
+Our notion of satisfaction is more general than the one presented mathematically earlier, since we chose to take \textit{formula lists} as our basic type of formulas. Earlier, we gave a mathematical formulation for the satisfaction of a formula $\varphi$ of sort $s$ at a world $w \in W_s$. Instead, the mechanized definition specifies the satisfaction of a formula list $\varphi_1, ..., \varphi_n$ of sorts $s_1, ..., s_n$, at a product of worlds $(w_1, ..., w_n) \in W_{s_1} \times ... \times W_{s_n}$. This makes our task of specifying the satisfaction of polyadic operators much easier.
+
+To see why, consider that the mechanized relation added the following clauses to the mathematical definition, with everything else unchanged:
+\begin{itemize}
+  \item $\mathcal{M}, g, (w_1, ..., w_n) \vDash^{s_1, ..., s_n} (\varphi_{s_1},...,\varphi_{s_n})$ iff $\mathcal{M}, g, w_1 \vDash^{s_1} \varphi_{s_1}$ and \\
+  \quad \quad $\mathcal{M}, g, (w_2, ..., w_n) \vDash^{s_2, ..., s_n} (\varphi_{s_2},...,\varphi_{s_n})$
+  \item $\mathcal{M}, g, w \vDash^s \sigma(\varphi_{s_1},...,\varphi_{s_n})$ iff there exist $w_1, ..., w_n \in W_{s_1} \times ... \times W_{s_n}$ such that $(w, w_1, ..., w_n) \in R_\sigma$ and $\mathcal{M}, g, (w_1, ..., w_n) \vDash^{s_1, ..., s_n} (\varphi_{s_1},...,\varphi_{s_n})$
+\end{itemize}
+
+We give the definition of the new clauses of \texttt{Sat} is below:
+
+\begin{leancode}
+def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : 
+  FormL symbs sorts → Prop
+| .cons φ ψs     => Sat M g w.1 φ ∧ Sat M g w.2 ψs
+| .appl σ arg    => ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ
+\end{leancode}
+
+\section{A Hilbert Proof System}
+Below we give the axiomatization of $\mathcal{H}(@, \forall)$.\footnote{In Barcan, the restriction on $x$ was omitted in the original \cite{leustean_operational_2019}, where \texttt{MSPHML} was introduced. Using Lean, we found that earlier version was unsound and added the appropriate restriction.} \footnote{In Name@,the requirement of $j$ not being a constant nominal was omitted from \cite{leustean_operational_2019}. Using this Lean formalization, we determined it is crucial for soundness.} \footnote{In rule Paste, the following restrictions were previously missed: i. The requirement of $k$ not being a constant nominal; ii. The requirement for $k$ to not occur in the dotted formulas. Using this Lean formalization, we found that their omission makes the system unsound.}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l l|}
+\hline
+\multicolumn{2}{|l|}{The logic of \textbf{$\mathcal{H}(@, \forall)$}} \\
+\hline
+\textbf{Axioms:} & \\
+Prop & All propositional tautologies \\
+K & $\vdash^s \sigma^{\Box} (\dots, \varphi \to \psi, \dots) \to \sigma^{\Box} (\dots, \varphi, \dots) \to \sigma^{\Box} (\dots, \psi, \dots)$ \\
+K@ & $\vdash^s @_j^s (\varphi_t \to \psi_t) \to (@_j^s \varphi \to @_j^s \psi)$ \\
+Agree & $\vdash^s @_k^s @_j^{s'} \varphi_t \leftrightarrow @_j^s\varphi_t$ \\
+SelfDual & $\vdash^s @_j^s \varphi_t \leftrightarrow \neg @_j^s \neg \varphi$ \\
+Intro & $\vdash^s j \to (\varphi_s \leftrightarrow @_j^s \varphi_s)$ \\
+Back & $\vdash^s \sigma(\dots,@_j^{s_i} \psi_t,\dots)_s \to @_j^s \psi$ \\
+Ref & $\vdash^s @_j^s j$ \\
+Q1 & $\vdash^s \forall x (\varphi \to \psi) \to (\varphi \to \forall x \psi)$, if $x$ does not occur free in $\varphi$ \\
+Q2 & $\vdash^s \forall x \varphi \to \varphi[y / x] $, if $y$ is substitutable for $x$ in $\varphi$ \\
+Name & $\vdash^s \exists x x$ \\
+Barcan & $\vdash^s \forall x \sigma^{\Box}(\varphi_1, \dots, \varphi_n) \to \sigma^{\Box}(\varphi_1,\dots, \forall x \varphi_i, \dots, \varphi_n)$, if $x$ does not \\ & \quad occur free in $\varphi_j$ for $j \neq i$\\
+Barcan@ & $\vdash^s \forall x @_j \varphi \to @_j \forall x \varphi$ \\
+Nom & $\vdash^s @_k x \wedge @_j x \to @_k j$ \\
+\hline
+\textbf{Rules:} & \\
+MP & If $\vdash^s \varphi \to \psi$ and $\vdash^s \varphi$, then $\vdash^s \psi$ \\
+UG & If $\vdash^{s_i}\varphi_i$, then $\vdash^s \sigma^{\Box}(\varphi_1,\dots,\varphi_i,\dots,\varphi_n)$ \\
+BroadcastS & If $\vdash^s @_j^s \varphi_t$, then $\vdash^{s'} @_j^{s'} \varphi_t$ \\
+Gen@ & If $\vdash^s \varphi$, then $\vdash^{s'} @_j^{s'} \varphi$ \\
+Name@ & If $\vdash^s @_j^s \varphi$, then $\vdash^{s'} \varphi$, if $j \not\in N $ and $j$ does not occur in $\varphi$ \\
+Paste & $\vdash^s @_j \sigma(\dots , k, \dots) \wedge @_k \varphi \to \psi$, then $\vdash^s @_j \sigma(\dots, \varphi, \dots) \to \psi$, for $k \neq j$, $k \not\in N$, \\ & \quad and $k$ does not occur in $\varphi$, $\psi$, or the $\dots$ formulas\\
+Gen & If $\vdash^s \varphi$, then $\vdash^s \forall x \varphi$ \\
+\hline
+\end{tabular}
+\end{table}
+
+If $\Lambda$ is an $S$-sorted set of $\mathcal{H}(@, \forall)$ formulas, then by $\mathcal{H}(@, \forall) + \Lambda$ we mean the proof system obtained by extending $\mathcal{H}(@, \forall)$ with $\Lambda$ as additional axioms, closed under the usual deduction rules. We write $\vdash^s_{\Lambda} \varphi$ to denote that $\varphi$ is a theorem in the system $\mathcal{H}(@, \forall) + \Lambda$.
+
+\begin{definition}[Local syntactic consequence]\label{consequence}
+    Let $\Gamma$ be a set of formulas of sort $s \in S$. The \textit{local syntactic consequence} relation $\Gamma \vdash^s_\Lambda \varphi$ is defined as: there exist formulas $\varphi_1 \dots \varphi_n \in \Gamma$, such that $\vdash^s_\Lambda (\varphi_1 \wedge \dots \wedge \varphi_n) \to \varphi$.    
+\end{definition}
+
+\begin{definition}[Consistency]
+    We say that $\Gamma$ is $\Lambda$\textit{-inconsistent} if $\Gamma \vdash^s_\Lambda \bot$. We say that $\Gamma$ is $\Lambda$\textit{-consistent} if it is not $\Lambda$\textit{-inconsistent}.
+\end{definition}
+
+Finally, we define soundness and completeness, the statements which link the semantics and the proof system together. In Chapter ~\ref{ch:soundnes-completeness}, we will devote our attention to proving them with respect to pure extensions, which will be introduced then.
+
+\begin{definition}[Frame-soundness and frame-completeness]
+    Let $\Lambda$ be an $S$-sorted set of formulas, and let $\Gamma$ be a set of formulas of sort $s \in S$.
+    
+    We say $\mathcal{H}(@, \forall) + \Lambda$ is \textit{sound} if the following implication holds, for all $\varphi$ of sort $s$:
+    \begin{equation*}
+        \Gamma \vdash^s_{\Lambda} \varphi \text{ implies } \Gamma \vDash^s_{Fr(\Lambda)} \varphi.
+    \end{equation*}
+
+    Conversely, we say $\mathcal{H}(@, \forall) + \Lambda$ is \textit{complete} if the following implication holds, for all $\varphi$ of sort $s$:
+    \begin{equation*}
+        \Gamma \vDash^s_{Fr(\Lambda)} \varphi \text{ implies } \Gamma \vdash^s_{\Lambda} \varphi.
+    \end{equation*}
+\end{definition}
+
+\section{Proof System Definition in Lean. Contexts}
+Implementing the proof system stems little difficulty. We defined an inductive family for Proof objects, with a term of type \texttt{Proof Λ s φ} corresponding to a formal derivation of $\varphi$ within $\mathcal{H}(@, \forall) + \Lambda$.
+
+However, some care is necessary to formalize axioms that require substituting one of the arguments to a modal operator. To enumerate them all, these are the axioms Barcan, Back and K, and rules UG and Paste. For simplicity, in this section it suffices to devote our attention only to axiom K:
+\begin{equation*}
+  \sigma (..., \varphi \to \psi, ...) \to \sigma (..., \varphi, ...) \to \sigma (..., \psi, ...)
+\end{equation*}
+
+With our formalization of syntax, it is not immediately clear how this could be expressed, as it picks out an arbitrary occurrence of $\varphi \to \psi$ within $\sigma$'s arguments, and substitutes it with its two sides. This is a non-trivial operation that would be tedious to implement naively in our custom-tailored \texttt{FormL} lists.
+
+We note, however, its strong resemblance to the Framing rule of Matching $\mu$-Logic, as in fact noted in \cite{chen_matching_2021}, where Matching $\mu$-Logic is introduced. The Framing rule has the advantage of being compactly expressible, by its use of so-called "contexts". We reproduce the definition of contexts and the Framing rule from \cite{chen_matching_2021}.
+
+\begin{definition}[Matching logic: single symbol context]
+  A \textit{context} $C$ is a pattern with a distinguished placeholder variable $\square$. We write $C[\varphi]$ to mean the result of replacing $\square$ with $\varphi$ without any $\alpha$-renaming.
+  
+  A \textit{single symbol context} has the form $C_{\sigma} \equiv \sigma(\varphi_1,\dots, \varphi_{i−1}, \square, \varphi_{i+1},\dots, \varphi_n)$ where $\sigma \in \Sigma_{s_1\dots s_n,s}$ and $\varphi_1, \dots, \varphi_{i−1}, \varphi_{i+1}, \dots, \varphi_n$ are patterns of appropriate sorts.
+\end{definition}
+\begin{definition}[Matching logic: Framing rule]
+  Given a proof of $\varphi_1 \to \varphi_2$, a proof of $C_\sigma[\phi_1] \to C_\sigma[\phi_2]$ can be inferred.
+\end{definition}
+
+Even though contexts have no direct equivalent in modal logic, we used the matching logic intuition to define a similar notion in our own setting.
+
+From a purely engineering point of view, we found it unnecessary to deal with a placeholder variable $\square$ as is done in Matching logic. In this formalization, a term of type \texttt{Context φ ψ} can be seen as a \textit{pointer} to a single occurrence of \texttt{φ} within the formula list \texttt{ψ}. It is a way to express the \textit{fact} that \texttt{φ} occurs within \texttt{ψ}, as well as also constructing the precise \textit{indication} to where it occurs. We have a very simple inductive definition for contexts, which we give below:
+\begin{leancode}
+inductive Context (φ : Form symbs s) : FormL symbs sorts → Type u
+  | refl : Context φ φ
+  | head : Context φ (.cons φ ψ)
+  | tail : Context φ ψ → Context φ (.cons χ ψ)
+\end{leancode}
+
+Let us show an example.
+\begin{leancode}
+variable (symbs : Symbols α)
+variable (s : symbs.signature.S)
+variable (φ ψ χ : Form symbs s)
+-- φ → ψ is identical to itself; it occurs within itself by .refl:
+example : (φ ⟶ ψ).Context (φ ⟶ ψ) := Context.refl
+-- φ → ψ is the head of formula list (φ → ψ, χ):
+example : (φ ⟶ ψ).Context (φ ⟶ ψ, χ) := Context.head
+-- More involved examples;
+-- This points to the first occurrence of φ → ψ in (χ, φ → ψ, φ → ψ):
+example : (φ ⟶ ψ).Context (χ, φ ⟶ ψ, φ ⟶ ψ) :=
+  Context.tail Context.head
+-- This points to the second occurrence of φ → ψ in (χ, φ → ψ, φ → ψ):
+example : (φ ⟶ ψ).Context (χ, φ ⟶ ψ, φ ⟶ ψ) :=
+  Context.tail $ Context.tail Context.refl
+\end{leancode}
+
+Contexts are useful as they allow us to define the substitution of a new formula for the one that it points to, obtaining a new \texttt{FormL}. We used notation directly inspired from Matching Logic: if \texttt{C : φ.Context ψ}, then \texttt{C[χ]} denotes the formula obtained by substituting \texttt{φ} with \texttt{χ} in \texttt{ψ}.
+
+We can therefore obtain a neat expression of the K rule, and all others that require substitution of a specific argument to a modal operator. We indicate the way we formalized the K axiom, and note all other cases enumerated in the beginning of this section can be found in the \texttt{Proof.Hilbert} module:
+\begin{leancode}
+inductive Proof (Λ : AxiomSet symbs) :
+  (s : symbs.signature.S) → Form symbs s → Type u
+  | k φ ψ χ
+      (σ : symbs.signature.«Σ» _ s)
+      (C : (φ ⟶ ψ).Context χ):
+            Proof Λ s (ℋ⟨σ⟩□ χ ⟶ (ℋ⟨σ⟩□ C[φ] ⟶ ℋ⟨σ⟩□ C[ψ]))
+\end{leancode}
+
+We finish this section recalling the definition of the local consequence relation~\ref{consequence}, $\Gamma \vdash^s_{\Lambda} \varphi$: there exist a choice of formulas $\varphi_1 \dots \varphi_n \in \Gamma$, such that $\vdash^s_\Lambda (\varphi_1 \wedge \dots \wedge \varphi_n) \to \varphi$.
+
+In Lean, we call sets of formulas of the same sort \texttt{PremiseSet}s. The choice of elements in $\Gamma$ is formalized as a list of terms subtyped to the set $\Gamma$, and a proof that the list has no duplicates:
+\begin{leancode}
+abbrev PremiseSet (symbs : Symbols α) (s: symbs.signature.S): Type u :=
+  Set (Form symbs s)
+abbrev FiniteChoice  (Γ : PremiseSet symbs s) := (L : List Γ) ×' L.Nodup
+\end{leancode}
+
+The conjunction of this list is then easily computable:
+\begin{leancode}  
+def List.conjunction {Γ: PremiseSet symbs s}: List Γ → Form symbs s
+  | []      => ℋ⊤
+  | φ :: ψs => ψs.conjunction ⋀ φ
+def FiniteChoice.conjunction {Γ: PremiseSet symbs s} :
+  FiniteChoice Γ → Form symbs s :=
+  λ ⟨ch, _⟩ => ch.conjunction
+\end{leancode}
+
+With all this machinery in place, syntactic consequence is naturally defined: there exists a finite choice of elements in $\Gamma$ such that their conjunction implies $\varphi$:
+\begin{leancode}
+def SyntacticConsequence {symbs : Symbols α} {s : symbs.signature.S}
+  (Γ : PremiseSet symbs s) (Λ : AxiomSet symbs) (φ : Form symbs s): Prop :=
+  ∃ ch : FiniteChoice Γ, ⊢(Λ, s) (ch.conjunction ⟶ φ)
+\end{leancode}
+
+\bigskip
+
+We now have a complete formalization in Lean 4 of the syntax of \texttt{MSPHML}, its semantics and its proof system, as were defined in Chapter ~\ref{ch:syntax-semantics}. We are now ready to put this formalization to work. In the next chapter, we will discuss our formalization of the soundness theorem, and progress we made towards the completeness theorem.

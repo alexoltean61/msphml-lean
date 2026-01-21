@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1275pt"
+   height="260pt"
+   viewBox="0.00 0.00 1275.00 260.00"
+   version="1.1"
+   id="svg33848"
+   sodipodi:docname="completeness.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs33852">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient48597">
+      <stop
+         style="stop-color:#008000;stop-opacity:1;"
+         offset="0"
+         id="stop48593" />
+      <stop
+         style="stop-color:#008000;stop-opacity:0;"
+         offset="1"
+         id="stop48595" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient48515">
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:1;"
+         offset="0"
+         id="stop48511" />
+      <stop
+         style="stop-color:#ff7f2a;stop-opacity:0;"
+         offset="1"
+         id="stop48513" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient34444">
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0"
+         id="stop34440" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="1"
+         id="stop34442" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient34390">
+      <stop
+         style="stop-color:#ffff00;stop-opacity:1;"
+         offset="0"
+         id="stop34386" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:0;"
+         offset="1"
+         id="stop34388" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient34332">
+      <stop
+         style="stop-color:#008000;stop-opacity:1;"
+         offset="0"
+         id="stop34328" />
+      <stop
+         style="stop-color:#008000;stop-opacity:0;"
+         offset="1"
+         id="stop34330" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34332"
+       id="linearGradient34334"
+       x1="3.5"
+       y1="166"
+       x2="191.25999"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34332"
+       id="linearGradient34336"
+       x1="208.3"
+       y1="166"
+       x2="306.46001"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34332"
+       id="linearGradient34338"
+       x1="455.32001"
+       y1="166"
+       x2="663.44"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34396"
+       x1="679.95"
+       y1="166"
+       x2="854.81001"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34400"
+       x1="1101.36"
+       y1="166"
+       x2="1271.4"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34402"
+       x1="871.9"
+       y1="166"
+       x2="1084.86"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34404"
+       x1="875.7"
+       y1="94"
+       x2="999.06001"
+       y2="94"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34406"
+       x1="607.34"
+       y1="94"
+       x2="785.42001"
+       y2="94"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34408"
+       x1="301.59"
+       y1="94"
+       x2="487.17001"
+       y2="94"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34390"
+       id="linearGradient34412"
+       x1="600.05422"
+       y1="-234"
+       x2="784.70578"
+       y2="-234"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient34444"
+       id="linearGradient34448"
+       x1="1015.71"
+       y1="94"
+       x2="1205.05"
+       y2="94"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient48515"
+       id="linearGradient48517"
+       x1="323.02"
+       y1="166"
+       x2="399.74001"
+       y2="166"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient48515"
+       id="linearGradient48519"
+       x1="530.58"
+       y1="238"
+       x2="664.18001"
+       y2="238"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient48515"
+       id="linearGradient48521"
+       x1="908.11001"
+       y1="238"
+       x2="1048.65"
+       y2="238"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient48597"
+       id="linearGradient48599"
+       x1="134.29001"
+       y1="94"
+       x2="284.47"
+       y2="94"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview33850"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="pt"
+     showgrid="false"
+     inkscape:zoom="0.56817132"
+     inkscape:cx="852.73575"
+     inkscape:cy="66.001219"
+     inkscape:window-width="1850"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg33848" />
+  <polygon
+     fill="none"
+     stroke="#000000"
+     points="692.38,-252 600.15,-234 692.38,-216 784.61,-234 "
+     id="polygon33631"
+     transform="translate(4,256)"
+     style="fill-opacity:1;fill:url(#linearGradient34412)" />
+  <polyline
+     fill="none"
+     stroke="#000000"
+     points="611.93,-236.3 611.93,-231.7"
+     id="polyline33633"
+     transform="translate(4,256)" />
+  <polyline
+     fill="none"
+     stroke="#000000"
+     points="680.6,-218.3 704.16,-218.3"
+     id="polyline33635"
+     transform="translate(4,256)" />
+  <polyline
+     fill="none"
+     stroke="#000000"
+     points="772.83,-231.7 772.83,-236.3"
+     id="polyline33637"
+     transform="translate(4,256)" />
+  <polyline
+     fill="none"
+     stroke="#000000"
+     points="704.16,-249.7 680.6,-249.7"
+     id="polyline33639"
+     transform="translate(4,256)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="696.38"
+     y="26.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33641">Completeness</text>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="209.38"
+     cy="94"
+     rx="74.589996"
+     ry="18"
+     id="ellipse33646"
+     style="fill-opacity:1;fill:url(#linearGradient48599)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="209.38"
+     y="98.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33648">Model existence</text>
+  <g
+     id="edge1"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33651">Completeness-&gt;Model existence</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 635.14,-226.73 c -78.3,8.86 -223.08,26.27 -345.76,46.73 -5.96,0.99 -12.15,2.1 -18.34,3.26"
+       id="path33653" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="270.6,-180.22 271.92,-173.34 261.44,-174.9 "
+       id="polygon33655" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="394.38"
+     cy="94"
+     rx="92.290001"
+     ry="18"
+     id="ellipse33660"
+     style="fill-opacity:1;fill:url(#linearGradient34408)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="394.38"
+     y="98.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33662">Language extensions</text>
+  <g
+     id="edge2"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33665">Completeness-&gt;Language extensions</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="M 651.65,-223.56 C 602.42,-212.15 518.8,-192.77 459.43,-179"
+       id="path33667" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="458.69,-182.43 460.27,-175.61 449.74,-176.76 "
+       id="polygon33669" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="696.38"
+     cy="94"
+     rx="88.540001"
+     ry="18"
+     id="ellipse33674"
+     style="fill-opacity:1;fill:url(#linearGradient34406)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="696.38"
+     y="98.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33676">Lindenbaum lemma</text>
+  <g
+     id="edge7"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33679">Completeness-&gt;Lindenbaum lemma</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 692.38,-215.7 c 0,7.29 0,15.97 0,24.16"
+       id="path33681" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="688.88,-191.62 695.88,-191.62 692.38,-181.62 "
+       id="polygon33683" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="937.38"
+     cy="94"
+     rx="61.18"
+     ry="18"
+     id="ellipse33688"
+     style="fill-opacity:1;fill:url(#linearGradient34404)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="937.38"
+     y="98.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33690">Truth lemma</text>
+  <g
+     id="edge11"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33693">Completeness-&gt;Truth lemma</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 728.2,-222.6 c 40.1,11.65 105.48,30.64 151.65,44.05"
+       id="path33695" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="878.82,-175.2 880.78,-181.92 889.4,-175.77 "
+       id="polygon33697" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="1110.38"
+     cy="94"
+     rx="94.169998"
+     ry="18"
+     id="ellipse33702"
+     style="fill-opacity:1;fill:url(#linearGradient34448)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="1110.38"
+     y="98.199997"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33704">Pure formulas lemma</text>
+  <g
+     id="edge15"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33707">Completeness-&gt;Pure formulas lemma</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 740.28,-224.9 c 70.07,11.85 201.39,34.05 286.23,48.4"
+       id="path33709" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="1025.71,-173.09 1026.88,-179.99 1036.15,-174.87 "
+       id="polygon33711" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="97.379997"
+     cy="166"
+     rx="93.379997"
+     ry="18"
+     id="ellipse33716"
+     style="fill:url(#linearGradient34334);fill-opacity:1" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="97.379997"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33718">Definitions</text>
+  <g
+     id="edge3"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33721">Language extensions-&gt;Extension definitions</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 333.12,-147.5 c -48.84,11.51 -119.18,28.09 -171.04,40.31"
+       id="path33723" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="161.38,-110.62 162.98,-103.81 152.45,-104.92 "
+       id="polygon33725" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="257.38"
+     cy="166"
+     rx="48.580002"
+     ry="18"
+     id="ellipse33730"
+     style="fill:url(#linearGradient34336);fill-opacity:1" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="257.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33732">Existence</text>
+  <g
+     id="edge4"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33735">Language extensions-&gt;Existence</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 358.6,-144.76 c -20.24,10.34 -46.56,23.79 -67.81,34.64"
+       id="path33737" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="289.48,-113.37 292.66,-107.14 282.16,-105.71 "
+       id="polygon33739" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="361.38"
+     cy="166"
+     rx="37.860001"
+     ry="18"
+     id="ellipse33744"
+     style="fill-opacity:1;fill:url(#linearGradient48517)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="361.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33746">SatLift</text>
+  <g
+     id="edge5"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33749">Language extensions-&gt;SatLift</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 382.22,-143.7 c -3.65,7.75 -8.04,17.06 -12.1,25.68"
+       id="path33751" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="366.96,-119.53 373.29,-116.54 365.86,-108.99 "
+       id="polygon33753" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="597.38"
+     cy="238"
+     rx="66.300003"
+     ry="18"
+     id="ellipse33758"
+     style="fill-opacity:1;fill:url(#linearGradient48519)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="597.38"
+     y="242.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33760">ConsistentLift</text>
+  <g
+     id="edge6"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33763">Language extensions-&gt;ConsistentLift</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 396.23,-143.82 c 7.63,19.95 22.82,52.57 46.15,71.82 24.22,19.98 56.48,32.65 84.96,40.57"
+       id="path33765" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="526.43,-28.06 528.2,-34.83 536.99,-28.91 "
+       id="polygon33767" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="559.38"
+     cy="166"
+     rx="103.56"
+     ry="18"
+     id="ellipse33772"
+     style="fill:url(#linearGradient34338);fill-opacity:1" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="559.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33774">Definitions</text>
+  <g
+     id="edge8"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33777">Lindenbaum lemma-&gt;Lindenbaum definitions</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 660.6,-144.76 c -18.71,9.56 -42.61,21.77 -62.91,32.14"
+       id="path33779" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="596.12,-115.75 599.3,-109.51 588.8,-108.08 "
+       id="polygon33781" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="767.38"
+     cy="166"
+     rx="86.93"
+     ry="18"
+     id="ellipse33786"
+     style="fill-opacity:1;fill:url(#linearGradient34396)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="767.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33788">Proofs</text>
+  <g
+     id="edge9"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33791">Lindenbaum lemma-&gt;Lindenbaum proofs</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 709.57,-144.05 c 8.63,8.51 19.25,18.98 28.78,28.37"
+       id="path33793" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="735.69,-113.38 740.61,-118.36 745.27,-108.85 "
+       id="polygon33795" />
+  </g>
+  <g
+     id="edge10"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33798">Lindenbaum proofs-&gt;ConsistentLift</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 725.65,-73.46 c -25.47,10.48 -59.25,24.39 -86.3,35.53"
+       id="path33800" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="638.28,-41.27 640.95,-34.8 630.37,-34.23 "
+       id="polygon33802" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="978.38"
+     cy="166"
+     rx="105.98"
+     ry="18"
+     id="ellipse33807"
+     style="fill-opacity:1;fill:url(#linearGradient34402)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="978.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33809">Henkin model definition</text>
+  <g
+     id="edge12"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33812">Truth lemma-&gt;Henkin model definition</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 943.3,-144.05 c 4.57,7.79 10.1,17.23 15.22,25.97"
+       id="path33814" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="955.42,-116.44 961.46,-119.98 963.5,-109.58 "
+       id="polygon33816" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="1186.38"
+     cy="166"
+     rx="84.519997"
+     ry="18"
+     id="ellipse33821"
+     style="fill-opacity:1;fill:url(#linearGradient34400)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="1186.38"
+     y="170.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33823">Proof</text>
+  <g
+     id="edge14"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33826">Truth lemma-&gt;Truth lemma proof</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 976.47,-148.89 c 40.16,11.29 100.46,28.24 145.43,40.89"
+       id="path33828" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="1120.95,-104.63 1122.85,-111.37 1131.53,-105.3 "
+       id="polygon33830" />
+  </g>
+  <ellipse
+     fill="none"
+     stroke="#000000"
+     cx="978.38"
+     cy="238"
+     rx="69.769997"
+     ry="18"
+     id="ellipse33835"
+     style="fill-opacity:1;fill:url(#linearGradient48521)" />
+  <text
+     xml:space="preserve"
+     text-anchor="middle"
+     x="978.38"
+     y="242.2"
+     font-family="Times, serif"
+     font-size="14px"
+     id="text33837">Setoid instance</text>
+  <g
+     id="edge13"
+     class="edge"
+     transform="translate(4,256)">
+    <title
+       id="title33840">Henkin model definition-&gt;Setoid instance</title>
+    <path
+       fill="none"
+       stroke="#000000"
+       d="m 974.38,-71.7 c 0,7.29 0,15.97 0,24.16"
+       id="path33842" />
+    <polygon
+       fill="#000000"
+       stroke="#000000"
+       points="970.88,-47.62 977.88,-47.62 974.38,-37.62 "
+       id="polygon33844" />
+  </g>
+</svg>

@@ -1,0 +1,58 @@
+\chapter{Conclusions and Further Work}\label{ch:conclusions}
+
+This thesis highlights several promising directions for extending the present work. The most immediate task is to complete the mechanized proof of completeness outlined in the previous chapter. Since all relevant statements have already been formalized, the remaining effort consists of providing the corresponding proof terms. While this represents a substantial amount of work, we believe that the most challenging conceptual difficulties have already been addressed.
+
+\section{Further Work: Operational Semantics}
+Once the completeness of the system is fully verified, the formalization of \texttt{MSPHML} opens significant opportunities for applications in the semantics of programming languages. In \cite{leustean_operational_2019}, the system is employed to define the syntax and semantics of the $\langle S, M, C\rangle$ machine introduced by Plotkin \cite{plotkin_structural_1981}, and to reason about program executions and invariants. Given the expressive power of Lean, particularly in its metaprogramming facilities, a formalization of \texttt{MSPHML} within Lean may provide a modular and practical framework for such applications.
+
+We illustrate this potential with two preliminary examples. To demonstrate feasibility, in the module \texttt{SMC.Signature} we manually defined the many-sorted signature of the $\langle S, M, C\rangle$ machine as a genuine \textit{hybrid logic signature}, that is, a \texttt{Symbols String} object. Furthermore, we introduced notations for formulas over this signature that preserve the intuitive style of structural operational semantics while abstracting away the syntactic complexity intrinsic to \texttt{MSPHML}. As a simple illustration, consider the following structural rule for compound statements:
+\begin{leancode}
+def CStmtAx (s1 s2 : SMCForm SortStmt)
+  : SMCForm SortCtrlStack := c(s1 ; s2) ↔ c(s1) ; c(s2)
+\end{leancode}
+This expression defines an actual many-sorted hybrid formula, hidden under multiple layers of syntactic sugar. As shown in \cite{leustean_operational_2019}, such formulas amount to pure extensions of the underlying proof system, thus automatically gaining soundness and completeness guarantees when used to reason about program properties. Demonstrating that program verification in Lean via \texttt{MSPHML} can be both practical and lightweight, thanks to such syntactic sugar, would represent a significant step forward.
+
+The applicability of this approach is by no means limited to the $\langle S, M, C\rangle$ machine, and neither should one be forced to define the signature manually as we have done. Using Lean's metaprogramming capabilities, it is possible to design a domain-specific language (DSL) for specifying arbitrary BNF-style grammars, which could then be \textit{automatically} elaborated into \texttt{MSPHML} signatures. Initial experiments in this direction were carried out in the module \texttt{DSL.BNF}. Consider the following sketch of defining the $\langle S, M, C\rangle$ machine's signature in our proof-of-concept DSL:
+\begin{leancode}
+```hybrid_def SMC
+    sort Nat  ::= builtin Nat
+    sort Bool ::= builtin Bool | "_==_"(Nat, Nat) | "_<=_"(Nat, Nat)
+
+    sort Var  ::= builtin String
+    sort AExp ::= subsort Nat | subsort Var
+    sort AEXp ::= "_+_"(AExp, AExp) | "++"(Var)
+    sort BExp ::= "_<=_"(AExp, AExp)
+    sort Stmt ::= skip
+                | "_:=_"(Var, AExp)
+                | "if_then_else_"(BExp, Stmt, Stmt)
+                | "while_do_"(BExp, Stmt)
+                | "_;_"(Stmt, Stmt)
+
+    sort Val ::= subsort Nat | subsort Bool
+    sort ValStack ::= nil
+                | "_._"(Val, ValStack)
+    sort Mem ::= empty | "set"(Mem, Var, Nat)
+    sort CtrlStack ::= "c"(AExp)
+                | "c"(BExp)
+                | "c"(Stmt)
+                | "asgn"(Var)
+                | plus | leq
+                | "_?"(Val)
+                | "_;_"(CtrlStack, CtrlStack)
+    sort Config ::= "<_,_>"(ValStack, Mem)
+```
+\end{leancode}
+Although this code is currently valid Lean syntax, it is currently \textit{meaningless}: no elaboration mechanism has yet been implemented to translate it into a \texttt{Symbols String} object (i.e., a hybrid logic signature). Developing such a compilation pipeline is an engineering direction we have not yet tackled, and will likely require significant implementation effort in its own self.
+
+Furthermore, there is also the immediate promise of studying computability questions of \texttt{MSPHML} and its fragments, following the extensive literature that exists on this topic in regular hybrid settings. Having the system formalized in Lean allows decidability results to be tied to executable artifacts, that can be used in tactics to automatically close proof goals.
+
+\section{Conclusions}
+We conclude by briefly noting our main achievements and findings. We were successful in formalizing a very general kind of hybrid modal logic, involving polyadic modal operators and many-sorted signatures. This proves once more that proof assistants, and Lean in particular, have become mature enough to aid the verification of results in published research papers, with \cite{leustean_operational_2019} serving as our blueprint for this enterprise.
+
+Naturally, the more complex the formalism, the more prone to mistakes the human researcher is. Our work clarified and expanded upon the original formalization, which helped in identifying and resolving certain inconsistencies. Specifically, the Barcan axiom, along with the Name@ and Paste rules, were found to be unsound unless certain restrictions were additionally imposed.
+
+\bigskip
+
+The introduction of computer assistance in mathematical proof construction is widely recognized to have begun with Appel and Haken's solution to the four-color problem \cite{appel_every_1989}. However, as Tymoczko \cite{tymoczko_four-color_1979} notably observed, their proof exemplified what he termed a "non-surveyable proof": one whose entirety cannot be comprehended by any individual human mind, thus challenging traditional notions of mathematical proof and knowledge.
+
+This observation merits serious consideration. Yet we propose that a complementary perspective deserves equal attention: when the theory under study becomes so complex that even the most attentive researcher cannot simultaneously maintain awareness of all relevant details and their interactions, how else could they gain confidence in the validity of their work if not by means of computer assistance? In such circumstances, formal verification may represent not merely a convenience, but a methodological necessity for advancing knowledge with appropriate rigor.

@@ -1,0 +1,17 @@
+*.aux
+*.log
+*.toc
+*.fdb_latexmk
+*.synctex.gz
+*.snm
+*.vrb
+*.nav
+*.out
+*.bbl
+*.blg
+*.xml
+*.bcf
+*.fls
+_minted-main/*
+*.pdf_tex
+main.pdf

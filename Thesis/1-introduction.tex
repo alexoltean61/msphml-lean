@@ -1,0 +1,33 @@
+\chapter{Introduction}
+
+The central objective of this thesis is to provide a Lean~4 formalization of \textit{many-sorted polyadic hybrid modal logic}. This logic, recently introduced and studied in \cite{leustean_operational_2019}, extends traditional hybrid modal logic with polyadic modalities and many-sorted signatures.
+
+Interest in such a system and its mechanization comes from two interconnected directions. First, this system promises to provide a highly expressive modal framework for defining the syntax and semantics of programming languages, and reasoning about properties of programs. It is therefore vital to ensure that it satisfies basic mathematical requirements, such as soundness, in order to ensure that its applications to program verification are correct and, in a sense, bug-free. With the work already published offering a purely mathematical treatment to such questions, more confidence is gained once the logic is formalized in a computer-based proof assistant and the relevant theorems are successfully checked.
+
+Moreover, once the validity of fundamental mathematical results is machine-checked, the formal artifact can be used as a stepping stone in a broader effort to bring software verification to proof assistants, under the unifying framework of hybrid modal logic. The promise of many-sorted polyadic hybrid logic's expressivity makes it an attractive choice to formalize, opening the door to the application and automation of modal techniques to program verification.
+
+\section{State of the Art}
+This thesis is the natural continuation of previous work \cite{oltean_formalization_2023}, in which we formalized a simpler, monadic and mono-sorted, system of hybrid modal logic. The present effort significantly generalizes that work, both in scope (by adopting a many-sorted, polyadic setting), and in methodology, by redeveloping the system from scratch rather than extending the prior implementation. This decision, while more demanding, enabled a more modular design that aligned better with our research goals of verifying the soundness and completeness theorems.
+
+Being a formal system that is still the subject of ongoing theoretical research, there is no prior implementation of this particular logic in Lean~4, or some other proof assistant. In fact, to the best of our knowledge, no work has been published concerning the Lean formalization of any system of many-sorted logic. In this sense, the present project is novel.
+
+Nonetheless, our work connects to a broader tradition of using proof assistants to specify and reason about the formal semantics of programming languages. We note, for instance, the Isabelle/HOL textbook \textit{Concrete Semantics} \cite{nipkow_concrete_2014} which follows \cite{winskel_formal_1993} in its treatment of imperative semantics, and the \textit{Software Foundations} series \cite{pierce_programming_nodate} treating many of the same topics in Rocq.
+
+In the Lean ecosystem, several projects have targeted the formalization of specific computational models, including the RISC-V instruction set \cite{noauthor_opencomplsail-riscv-lean_nodate}, the Ethereum Virtual Machine (EVM) \cite{noauthor_nethermindethevmyullean_2025}, and the RISC0 zkVM \cite{noauthor_risc0risc0-lean4_nodate}. More recently, since version 4.22.0 released in July 2025, Lean has introduced experimental support for Hoare-logic style verification of Lean programs \cite{noauthor_lean_nodate}, reflecting growing interest in using Lean for program verification tasks.
+
+We note, however, that all aforementioned projects are tied to concrete programming languages or architectures, and are not aimed at providing a general logical framework for arbitrary semantics. In this respect, our aims are much more closely aligned to those of matching logic \cite{chen_matching_2021}, the system underlying the K Framework \cite{rosu_overview_2010}. matching logic promises to be a unifying logical system in which the syntax and semantics of any programming language can be defined and reasoned about. Earlier research in polyadic hybrid logic showed clear parallels with matching logic \cite{leustean_hybrid_2019}, so the connection is already known. Matching logic, for its part, has seen formalizations in both Rocq \cite{bereczky_mechanizing_2022} and Lean \cite{cheval_matching_2022}.
+
+
+\section{Our Contributions}
+
+The main contribution of this thesis is the full formalization of many-sorted polyadic hybrid modal logic in Lean~4. The formal artifact we provide can serve as a research tool in its own right, aiding to the study of hybrid logics in general.
+
+In this respect, we claim that the work we present here has proven its merits. In the process of verifying the system's soundness, we identified several axioms and rules which, in their original form, led to unsound derivations. Through the Lean~4 formalization we have implemented, we were able to detect and correct these issues, thereby refining the logical system itself. We then successfully completed the formal proof of the soundness theorem. 
+
+With regard to completeness, we provide substantial progress towards a fully mechanized Henkin-style proof. While the complete formalization is ongoing, we establish key intermediate results and outline a concrete path to completing the argument. 
+
+All work presented in this thesis is made publicly available at \url{https://github.com/alexoltean61/msphml-lean}.
+
+\section{Thesis Structure}
+
+In Chapter~\ref{ch:outline}, we establish some general preliminaries regarding the system of logic at hand, the Lean prover in general, and our design decisions for this formalization. Chapter~\ref{ch:syntax-semantics} introduces the syntax and semantics of the logic, along with our mechanization thereof. Chapter~\ref{ch:soundnes-completeness} focuses on the core theoretical results, presenting our complete soundness proof and the framework for completeness. Finally, Chapter~\ref{ch:conclusions} discusses applications to operational semantics and outlines directions for future research.

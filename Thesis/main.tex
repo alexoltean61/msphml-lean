@@ -1,0 +1,140 @@
+\documentclass[12pt, a4paper]{report}
+
+\usepackage{amssymb}
+
+% Font Times New Roman
+\usepackage{times}
+
+% Suport pentru diferite stiluri de ghilimele
+\usepackage{csquotes}
+
+% Utilizează biblatex pentru referințe bibliografice
+\usepackage[
+    maxbibnames=50,
+    sorting=nty
+]{biblatex}
+
+\addbibresource{bibliography.bib}
+
+% Setează spațiere inter-linie (doublespacing din LaTeX este echivalentul setarii 1.5 in Microsoft Word)
+\usepackage{setspace}
+\doublespacing
+
+% Modificarea geometriei paginii (cu margini de 2,5 cm) 
+\usepackage[margin=2.5cm]{geometry}
+
+% Include funcțiile de grafică
+\usepackage{graphicx}
+% Încarcă imaginile din directorul `images`
+\graphicspath{{./images/}}
+
+% Listări de cod
+\usepackage{fontspec}
+% switch to a monospace font supporting more Unicode characters
+\setmonofont{FreeMono}
+\usepackage{minted}
+\newmintinline[lean]{lean4}{bgcolor=white}
+\newminted[leancode]{lean4}{fontsize=\footnotesize}
+\usemintedstyle{tango}  % a nice, colorful theme
+\usepackage{newunicodechar}
+\newunicodechar{ℋ}{$\mathcal{H}$}
+
+% Linkuri interactive în PDF
+\usepackage[
+    colorlinks,
+    linkcolor={black},
+    menucolor={black},
+    citecolor={black},
+    urlcolor={blue}
+]{hyperref}
+
+% Simboluri matematice codificate Unicode
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+% Comenzi matematice
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{comment}
+\usepackage{multirow}
+\usepackage{tablefootnote}
+\usepackage{setspace}
+% Formule matematice
+\newcommand{\bigO}[1]{\symcal{O}\left(#1\right)}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
+
+% Suport pentru anexe
+\usepackage{appendix}
+
+% Stiluri diferite de headere și footere
+\usepackage{fancyhdr}
+
+% Metadate
+\title{Mechanizing Many-Sorted Polyadic Hybrid Logic in the Lean 4 Prover}
+\author{Andrei-Alexandru Oltean}
+
+% Generează variabilele cu @
+\makeatletter
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\numberwithin{definition}{section}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}
+\numberwithin{lemma}{section}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\numberwithin{theorem}{section}
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\numberwithin{proposition}{section}
+
+\begin{document}
+
+% Front matter
+\cleardoublepage
+\let\ps@plain
+
+% Pagina de titlu
+\include{0-title}
+\restoregeometry
+\newgeometry{
+    margin=2.5cm
+}
+
+\fancypagestyle{main}{
+  \fancyhf{}
+  \renewcommand\headrulewidth{0pt}
+  \fancyhead[C]{}
+  \fancyfoot[C]{\thepage}
+}
+
+\addtocounter{page}{1}
+
+% Rezumatul
+\include{0-abstract}
+
+\tableofcontents
+
+% Main matter
+\cleardoublepage
+\pagestyle{main}
+\let\ps@plain\ps@main
+
+\include{1-introduction}
+\include{2-outline}
+\include{3-syntax-semantics}
+\include{4-soundness-completeness}
+\include{6-conclusions}
+
+\printbibliography[heading=bibintoc]
+
+\appendix
+
+\include{7-technical-appendix}
+
+\end{document}

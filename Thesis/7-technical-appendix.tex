@@ -1,0 +1,31 @@
+\chapter{Technical Appendix}\label{appendix}
+
+\begin{comment}
+    In this appendix we provide the detailed proofs of the theorems and propositions stated in the main text.
+\end{comment}
+
+\begin{proof}[Reamining cases for Soundness (Theorem~\ref{soundness})]
+    $ $\newline
+    ($\Lambda$): By definition, if $\phi \in \Lambda$, then $\vDash^{s}_{Fr(\Lambda)} \varphi$.
+    (Prop): All propositional tautologies are clearly true in any model $\mathcal{M}$, with any assignment $g$ and at any world $w$. \\
+    (K): Assume $\mathcal{M}, g, w \vDash^s \sigma^{\Box}(\varphi_1,\dots, (\varphi \to \psi)_i, \dots, \varphi_n)$ and $\mathcal{M}, g, w \vDash^s \sigma^{\Box}(\varphi_1, \dots, \varphi_i, \dots, \varphi_n)$. Let $w_1, \dots w_n \in W_{s_1} \times \dots \times W_{s_n}$ such that $(w, w_1, \dots, w_n) \in R_\sigma$. \\
+    By assumption, we know there exist indices $j$ and $k$ such that: (a) $\mathcal{M}, g, w_j$ satisfies the $j$-th formula in $\varphi_1,\dots, (\varphi \to \psi)_i, \dots, \varphi_n$; and (b) $\mathcal{M}, g, w_k$ satisfies the $k$-th formula in $\varphi_1, \dots, \varphi_i, \dots, \varphi_n$. If $j = k = i$, then $\mathcal{M}, g, w_{j} \vDash^{s_i} \varphi \to \psi$ and $\mathcal{M}, g, w_{j} \vDash^{s_i} \varphi$, so $\mathcal{M}, g, w_{j} \vDash^{s_i} \psi$, QED. Otherwise, we know $\varphi_j$ occurs in $\varphi_1,\dots, (\varphi \to \psi)_i, \dots, \varphi_n$, and $\mathcal{M}, g, w_{j} \vDash^{s_j} \varphi_j$, QED. \\
+    (K@): Assume $\mathcal{M}, g, w \vDash^s @_j^s (\varphi \to \psi)$, iff $\mathcal{M}, g, V(j) \vDash^t \varphi \to \psi$. Assume also $\mathcal{M}, g, w \vDash^s @_j^s \varphi$, iff $\mathcal{M}, g, V(j) \vDash^t \varphi$. Thus $\mathcal{M}, g, V(j) \vDash^t \psi$, iff $\mathcal{M}, g, w \vDash^s @_j^s \varphi$. \\
+    (Agree): $\mathcal{M}, g, w \vDash^s @_k^s @_j^{s'} \varphi$ iff $\mathcal{M}, g, V(k) \vDash^{s'} @_j^{s'} \varphi$ iff $\mathcal{M}, g, V(j) \vDash^t \varphi$ iff $\mathcal{M}, g, w \vDash^t @_j^s \varphi$. \\
+    (SelfDual): $\mathcal{M}, g, w \vDash^s @_j^s \varphi$ iff $\mathcal{M}, g, V(j) \vDash^t \varphi$ iff $\mathcal{M}, g, V(j) \nvDash^t \neg\varphi$ iff $\mathcal{M}, g, w \nvDash^s @_j^s \neg\varphi$ iff $\mathcal{M}, g, w \vDash^s \neg @_j^s \neg\varphi$. \\
+    (Intro): Assume $\mathcal{M}, g, w \vDash^s j$, so $V(j) = w$. Then clearly $\mathcal{M}, g, w \vDash^s \varphi$ iff $\mathcal{M}, g, w \vDash^s @_j \varphi$. \\
+    (Back): Assume $\mathcal{M}, g, w \vDash^s \sigma(\dots, @_j^{s_i} \psi, \dots)$. Thus, there exist $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ so that $\mathcal{M}, g, w_j$ satisfies the $l$-th argument to $\sigma$, for all $1 \leq l \leq n$. In particular, $\mathcal{M}, g, w_i \vDash^s @_j^{s_i} \psi$, which is equivalent to $\mathcal{M}, g, V(j) \vDash^s \psi$. So $\mathcal{M}, g, w_i \vDash^s @_j^{s_i} \psi$. \\
+    (Ref): Trivial: we have $\mathcal{M}, g, w \vDash^s @_j j$ iff $\mathcal{M}, g, V(j) \vDash^s j$, which is simply the definition of the satisfaction relation. \\
+    (Q1): Assume $\mathcal{M}, g, w \vDash^s \forall x (\varphi \to \psi)$ and $\mathcal{M}, g, w \vDash^s \varphi$, for $x$ not occurring freely in $\varphi$. Let $g' \rightsquigarrow^x g$. By the first assumption we have $\mathcal{M}, g', w \vDash^s \varphi \to \psi$. Since $x$ does not occur free in $\varphi$, and $g$, $g'$ otherwise agree, we apply the Agreement Lemma (\ref{agreement}) to the second assumption, obtaining $\mathcal{M}, g', w \vDash^s \varphi$. Immediately, then, $\mathcal{M}, g', w \vDash^s \psi$, QED. \\
+    (Q2): Assume $\mathcal{M}, g, w \vDash^s \forall x \varphi$, and let $y$ be substitutable for $x$ in $\varphi$. Let $g'$ be the x-variant of $g$ such that $g'(x) = g(y)$. Then we have $\mathcal{M}, g', w \vDash^s \varphi$, which, by Substitution Lemma (\ref{substitution}), is equivalent to $\mathcal{M}, g, w \vDash^s \varphi[y / x]$, QED. For the case of substituting with a nominal, we pick $g' = V(j)$.v\\
+    (Name): Let $\mathcal{M}, g, w$, and take $g'$ as the x-variant of $g$ such that $g'(x) = w$. Then $\mathcal{M}, g', w \vDash^s x$, so we have $\mathcal{M}, g, w \vDash^s \exists x x$. \\
+    (Barcan@): Assume $\mathcal{M}, g, w \vDash^s \forall x @_j \varphi$, iff for all $g' \rightsquigarrow^x g, \; \mathcal{M}, g', w \vDash^s @_j \varphi$, iff for all $g' \rightsquigarrow^x g, \; \mathcal{M}, g', V(j) \vDash^s \varphi$, iff $\mathcal{M}, g', V(j) \vDash^s \forall x \varphi$, iff $\mathcal{M}, g, w \vDash^s @_j \forall x \varphi$.\\
+    (Nom): Assume $\mathcal{M}, g, w \vDash^s @_k x$ and $\mathcal{M}, g, w \vDash^s @_j x$. Thus, $g(x) = V(j) = V(k)$. Therefore $\mathcal{M}, g, w \vDash^s @_k j$. \\
+    (MP): Trivial by basic reasoning. \\
+    (UG): Assume $\vDash^{s_i}_{Fr(\Lambda)} \varphi_i$. We want to show $\vDash^{s}_{Fr(\Lambda)} \sigma^{\Box}(\varphi_1, \dots, \varphi_i, \dots, \varphi_n)$. Therefore, let $\mathcal{M} \in Fr(\Lambda), g, w$, and let $w_1, \dots, w_n \in W_{s_1} \times \dots \times W_{s_n}$ be such that $(w, w_1, \dots, w_n) \in R_\sigma$. By assumption we have $\mathcal{M}, g, w_i \vDash^{s_i} \varphi_i$, QED. \\
+    (BroadcastS): Assume $\vDash^{s_i}_{Fr(\Lambda)} @_j^s \varphi$. We want to show $\vDash^{s}_{Fr(\Lambda)} @_j^{s'} \varphi$. Let $\mathcal{M}  \in Fr(\Lambda), g$, and let $w' \in W_{s'}$. We have $\mathcal{M}, g, w' \vDash^{s'} @_j^{s'} \varphi$ iff $\mathcal{M}, g, V(j) \vDash^{t} \varphi$.
+    
+    By definition, $W_s$ is non-empty, so let $w \in W_s$. By assumption, then, $\mathcal{M}, g, w \vDash^s @_j^s \varphi$, equivalent to $\mathcal{M}, g, V(j) \vDash^t \varphi$, QED. \\
+    (Gen@): Assume $\vDash^{s}_{Fr(\Lambda)} \varphi$. We want to show $\mathcal{M}, g, V(j) \vDash^t \varphi$, for any $\mathcal{M}  \in Fr(\Lambda), g$. This follows immediately by assumption. \\
+    (Gen): Assume $\vDash^{s}_{Fr(\Lambda)} \varphi$. We want to show $\mathcal{M}, g', w \vDash^s \varphi$, for any $\mathcal{M}  \in Fr(\Lambda), g, w$ and $g' \rightsquigarrow^x g$. This follows immediately by assumption.
+\end{proof}
