@@ -4,25 +4,26 @@ import Hybrid.Language.Form
 namespace SMC
 
 -- Define sorts:
-def Sorts : Set String := {
+abbrev Sorts : Set String := {
   "Nat", "Bool", "Var", "AExp",
   "BExp", "Stmt", "Val", "ValStack",
   "Mem", "CtrlStack", "Config"
 }
 
-def SortNat  : Sorts.Elem := ⟨"Nat", Or.inl rfl⟩
-def SortBool : Sorts.Elem := ⟨"Bool", Or.inr (Or.inl rfl)⟩
-def SortVar  : Sorts.Elem := ⟨"Var", Or.inr (Or.inr (Or.inl rfl))⟩
-def SortAExp : Sorts.Elem := ⟨"AExp", Or.inr (Or.inr (Or.inr (Or.inl rfl)))⟩
-def SortBExp : Sorts.Elem := ⟨"BExp", Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl))))⟩
-def SortStmt : Sorts.Elem := ⟨"Stmt", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl)))))⟩
-def SortVal  : Sorts.Elem := ⟨"Val", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl))))))⟩
-def SortValStack : Sorts.Elem := ⟨"ValStack", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl)))))))⟩
-def SortMem  : Sorts.Elem := ⟨"Mem", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl))))))))⟩
-def SortCtrlStack : Sorts.Elem := ⟨"CtrlStack", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl)))))))))⟩
-def SortConfig : Sorts.Elem := ⟨"Config", Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr rfl)))))))))⟩
+abbrev SortNat  : Sorts.Elem := ⟨"Nat",  by aesop⟩
+abbrev SortBool : Sorts.Elem := ⟨"Bool", by aesop⟩
+abbrev SortVar  : Sorts.Elem := ⟨"Var",  by aesop⟩
+abbrev SortAExp : Sorts.Elem := ⟨"AExp", by aesop⟩
+abbrev SortBExp : Sorts.Elem := ⟨"BExp", by aesop⟩
+abbrev SortStmt : Sorts.Elem := ⟨"Stmt", by aesop⟩
+abbrev SortVal  : Sorts.Elem := ⟨"Val",  by aesop⟩
+abbrev SortValStack : Sorts.Elem := ⟨"ValStack",   by aesop⟩
+abbrev SortMem  : Sorts.Elem := ⟨"Mem",  by aesop⟩
+abbrev SortCtrlStack : Sorts.Elem := ⟨"CtrlStack", by aesop⟩
+abbrev SortConfig : Sorts.Elem := ⟨"Config", by aesop⟩
 
 -- Define operators:
+@[simp]
 def Op : List Sorts → Sorts → Set String := λ domain range =>
   if domain = [SortNat, SortNat] ∧ range = SortBool then
     { "==", "<=" }
@@ -51,11 +52,11 @@ def Op : List Sorts → Sorts → Set String := λ domain range =>
   else if domain = [SortMem, SortVar, SortVal] ∧ range = SortMem then
     { "set" }
   else if domain = [SortAExp] ∧ range = SortCtrlStack then
-    { "c" }
+    { "cAExp" }
   else if domain = [SortBExp] ∧ range = SortCtrlStack then
-    { "c" }
+    { "cBExp" }
   else if domain = [SortStmt] ∧ range = SortCtrlStack then
-    { "c" }
+    { "cStmt" }
   else if domain = [SortVar] ∧ range = SortCtrlStack then
     { "asgn" }
   else if domain = [SortVal] ∧ range = SortCtrlStack then
@@ -70,6 +71,7 @@ def Op : List Sorts → Sorts → Set String := λ domain range =>
     { "[ ]" } -- PDL-inspired symbol; should find something better
   else { }
 
+@[simp]
 def CtNom : Sorts → Set String := λ s =>
   if s = SortNat then
     -- All natural numbers, as strings:
@@ -87,18 +89,20 @@ def CtNom : Sorts → Set String := λ s =>
     { "plus", "leq", "skip" }
   else { "n" }
 
+@[simp]
 def Sig : Signature String where
   S   := Sorts
   «Σ» := Op
   N   := CtNom
 
-  sortsCtbl := ⟨sorry, sorry, sorry⟩
-  opsCtbl   := by intro _ _; unfold Op; admit
-  nomCtbl   := by intro _; unfold CtNom; admit
+  sortsCtbl := sorry -- explicit encoding of sorts to ℕ; todo
+  opsCtbl   := sorry -- explicit encoding of ops to ℕ; todo
+  nomCtbl   := sorry -- explicit encoding of ctNoms to ℕ; todo
 
   sNonEmpty := ⟨SortNat⟩
-  nNonEmpty := sorry
+  nNonEmpty := sorry -- constant nominals inhabited; todo
 
+@[simp]
 def Symb : Symbols String where
   signature := Sig
   prop := λ _ => { "p" }
@@ -110,29 +114,32 @@ def Symb : Symbols String where
       { s | s = s }
     else { }
   svar := λ _ => { s | ∃ n : ℕ, s = "x" ++ n.repr }
-  propCtbl := λ _ => sorry
-  nomCtbl  := λ _ => sorry
-  svarCtbl := λ _ => sorry
+  propCtbl := sorry  -- explicit encoding of props to ℕ; todo
+  nomCtbl  := sorry  -- explicit encoding of noms to ℕ; todo
+  svarCtbl := sorry  -- explicit encoding of vars to ℕ; todo
+  nomExt   := sorry  -- extension set of nominals; needed for completenes; todo
+  hExtInf  := sorry  -- nomExt is countable; needed for completeness; todo
+  hExtDisj := sorry  -- nomExt can be partitioned in two countable sets; needed for completeness; todo
 
   -- == :: (SortNat, SortNat) -> SortBool
-def EqNat : (Symb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"==", by simp [Symb, Sig, Op]⟩
+def EqNat : (Symb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"==", by aesop⟩
 -- <= :: (SortNat, SortNat) -> SortBool
-def LEqNat : (Symb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"<=", by simp [Symb, Sig, Op]⟩
+def LEqNat : (Symb.signature.«Σ» [SortNat, SortNat] SortBool).Elem := ⟨"<=", by aesop⟩
 
 -- nat2AExp :: SortNat -> SortAExp
-def nat2AExp : (Symb.signature.«Σ» [SortNat] SortAExp).Elem := ⟨"nat2AExp", by simp [Symb, Sig, Op]⟩
+def nat2AExp : (Symb.signature.«Σ» [SortNat] SortAExp).Elem := ⟨"nat2AExp", by aesop⟩
 -- var2AExp :: SortVar -> SortAExp
-def var2AExp : (Symb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"var2AExp", by simp [Symb, Sig, SortVar, SortNat, Op]⟩
+def var2AExp : (Symb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"var2AExp", by aesop⟩
 
 -- + :: (SortAExp, SortAExp) -> SortAExp
-def PlusNat : (Symb.signature.«Σ» [SortAExp, SortAExp] SortAExp).Elem := ⟨"+", by simp [Symb, Sig, SortAExp, SortNat, Op]⟩
+def PlusNat : (Symb.signature.«Σ» [SortAExp, SortAExp] SortAExp).Elem := ⟨"+", by aesop⟩
 -- ++ :: SortVar -> SortAExp
-def PlusPlusVar : (Symb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"++", by simp [Symb, Sig, SortAExp, SortNat, SortVar, Op]⟩
+def PlusPlusVar : (Symb.signature.«Σ» [SortVar] SortAExp).Elem := ⟨"++", by aesop⟩
 
 -- <= :: (SortAExp, SortAExp) -> SortBExp
 -- TODO: There is also a <= strictly between naturals, returning strictly booleans
 -- Why both?
-def LEqAExp : (Symb.signature.«Σ» [SortAExp, SortAExp] SortBExp).Elem := ⟨"<=", by simp [Symb, Sig, SortBExp, SortNat, SortAExp, Op]⟩
+def LEqAExp : (Symb.signature.«Σ» [SortAExp, SortAExp] SortBExp).Elem := ⟨"<=", by aesop⟩
 
 -- skip :: SortStmt
 -- skip is a nominal
@@ -143,49 +150,50 @@ def LEqAExp : (Symb.signature.«Σ» [SortAExp, SortAExp] SortBExp).Elem := ⟨"
 --  Stmt ::= Var := AExp
 --
 -- := :: (SortVar, SortAExp) -> SortStmt
-def AsgnStmt : (Symb.signature.«Σ» [SortVar, SortAExp] SortStmt).Elem := ⟨":=", by simp [Symb, Sig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def AsgnStmt : (Symb.signature.«Σ» [SortVar, SortAExp] SortStmt).Elem := ⟨":=", by aesop⟩
 -- ite :: (SortBExp, SortStmt, SortStmt) -> SortStmt
-def IteStmt : (Symb.signature.«Σ» [SortBExp, SortStmt, SortStmt] SortStmt).Elem := ⟨"ite", by simp [Symb, Sig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def IteStmt : (Symb.signature.«Σ» [SortBExp, SortStmt, SortStmt] SortStmt).Elem := ⟨"ite", by aesop⟩
 -- seq :: (SortStmt, SortStmt) -> SortStmt
-def SeqStmt : (Symb.signature.«Σ» [SortStmt, SortStmt] SortStmt).Elem := ⟨";", by simp [Symb, Sig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def SeqStmt : (Symb.signature.«Σ» [SortStmt, SortStmt] SortStmt).Elem := ⟨";", by aesop⟩
 -- while :: (SortBExp, SortStmt) -> SortStmt
-def WhileStmt : (Symb.signature.«Σ» [SortBExp, SortStmt] SortStmt).Elem := ⟨"while", by simp [Symb, Sig, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def WhileStmt : (Symb.signature.«Σ» [SortBExp, SortStmt] SortStmt).Elem := ⟨"while", by aesop⟩
 
 -- nat2Val :: SortNat -> SortVal
-def nat2Val : (Symb.signature.«Σ» [SortNat] SortVal).Elem := ⟨"nat2Val", by simp [Symb, Sig, SortVal, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def nat2Val : (Symb.signature.«Σ» [SortNat] SortVal).Elem := ⟨"nat2Val", by aesop⟩
 -- bool2Val :: SortBool -> SortVal
-def bool2Val : (Symb.signature.«Σ» [SortBool] SortVal).Elem := ⟨"bool2Val", by simp [Symb, Sig, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def bool2Val : (Symb.signature.«Σ» [SortBool] SortVal).Elem := ⟨"bool2Val", by aesop⟩
 
 -- . :: (Val, ValStack) -> ValStack
-def consValStack : (Symb.signature.«Σ» [SortVal, SortValStack] SortValStack).Elem := ⟨"·", by simp [Symb, Sig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def consValStack : (Symb.signature.«Σ» [SortVal, SortValStack] SortValStack).Elem := ⟨"·", by aesop⟩
 -- set :: (Mem, Var, AExp) -> Mem
-def setMem : (Symb.signature.«Σ» [SortMem, SortVar, SortVal] SortMem).Elem := ⟨"set", by simp [Symb, Sig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def setMem : (Symb.signature.«Σ» [SortMem, SortVar, SortVal] SortMem).Elem := ⟨"set", by aesop⟩
 
 -- c :: AExp -> CtrlStack
-def cAExp : (Symb.signature.«Σ» [SortAExp] SortCtrlStack).Elem := ⟨"c", by simp [Symb, Sig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def cAExp : (Symb.signature.«Σ» [SortAExp] SortCtrlStack).Elem := ⟨"cAExp", by aesop⟩
 -- c :: BExp -> CtrlStack
-def cBExp : (Symb.signature.«Σ» [SortBExp] SortCtrlStack).Elem := ⟨"c", by simp [Symb, Sig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def cBExp : (Symb.signature.«Σ» [SortBExp] SortCtrlStack).Elem := ⟨"cBExp", by aesop⟩
+
 -- c :: Stmt -> CtrlStack
-def cStmt : (Symb.signature.«Σ» [SortStmt] SortCtrlStack).Elem := ⟨"c", by simp [Symb, Sig, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def cStmt : (Symb.signature.«Σ» [SortStmt] SortCtrlStack).Elem := ⟨"cStmt", by aesop⟩
 -- asgn :: Var -> CtrlStack
-def AsgnCtrlStack : (Symb.signature.«Σ» [SortVar] SortCtrlStack).Elem := ⟨"asgn", by simp [Symb, Sig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def AsgnCtrlStack : (Symb.signature.«Σ» [SortVar] SortCtrlStack).Elem := ⟨"asgn", by aesop⟩
 
 -- < > :: (ValStack, Mem) -> Config
-def mkConfig : (Symb.signature.«Σ» [SortValStack, SortMem] SortConfig).Elem := ⟨"< >", by simp [Symb, Sig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def mkConfig : (Symb.signature.«Σ» [SortValStack, SortMem] SortConfig).Elem := ⟨"< >", by aesop⟩
 
 -- PDL :: (CtrlStack, Config) -> Config
-def PDLOp : (Symb.signature.«Σ» [SortCtrlStack, SortConfig] SortConfig).Elem := ⟨"[ ]", by simp [Symb, Sig, SortConfig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def PDLOp : (Symb.signature.«Σ» [SortCtrlStack, SortConfig] SortConfig).Elem := ⟨"[ ]", by aesop⟩
 
 -- ? ::    Val -> CtrlStack
-def PDLTest : (Symb.signature.«Σ» [SortVal] SortCtrlStack).Elem := ⟨"?", by simp [Symb, Sig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def PDLTest : (Symb.signature.«Σ» [SortVal] SortCtrlStack).Elem := ⟨"?", by aesop⟩
 -- seq :: (CtrlStack, CtrlStack) -> CtrlStack
-def PDLSeq : (Symb.signature.«Σ» [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨";", by simp [Symb, Sig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def PDLSeq : (Symb.signature.«Σ» [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨";", by aesop⟩
 
 -- PDLUnion :: (CtrlStack, CtrlStack) -> CtrlStack
-def PDLUnion : (Symb.signature.«Σ» [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨"∪", by simp [Symb, Sig, SortConfig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def PDLUnion : (Symb.signature.«Σ» [SortCtrlStack, SortCtrlStack] SortCtrlStack).Elem := ⟨"∪", by aesop⟩
 
 -- PDLStar :: (CtrlStack) -> CtrlStack
-def PDLStar : (Symb.signature.«Σ» [SortCtrlStack] SortCtrlStack).Elem := ⟨"*", by simp [Symb, Sig, SortConfig, SortCtrlStack, SortValStack, SortVal, SortBool, SortBExp, SortNat, SortAExp, SortVar, SortStmt, Op]⟩
+def PDLStar : (Symb.signature.«Σ» [SortCtrlStack] SortCtrlStack).Elem := ⟨"*", by aesop⟩
 
 abbrev SMCFormL := FormL Symb
 abbrev SMCForm  := Form Symb
@@ -210,15 +218,13 @@ instance : Coe (SMCForm SortBool) (SMCForm SortVal) where
 
 class Evaluable (α : Type u) where
   ctrlStackEval : α → SMCForm SortCtrlStack
--- Help: you can mix up cAExp, CBexp, cStmt anyway you want here
--- The type checker doesn't mind.
--- But why?
+
 instance : Evaluable (SMCForm SortAExp) where
   ctrlStackEval := FormL.appl cAExp
 instance : Evaluable (SMCForm SortBExp) where
   ctrlStackEval := FormL.appl cBExp
 instance : Evaluable (SMCForm SortStmt) where
-  ctrlStackEval := FormL.appl cAExp
+  ctrlStackEval := FormL.appl cStmt
 instance : Evaluable ℕ where
   ctrlStackEval := λ n => FormL.appl cAExp n
 instance : Evaluable (SMCForm SortVar) where
@@ -248,13 +254,13 @@ notation:102 "++" x:101 => ℋ⟨PlusPlusVar⟩ x
 notation:102 a1:99 "+" a2:100 => ℋ⟨PlusNat⟩ (a1, a2)
 notation:100 a1:99 "<=" a2:100 => ℋ⟨LEqAExp⟩ (a1, a2)
 
-def plus : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"plus", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def plus : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"plus", by aesop⟩)
 notation:100 "plus" => plus
 
-def leq : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"leq", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def leq : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"leq", by aesop⟩)
 notation:100 "leq" => leq
 
-def skip : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"skip", by simp [Symb, Sig, CtNom, SortCtrlStack, SortNat, SortBool, SortStmt, SortValStack, SortMem]⟩)
+def skip : SMCForm SortCtrlStack := ℋNom (.ctNom ⟨"skip", by aesop⟩)
 notation:100 "skip" => skip
 
 end SMC
