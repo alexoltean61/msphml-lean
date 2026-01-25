@@ -182,6 +182,7 @@ def AsgnCtrlStack : (Symb.signature.«Σ» [SortVar] SortCtrlStack).Elem := ⟨"
 def mkConfig : (Symb.signature.«Σ» [SortValStack, SortMem] SortConfig).Elem := ⟨"< >", by aesop⟩
 
 -- PDL :: (CtrlStack, Config) -> Config
+-- Note!: [α] φ = ¬ ⟨α⟩ ¬ φ
 def PDLOp : (Symb.signature.«Σ» [SortCtrlStack, SortConfig] SortConfig).Elem := ⟨"[ ]", by aesop⟩
 
 -- ? ::    Val -> CtrlStack
@@ -240,7 +241,8 @@ instance : HasSeq (SMCForm SortCtrlStack) where
 notation:100 s1:99 ";" s2:100 => HasSeq.seq s1 s2
 notation:100 "c" "(" φ:100 ")" => Evaluable.ctrlStackEval φ
 notation:100 "⟨" vs ", " mem "⟩" => ℋ⟨mkConfig⟩ (vs, mem)
-notation:100 "[" ctrl "]" config => ℋ⟨PDLOp⟩ (ctrl, config)
+-- Note!: [α] φ = ¬ ⟨α⟩ ¬ φ
+notation:100 "[" ctrl "]" config => ℋ⟨PDLOp⟩ᵈ (∼ctrl, config)
 notation:100 "asgn" "(" x ")" => ℋ⟨AsgnCtrlStack⟩ x
 notation:100 x:101 "::=" a:101 => ℋ⟨AsgnStmt⟩ (x, a)
 notation:100 "if" bexp "then" s1 "else" s2 "endif" => ℋ⟨IteStmt⟩ (bexp, s1, s2)

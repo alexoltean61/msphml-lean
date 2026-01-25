@@ -1,7 +1,13 @@
-import Hybrid.SMC.Signature
+import Hybrid.Examples.SMC.Signature
 import Hybrid.Proof.Hilbert
 
 namespace SMC
+
+-- TODO: check if necessary!
+def CSeq (c1 c2 : SMCForm SortCtrlStack)
+         (φ : SMCForm SortConfig)
+  : SMCForm SortConfig :=
+    ([c1][c2] φ) ⟶ [c1 ; c2] φ
 
 -- c(s1 ; s2) ↔ c(s1) ; c(s2)
 def CStmtAx (s1 s2 : SMCForm SortStmt)
@@ -123,6 +129,7 @@ def AInd (π : SMCForm SortCtrlStack)
         γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ
 
 inductive Axiom : {s : Sorts} → SMCForm s → Type
+  | CSeq {c1 c2 φ}      : Axiom (CSeq c1 c2 φ)
   | CStmtAx {s1 s2}     : Axiom (CStmtAx s1 s2)
   | Aint {vs mem n}     : Axiom (Aint vs mem n)
   | Aid {vs mem x n}    : Axiom (Aid vs mem x n)
@@ -147,9 +154,11 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
 
 -- The set of axioms for SMC is that of formulas φ for which a term
 -- Axiom φ exists, for all sorts s:
-def SMCΛ : AxiomSet Symb := λ s => { φ | Nonempty (Axiom φ) }
+@[simp] def SMCΛ : AxiomSet Symb := λ s => { φ | Nonempty (Axiom φ) }
 
 -- The Hilbert proof system for SMC:
 def SMCProof := Proof SMCΛ
+
+def cseqAx : SMCProof _ (CSeq c1 c2 φ) := .ax ⟨_, .intro .CSeq⟩
 
 end SMC
