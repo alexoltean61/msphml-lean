@@ -35,6 +35,9 @@ def imp_idem_proof : Proof Λ s (φ ⟶ φ ⟶ ψ) → Proof Λ s (φ ⟶ ψ) :=
 
 def conj_intro_proof : Proof Λ s (φ ⟶ ψ ⟶ (φ ⋀ ψ)) := sorry
 
+-- Added by Proof.composition
+def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry
+
 def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) : Proof Λ s φ[i // x] → Proof Λ s φ[y // x] := sorry
 
 def alpha_conversion_proof {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) : Proof Λ s (ℋ∀ y φ[y // x]) → Proof Λ s (ℋ∀ x φ) := sorry
