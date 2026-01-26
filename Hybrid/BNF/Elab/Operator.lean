@@ -99,7 +99,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
       .lam `domain (listType sortsElemType) (
         .lam `range sortsElemType set .default
       ) .default
-  addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
     (.defnDecl
       {
         name   := defName
@@ -110,6 +110,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
         safety := .safe
       }
     )
+  setReducibilityStatus defName .reducible
 
   for ⟨stx, nm, dom, rng, usrFacing, usrFacingStx⟩ in ops do
     let declName := match usrFacing with
@@ -118,7 +119,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
     let domExprs : Expr := mkList sortsElemType dom
     let rngExpr  : Expr := mkConst rng
     let declType := setStringElemType $ mkAppN (mkConst defName) #[domExprs, rngExpr]
-    addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+    addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
       (.defnDecl
         {
           name   := declName
@@ -129,6 +130,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
           safety := .safe
         }
       )
+    setReducibilityStatus declName .reducible
     match usrFacingStx with
     | some usrStx =>
         discard <| addTermInfo stx (mkConst declName []) (expectedType? := some declType) (isBinder := false)

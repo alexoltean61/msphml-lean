@@ -130,7 +130,7 @@ def defineNoms : Name → Name → Array NomResolved → Array BuiltinResolved �
   let pred := .lam `s sortsElemType predBody .default
   let set  := mkAppN (mkConst ``setOf [0]) #[stringType, mkAppN pred #[.bvar 0] ]
   let sortedSet : Expr := .lam `s sortsElemType set .default
-  addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
     (.defnDecl
       {
         name   := defName
@@ -141,12 +141,13 @@ def defineNoms : Name → Name → Array NomResolved → Array BuiltinResolved �
         safety := .safe
       }
     )
+  setReducibilityStatus defName .reducible
   -- Then declare each individual non builtin nominal
   for ⟨stx, nm, st⟩ in noms do
     let declName := .str nmspace nm.lastComponentAsString
     let stExpr   : Expr := mkConst st
     let declType := setStringElemType $ mkAppN (mkConst defName) #[stExpr]
-    addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+    addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
       (.defnDecl
         {
           name   := declName
@@ -157,5 +158,6 @@ def defineNoms : Name → Name → Array NomResolved → Array BuiltinResolved �
           safety := .safe
         }
       )
+    setReducibilityStatus declName .reducible
     discard <| addTermInfo stx (mkConst declName []) (expectedType? := some declType) (isBinder := true)
   return defName

@@ -51,7 +51,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
 
   -- Declare def SMC.Sorts := { str | pred str }:
   let set  := mkAppN (mkConst ``setOf [0]) #[stringType, pred]
-  addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
     (.defnDecl
       {
         name   := defName
@@ -62,6 +62,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
         safety := .safe
       }
     )
+  setReducibilityStatus defName .reducible
 
   visited := λ _ => False
   -- Now iterate through names again and declare each individual sort
@@ -71,7 +72,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
     let declType := setStringElemType (mkConst defName [])
     -- Don't want to declare the same sort twice if more than one "sort S ::=" row exists:
     if !visited nm then
-      addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+      addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
         (.defnDecl
           {
             name   := declName
@@ -82,6 +83,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
             safety := .safe
           }
         )
+      setReducibilityStatus declName .reducible
       visited := λ i => if i == nm then true else visited i
     -- But for all "sort S ::=" rows, want to add hover info pointing to declaration:
     discard <| addTermInfo stx (mkConst declName []) (expectedType? := some declType) (isBinder := true)

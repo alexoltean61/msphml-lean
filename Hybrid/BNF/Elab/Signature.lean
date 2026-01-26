@@ -14,7 +14,7 @@ def defineSig : Name → Name → Name → Name → TermElabM Name := λ nmspace
   let nomCtbl ← mkSorry (.forallE `s sortsTy (mkApp (mkConst ``Encodable [0]) (setStringElemType <| mkAppN (mkConst nom) #[.bvar 0])) .default) false
   let sNonEmpty ← mkSorry (mkAppN (mkConst ``Inhabited [1]) #[sortsTy]) false
   let nNonEmpty ← mkSorry (.forallE `s sortsTy (mkAppN (mkConst ``Inhabited [1]) #[setStringElemType <| mkAppN (mkConst nom) #[.bvar 0] ]) .default) false
-  addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
     (.defnDecl
       {
         name   := defName
@@ -28,4 +28,5 @@ def defineSig : Name → Name → Name → Name → TermElabM Name := λ nmspace
         safety := .safe
       }
     )
+  setReducibilityStatus defName .reducible
   return defName
