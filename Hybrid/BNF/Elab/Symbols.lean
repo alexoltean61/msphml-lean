@@ -26,7 +26,7 @@ def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st 
                                 )
                           .default) false
   dbg_trace ← mkConst sig
-  addDecl -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
     (.defnDecl
       {
         name   := defName
@@ -39,3 +39,4 @@ def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st 
         safety := .safe
       }
     )
+  setReducibilityStatus defName .reducible

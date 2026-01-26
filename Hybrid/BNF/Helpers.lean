@@ -33,19 +33,18 @@ abbrev inhabitedType (type : Expr) : Expr := Expr.app (mkConst ``Inhabited [Leve
 
 /--
   Used to create expressions like:
-    `if t1 == t2 then b1 else b2`
+    `bif t1 == t2 then b1 else b2`
 -/
 abbrev eqIteExpr (cmpTy retTy s1 s2 b1 b2 : Expr) : TermElabM Expr := do
-  let mvar ← mkFreshExprMVar (type? := some $ mkAppN (mkConst ``DecidableEq [1]) #[cmpTy]) (kind := .synthetic)
+  let mvar ← mkFreshExprMVar (type? := some $ mkAppN (mkConst ``BEq [0]) #[cmpTy]) (kind := .synthetic)
   let succ ← synthesizeInstMVarCore mvar.mvarId!
   let inst ← instantiateMVars mvar
   unless succ do
-    throwError "failed to synthesize DecidableEq instance"
-  return mkAppN (mkConst ``ite [1])
+    throwError "failed to synthesize BEq instance"
+  return mkAppN (mkConst ``cond [1])
     #[
       retTy,
-      mkAppN (mkConst ``Eq [1]) #[cmpTy, s1, s2],
-      mkAppN (mkConst ``decEq [1]) #[cmpTy, inst, s1, s2],
+      mkAppN (mkConst ``BEq.beq [0]) #[cmpTy, inst, s1, s2],
       b1, b2
     ]
 def mkBEq (ty t1 t2 : Expr) : TermElabM Expr := do
@@ -58,7 +57,7 @@ def mkBEq (ty t1 t2 : Expr) : TermElabM Expr := do
 
 /--
   Used to create expressions like:
-    `if domain == dom && range == rng && operator == op then b1 else b2`
+    `bif domain == dom && range == rng && operator == op then b1 else b2`
 -/
 abbrev sigOpIteExpr (sortsType bvar2 dom bvar1 rng bvar0 op b1 b2 : Expr) : TermElabM Expr := do
   let check1 ← mkBEq (listType sortsType) bvar2 dom
@@ -72,21 +71,15 @@ abbrev sigOpIteExpr (sortsType bvar2 dom bvar1 rng bvar0 op b1 b2 : Expr) : Term
             check2, check3
           ]
         ]
-  let checksAsProp := mkAppN (mkConst ``Eq [1]) #[
-    boolType,
-    checks,
-    trueBoolExpr
-  ]
-  return mkAppN (mkConst ``ite [1])
+  return mkAppN (mkConst ``cond [1])
     #[
       boolType,
-      checksAsProp,
-      mkAppN (mkConst ``Bool.decEq) #[checks, trueBoolExpr],
+      checks,
       b1, b2
     ]
 /--
   Used to create expressions like:
-    `if s == SortS && str == string then b1 else b2`
+    `bif s == SortS && str == string then b1 else b2`
 -/
 abbrev sigNomIteExpr (sortsType bvar1 st bvar0 str b1 b2 : Expr) : TermElabM Expr := do
   let mvar2 ← mkFreshExprMVar (type? := some $ mkAppN (mkConst ``BEq [0]) #[sortsType]) (kind := .synthetic)
@@ -102,15 +95,9 @@ abbrev sigNomIteExpr (sortsType bvar1 st bvar0 str b1 b2 : Expr) : TermElabM Exp
   let check1 := mkAppN (mkConst ``BEq.beq [0]) #[sortsType, inst2, bvar1, st]
   let check2 := mkAppN (mkConst ``BEq.beq [0]) #[stringType, inst3, bvar0, str]
   let checks := mkAppN (mkConst ``Bool.and []) #[check1, check2]
-  let checksAsProp := mkAppN (mkConst ``Eq [1]) #[
-    boolType,
-    checks,
-    trueBoolExpr
-  ]
-  return mkAppN (mkConst ``ite [1])
+  return mkAppN (mkConst ``cond [1])
     #[
       boolType,
-      checksAsProp,
-      mkAppN (mkConst ``Bool.decEq) #[checks, trueBoolExpr],
+      checks,
       b1, b2
     ]
