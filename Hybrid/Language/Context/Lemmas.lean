@@ -278,13 +278,13 @@ lemma subst_to_ctx_iso {χ : Form sig s}
   | cons χ χs =>
       cases C
       . unfold subst_to_ctx
-        simp only [Context.iso]
+        simp only [id_eq, Context.iso]
       . unfold subst_to_ctx
-        simp only [Context.iso]
+        simp only [id_eq, Context.iso]
         apply_assumption
   | _ =>
       cases C
       . unfold subst_to_ctx
-        simp only [Context.iso]
+        simp only [id_eq, Context.iso]
 
 end FormL

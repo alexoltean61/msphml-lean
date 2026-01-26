@@ -53,7 +53,7 @@ noncomputable def Set.partition {set : Set α} (h : set.CountablyInfinite) : set
           simp_all only [exists_apply_eq_apply],
     by
       simp only [inter_def, mem_setOf_eq, eq_empty_iff_forall_notMem, not_and, not_exists,
-        forall_exists_index, forall_apply_eq_imp_iff, ←Subtype.eq_iff]
+        forall_exists_index, forall_apply_eq_imp_iff, ←Subtype.ext_iff]
       intro a b habs
       apply Nat.two_mul_ne_two_mul_add_one
       exact (iso.symm.injective habs).symm,
@@ -64,7 +64,7 @@ noncomputable def Set.partition {set : Set α} (h : set.CountablyInfinite) : set
         apply And.intro
         . intro a b; intro heq
           simp only [coe_setOf, mem_setOf_eq, Subtype.mk.injEq, ←
-          Subtype.eq_iff, EmbeddingLike.apply_eq_iff_eq, mul_eq_mul_left_iff, OfNat.ofNat_ne_zero,
+          Subtype.ext_iff, EmbeddingLike.apply_eq_iff_eq, mul_eq_mul_left_iff, OfNat.ofNat_ne_zero,
           or_false] at heq
           exact heq
         . intro ⟨x, ⟨n, hn⟩⟩
@@ -77,7 +77,7 @@ noncomputable def Set.partition {set : Set α} (h : set.CountablyInfinite) : set
       case is_bijective =>
         apply And.intro
         . intro a b; intro heq
-          simp only [coe_setOf, mem_setOf_eq, Subtype.mk.injEq, ← Subtype.eq_iff,
+          simp only [coe_setOf, mem_setOf_eq, Subtype.mk.injEq, ← Subtype.ext_iff,
             EmbeddingLike.apply_eq_iff_eq, Nat.add_right_cancel_iff, mul_eq_mul_left_iff,
             OfNat.ofNat_ne_zero, or_false] at heq
           exact heq
@@ -185,31 +185,31 @@ instance : HAdd Nat (symbs.svarType s)  (symbs.svarType s) where
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.signature.N s) := λ i j =>
   if h : (i.1 = j.1) then
-    isTrue (Subtype.eq h)
+    isTrue (Subtype.ext h)
   else isFalse (λ habs => h (congrArg Subtype.val habs))
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.prop s) := λ i j =>
   if h : (i.1 = j.1) then
-    isTrue (Subtype.eq h)
+    isTrue (Subtype.ext h)
   else isFalse (λ habs => h (congrArg Subtype.val habs))
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.nom s) := λ i j =>
   if h : (i.1 = j.1) then
-    isTrue (Subtype.eq h)
+    isTrue (Subtype.ext h)
   else isFalse (λ habs => h (congrArg Subtype.val habs))
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.svar s) := λ i j =>
   if h : (i.1 = j.1) then
-    isTrue (Subtype.eq h)
+    isTrue (Subtype.ext h)
   else isFalse (λ habs => h (congrArg Subtype.val habs))
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.nominal s) := λ i j =>
   match i with
   | .nom i => match j with
             | .nom j => if h : i = j then isTrue (congrArg Symbols.nominal.nom h) else isFalse (λ habs => h $ Symbols.nominal.nom.inj habs)
-            | .ctNom _ => isFalse (λ habs => Symbols.nominal.noConfusion habs)
+            | .ctNom _ => isFalse (λ habs => by simp only [reduceCtorEq] at habs)
   | .ctNom i => match j with
-            | .nom _ => isFalse (λ habs => Symbols.nominal.noConfusion habs)
+            | .nom _ => isFalse (λ habs => by simp only [reduceCtorEq] at habs)
             | .ctNom j => if h : i = j then isTrue (congrArg Symbols.nominal.ctNom h) else isFalse (λ habs => h $ Symbols.nominal.ctNom.inj habs)
 
 def Symbols.nominal.ne {symbs : Symbols α} [DecidableEq α] {s₁ s₂ : symbs.signature.S} (i : symbs.nominal s₁) (j : symbs.nominal s₂) : Prop := (h : s₁ = s₂) → h ▸ i ≠ j
