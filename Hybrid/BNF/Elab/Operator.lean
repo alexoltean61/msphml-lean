@@ -27,7 +27,9 @@ def opIdentToName : Syntax → Array Name → Name → Name
   | .node _ `operator_ident_ #[.node _ `str #[.atom _ str] ], dom, rng =>
       let domStr : String := dom.foldr (λ nm str => nm.lastComponentAsString ++ "_" ++ str) ""
       let rngStr : String := rng.lastComponentAsString
-      .str .anonymous ((str.stripPrefix "\"").stripSuffix "\"" ++ domStr ++ rngStr) -- TODO: add sorts to operator name, so you can have polymorphism
+      .str .anonymous $ ((str.dropPrefix "\"").toString.dropSuffix "\"").toString ++ domStr ++ rngStr
+  | .node _ `ssortSubsort_ _, #[dom], rng =>
+      .str .anonymous $ dom.lastComponentAsString.toLower ++ "2" ++ rng.lastComponentAsString
   | s, _, _ => panic! ("opIdentToName: not a proper identifier: " ++ toString s)
 
 def resolveOp (nmspace : Name) : OpSyntax → CommandElabM OpResolved := λ ⟨stx, dom, rng, usr⟩ => do
@@ -48,8 +50,10 @@ def resolveOp (nmspace : Name) : OpSyntax → CommandElabM OpResolved := λ ⟨s
 def extractOp (rng : Syntax) : Syntax → Option OpSyntax
   | .node _ `sort_def__ #[.node _ `production__ #[.node _ `«operator_decl_(_)_» #[op, _, domCST, _, usrFacingCST] ] ] => do
       let dom := domCST.getArgs.filter isSortIdent -- remove commas, keep only sort identifiers
-      let usrFacing := usrFacingCST.getOptional? -- keep none if no usr facing provided; remove brackets, keep only identifier
+      let usrFacing := usrFacingCST.getOptional? -- keepstripPrefix none if no usr facing provided; remove brackets, keep only identifier
       return { stx := op, dom := dom, rng := rng, usrFacingName := usrFacing }
+  | .node _ `sort_def__ #[op@(.node _ `ssortSubsort_ #[_, ssCst]) ] => do
+      return { stx := op, dom := #[ssCst], rng := rng, usrFacingName := none }
   | _ => none
 
 def gatherOpsFromDef (rng : Syntax) : Syntax.TSepArray `sort_def "|" → CommandElabM (Array OpSyntax) := λ ⟨defs⟩ => do
