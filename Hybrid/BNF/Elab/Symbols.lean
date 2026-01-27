@@ -25,7 +25,6 @@ def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st 
                                   ]
                                 )
                           .default) false
-  dbg_trace ← mkConst sig
   addAndCompile
     (.defnDecl
       {

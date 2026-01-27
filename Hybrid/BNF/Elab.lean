@@ -21,8 +21,7 @@ def hybrid_def_init : CommandElab
         -- 2. Gather & declare sorts
         let sortNames <- gatherSortNames decl
         let sortDecl <- liftTermElabM $ defineSorts declsNamespace sortNames
-        -- 3. Gather, resolve & declare operators
-        -- TODO: subsort operators (e.g. nat2AExp)
+        -- 3. Gather, resolve & declare operators (incl. subsort ops)
         let opStx  <- gatherOps decl
         let ops    <- opStx.mapM (resolveOp declsNamespace)
         let opDecl <- liftTermElabM <| defineOps declsNamespace sortDecl ops
