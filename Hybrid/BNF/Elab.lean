@@ -35,5 +35,5 @@ def hybrid_def_init : CommandElab
         let nomDecl <- liftTermElabM $ defineNoms declsNamespace sortDecl noms blts
         -- 5. Declare the signature & symbols
         let sigDecl <- liftTermElabM $ defineSig declsNamespace sortDecl opDecl nomDecl
-        liftTermElabM $ defineSymb (.str .anonymous defName) sigDecl sortDecl
+        liftTermElabM $ defineSymb name (.str .anonymous defName) sigDecl sortDecl
   | _ => throwUnsupportedSyntax
