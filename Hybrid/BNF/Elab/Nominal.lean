@@ -130,7 +130,7 @@ def defineNoms : Name → Name → Array NomResolved → Array BuiltinResolved �
   let pred := .lam `s sortsElemType predBody .default
   let set  := mkAppN (mkConst ``setOf [0]) #[stringType, mkAppN pred #[.bvar 0] ]
   let sortedSet : Expr := .lam `s sortsElemType set .default
-  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile
     (.defnDecl
       {
         name   := defName
@@ -147,7 +147,7 @@ def defineNoms : Name → Name → Array NomResolved → Array BuiltinResolved �
     let declName := .str nmspace nm.lastComponentAsString
     let stExpr   : Expr := mkConst st
     let declType := setStringElemType $ mkAppN (mkConst defName) #[stExpr]
-    addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+    addAndCompile
       (.defnDecl
         {
           name   := declName
