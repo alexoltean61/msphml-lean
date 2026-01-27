@@ -1,5 +1,4 @@
 import Hybrid.Examples.SMC.Axioms
-import Hybrid.Proof.Proofs
 
 open SMC
 
@@ -22,25 +21,25 @@ def Proof.composition
   --
   have l3 : SMCProof _ (([α₁] φ₁) ⟶ [α₁][α₂] φ₂) := mp l2 l1
   have l4 : SMCProof _ (φ₀ ⟶ [α₁][α₂] φ₂) := imp_trans_proof h1 l3
-  have l5 := imp_trans_proof l4 cseqAx
+  have l5 := imp_trans_proof l4 aseqR
   exact l5
 
-def Pgm (s i n : Symb.nominal SortVar)
-  : SMCForm SortStmt :=
+def Pgm (s i n : SMCForm Var)
+  : SMCForm Stmt :=
   s ::= 0;
   i ::= 0;
   while (++i <= n) do'
     s ::= s + i
 
-def PgmCorrect (vs : SMCForm SortValStack)
-        (mem : SMCForm SortMem)
-        (s i n : Symb.nominal SortVar)
-        (vn : ℕ) : SMCForm SortConfig :=
+def PgmCorrect (vs : SMCForm ValStack)
+        (mem : SMCForm Mem)
+        (s i n : CtNoms Var)
+        (vn : ℕ) : SMCForm Config :=
     ⟨vs, set(mem, n, vn)⟩ ⟶ [c(Pgm s i n)] ⟨vs, set(set(set(mem, n, vn), s, vn * (vn.add 1).div2), i, vn.add 1)⟩
 
 def todo : SMCProof _ (PgmCorrect vs mem s i n vn) := sorry
 
-def pgm_corr {s : Symb.nominal SortVar}: SMCProof _
+def pgm_corr {s : SMCForm Var}: SMCProof _
 -- ([c(s ::= (n : ℕ))] ⟨vs, set(mem, s, n)⟩) := by
   (⟨vs, set(mem, s, n)⟩ ⟶ [c(s ::= 1)] ⟨vs, set(mem, s, (1 : ℕ))⟩) := by
     -- 1. Inlocuire cu DAsgn peste c(Pgm' s)
