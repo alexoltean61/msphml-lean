@@ -3,7 +3,7 @@ import Hybrid.BNF.Helpers
 
 open Lean Elab Command Term Meta
 
-def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st => do
+def defineSymb : Syntax → Name → Name → Name → TermElabM Unit := λ stx defName sig st => do
   let ty : Expr := mkAppN (mkConst ``Symbols [0]) #[stringType]
   let sortsTy : Expr := setStringElemType <| mkConst st
   -- For now, prop and nom are always empty
@@ -39,3 +39,5 @@ def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st 
       }
     )
   setReducibilityStatus defName .reducible
+  -- Add hover info to syntax:
+  discard <| addTermInfo stx (mkConst defName []) (isBinder := true)
