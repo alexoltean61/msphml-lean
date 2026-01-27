@@ -26,7 +26,7 @@ def defineSymb : Name → Name → Name → TermElabM Unit := λ defName sig st 
                                 )
                           .default) false
   dbg_trace ← mkConst sig
-  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile
     (.defnDecl
       {
         name   := defName

@@ -51,7 +51,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
 
   -- Declare def SMC.Sorts := { str | pred str }:
   let set  := mkAppN (mkConst ``setOf [0]) #[stringType, pred]
-  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile
     (.defnDecl
       {
         name   := defName
@@ -72,7 +72,7 @@ def defineSorts : Name → Array (Syntax × Name) → TermElabM Name := λ nmspa
     let declType := setStringElemType (mkConst defName [])
     -- Don't want to declare the same sort twice if more than one "sort S ::=" row exists:
     if !visited nm then
-      addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+      addAndCompile
         (.defnDecl
           {
             name   := declName

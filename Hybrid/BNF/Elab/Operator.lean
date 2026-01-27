@@ -38,7 +38,7 @@ def resolveOp (nmspace : Name) : OpSyntax → CommandElabM OpResolved := λ ⟨s
     name := opIdentToName stx resolvedDom resolvedRng,
     dom  := resolvedDom,
     rng  := resolvedRng,
-    usrFacingName := outwardToName <$> usr -- TODO: ensure no declaration with the same name exists in the namespace!
+    usrFacingName := outwardToName <$> usr
     usrFacingNameStx := usr
   }
 
@@ -99,7 +99,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
       .lam `domain (listType sortsElemType) (
         .lam `range sortsElemType set .default
       ) .default
-  addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+  addAndCompile
     (.defnDecl
       {
         name   := defName
@@ -119,7 +119,7 @@ def defineOps : Name → Name → Array OpResolved → TermElabM Name := λ nmsp
     let domExprs : Expr := mkList sortsElemType dom
     let rngExpr  : Expr := mkConst rng
     let declType := setStringElemType $ mkAppN (mkConst defName) #[domExprs, rngExpr]
-    addAndCompile -- TODO: ensure no declaration with the same name exists in the namespace!
+    addAndCompile
       (.defnDecl
         {
           name   := declName
