@@ -35,6 +35,10 @@ def imp_idem_proof : Proof Λ s (φ ⟶ φ ⟶ ψ) → Proof Λ s (φ ⟶ ψ) :=
 
 def conj_intro_proof : Proof Λ s (φ ⟶ ψ ⟶ (φ ⋀ ψ)) := sorry
 
+def conj_elimL_proof : Proof Λ s ((φ ⋀ ψ) ⟶ φ) := sorry
+
+def conj_elimR_proof : Proof Λ s ((φ ⋀ ψ) ⟶ ψ) := sorry
+
 -- Added by Proof.composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry
 
