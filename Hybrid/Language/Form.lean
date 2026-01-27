@@ -46,6 +46,7 @@ prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
 prefix:65 "ℋVar "   => FormL.svar
 
+-- TODO: Write unexpander for FormL.cons!
 syntax (priority := high) "(" term,+ ")" : term
 macro_rules
   | `(($x)) => `($x)
