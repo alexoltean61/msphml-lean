@@ -1,5 +1,7 @@
 import Hybrid.Language.Signature
 
+open Lean PrettyPrinter
+
 inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
   | prop : symbs.prop s → FormL symbs [s]
   | nom  : symbs.nominal s → FormL symbs [s]
@@ -46,11 +48,18 @@ prefix:65 "ℋNom "   => FormL.nom
 prefix:65 "ℋProp "  => FormL.prop
 prefix:65 "ℋVar "   => FormL.svar
 
--- TODO: Write unexpander for FormL.cons!
 syntax (priority := high) "(" term,+ ")" : term
 macro_rules
   | `(($x)) => `($x)
   | `(($x, $xs:term,*)) => `(FormL.cons $x ($xs,*))
+@[app_unexpander FormL.cons]
+def unexpandFormLCons : Unexpander
+  | `($_ $x $tail) =>
+    match tail with
+    | `(($xs,*)) => `(($x, $xs,*))
+    | _          => `(($x, $tail))
+  | _ => throw ()
+
 notation:75 "ℋ⊤" => FormL.top
 notation:75 "ℋ⊥" => FormL.bot
 notation:65 "ℋ⟨" σ:lead "⟩" φ:arg => FormL.appl σ φ
