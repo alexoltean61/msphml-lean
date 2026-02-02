@@ -12,15 +12,15 @@ def CStmtAx (s1 s2 : SMCForm Stmt)
 -- ⟨vs, mem⟩ → [c(n)] ⟨n ⬝ vs, mem⟩, where n is an integer
 def Aint (vs : SMCForm ValStack)
          (mem : SMCForm Mem)
-         (n : ℕ)
+         (n : SMCForm Nat)
     : SMCForm Config :=
     ⟨vs, mem⟩ ⟶ [c(n)] ⟨n ⬝ vs, mem⟩
 
 -- ⟨vs, set(mem, x, n)⟩ → [c(x)] ⟨n ⬝ vs, set(mem, x, n)⟩
-def Aid (vs : SMCForm ValStack)
+abbrev Aid (vs : SMCForm ValStack)
         (mem : SMCForm Mem)
         (x : SMCForm Var)
-        (n : ℕ)
+        (n : SMCForm Val)
     : SMCForm Config :=
     ⟨vs, set(mem, x, n)⟩ ⟶ [c(x)] ⟨n ⬝ vs, set(mem, x, n)⟩
 
@@ -76,12 +76,6 @@ def DIf (bexp : SMCForm BExp)
           (s1 s2 : SMCForm Stmt) : SMCForm CtrlStack :=
       c(if bexp then s1 else s2 endif) ←→ c(bexp) ; ((true ? ; c(s1)) ∪ (false ? ; c(s2)))
 
--- DWhile
---   c(while bexp do s) ↔ c(bexp) ; ( (true?) ; c(s) ; c(bexp) )* ; false?
-def DWhile (bexp : SMCForm BExp)
-          (s : SMCForm Stmt) : SMCForm CtrlStack :=
-    c(while bexp do' s ) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?
-
 -- Memory consistency axioms:
 
 def AMem1 (x y : SMCForm Var)
@@ -105,15 +99,24 @@ def ASeq (π π' : SMCForm CtrlStack)
         ([π ; π'] γ) ←→ [π][π'] γ  -- FIXME: binding of implications / equivs
 
 def ATestTrue (v : SMCForm Val)
+         (v' : SMC.nominal Val)
          (vs : SMCForm ValStack)
          (mem : SMCForm Mem) : SMCForm Config :=
-        ⟨v ⬝ vs, mem⟩ ←→ [v ?] ⟨vs, mem⟩
+        ℋ@ v' v ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ⟨vs, mem⟩ ⋀ ℋ@ v' v
 
-def ATestFalse (v : CtNoms Val)
-         (v' : SMCForm Val)
+def ATestFalse (v : SMCForm Val)
+         (v' : SMC.nominal Val)
          (vs : SMCForm ValStack)
-         (mem : SMCForm Mem) : SMCForm Config :=
-        ⟨v ⬝ vs, mem⟩ ⋀ ℋ@ v (∼v') ←→ [v' ?] ℋ⊥
+         (mem : SMCForm Mem)
+         (ψ : SMCForm Config) : SMCForm Config :=
+        ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ψ
+
+
+-- DWhile
+--   c(while bexp do s) ↔ c(bexp) ; ( (true?) ; c(s) ; c(bexp) )* ; false?
+def DWhile (bexp : SMCForm BExp)
+          (s : SMCForm Stmt) : SMCForm CtrlStack :=
+    c(while bexp do' s ) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?
 
 def AStar (π : SMCForm CtrlStack)
          (γ : SMCForm Config) : SMCForm Config :=
@@ -122,6 +125,17 @@ def AStar (π : SMCForm CtrlStack)
 def AInd (π : SMCForm CtrlStack)
          (γ : SMCForm Config) : SMCForm Config :=
         γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ
+
+-- Subsorting axioms!
+-- Bool < Val:
+def ATrueBoolVal : SMCForm Val :=
+        true ←→ ℋ⟨bool2Val⟩(true)
+def AFalseBoolVal : SMCForm Val :=
+        false ←→ ℋ⟨bool2Val⟩(false)
+def ATrueValEmbed {φ : SMCForm Bool} : SMCForm s :=
+        ℋ@ true φ ←→ ℋ@ true (ℋ⟨bool2Val⟩ φ)
+def AFalseValEmbed {φ : SMCForm Bool} : SMCForm s :=
+        ℋ@ false φ ←→ ℋ@ false (ℋ⟨bool2Val⟩ φ)
 
 inductive Axiom : {s : Sorts} → SMCForm s → Type
   | CStmtAx {s1 s2}     : Axiom (CStmtAx s1 s2)
@@ -137,14 +151,18 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AAsgn {n vs mem x}  : Axiom (AAsgn n vs mem x)
   | DIf {bexp s1 s2}    : Axiom (DIf bexp s1 s2)
   | DWhile {bexp s}     : Axiom (DWhile bexp s)
-  | AMem1 {x y h n m mem}: Axiom (AMem1 x y h n m mem)
+  | AMem1 {x y n m mem} h : Axiom (AMem1 x y h n m mem)
   | AMem2 {x n m mem}   : Axiom (AMem2 x n m mem)
   | ACup {π π' γ}       : Axiom (ACup π π' γ)
   | ASeq {π π' γ}       : Axiom (ASeq π π' γ)
-  | ATestTrue {v vs mem}: Axiom (ATestTrue v vs mem)
-  | ATestFalse {v v' vs mem}: Axiom (ATestFalse v v' vs mem)
+  | ATestTrue {v v' vs mem} : Axiom (ATestTrue v v' vs mem)
+  | ATestFalse {v v' vs mem ψ}: Axiom (ATestFalse v v' vs mem ψ)
   | AStar {π γ}         : Axiom (AStar π γ)
   | AInd {π γ}          : Axiom (AInd π γ)
+  | ATrueBoolVal        : Axiom (ATrueBoolVal)
+  | AFalseBoolVal       : Axiom (AFalseBoolVal)
+  | ATrueValEmbed       : Axiom (ATrueValEmbed)
+  | AFalseValEmbed      : Axiom (AFalseValEmbed)
 
 -- The set of axioms for SMC is that of formulas φ for which a term
 -- Axiom φ exists, for all s s:
@@ -152,13 +170,5 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
 
 -- The Hilbert proof system for SMC:
 def SMCProof := Proof SMCΛ
-
-def aseqL : SMCProof _
-  (([π ; π'] γ) ⟶ [π][π'] γ) := -- FIXME: binding of implications!
-  .mp .conj_elimL_proof (.ax ⟨_, .intro .ASeq⟩)
-
-def aseqR : SMCProof _
-  (([π][π'] γ) ⟶ [π ; π'] γ) := -- FIXME: binding of implications!
-  .mp .conj_elimR_proof (.ax ⟨_, .intro .ASeq⟩)
 
 end SMC

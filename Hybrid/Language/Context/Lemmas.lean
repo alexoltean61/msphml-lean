@@ -4,6 +4,10 @@ namespace FormL
 
 namespace Context
 
+/--
+  TODO: Refactor me!
+-/
+
 @[refl]
 lemma iso_refl {φ : Form symbs s} {a : FormL symbs sorts} {C : φ.Context a} : C.iso C := by
   induction C
@@ -84,7 +88,7 @@ lemma subst_as_id {φ : Form symbs s} {τ : FormL symbs sorts} {C : φ.Context �
       cases C
       . rfl
 
-lemma subst_in_iso_helper {φ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : χ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[φ] = C₁[φ] := by
+lemma subst_in_iso_helper {φ ψ χ γ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : γ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[ψ] = C₁[ψ] := by
   induction τ with
   | cons _ _ _ ih =>
       cases C₁
@@ -266,6 +270,21 @@ def subst_not_iso'' {φ χ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symb
         exact tail C'''
       case snd =>
         exact iso
+
+lemma subst_back {φ ψ : Form symbs s} {τ : FormL symbs sorts}
+    (C : φ.Context τ) : τ = (ψ.subst_to_ctx C)[φ] := by
+  induction τ with
+  | cons χ χs =>
+      cases C
+      . unfold subst_to_ctx
+        simp only [id_eq, subst]
+      . unfold subst_to_ctx
+        simp only [id_eq, subst]
+        repeat apply_assumption
+  | _ =>
+      cases C
+      . unfold subst_to_ctx
+        simp only [id_eq, subst]
 
 end Context
 
