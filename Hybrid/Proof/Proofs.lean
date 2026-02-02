@@ -2,8 +2,6 @@ import Hybrid.Proof.Hilbert
 
 namespace Proof
 
-open Proof
-
 variable {α : Type u}
 variable [DecidableEq α]
 variable {symbs : Symbols α}
@@ -33,11 +31,19 @@ def imp_com_proof' : Proof Λ s (φ ⟶ ψ ⟶ χ ⟶ τ) → Proof Λ s (φ ⟶
 
 def imp_idem_proof : Proof Λ s (φ ⟶ φ ⟶ ψ) → Proof Λ s (φ ⟶ ψ) := sorry
 
+def tertium_non_datur_proof : Proof Λ s (φ ⋁ ∼φ) := sorry
+
+def tertium_non_daturAt_proof (k : symbs.nominal t) (φ : Form symbs t) : Proof Λ s (ℋ@ k φ ⋁ ℋ@ k (∼φ)) := sorry
+
 def conj_intro_proof : Proof Λ s (φ ⟶ ψ ⟶ (φ ⋀ ψ)) := sorry
 
 def conj_elimL_proof : Proof Λ s ((φ ⋀ ψ) ⟶ φ) := sorry
 
 def conj_elimR_proof : Proof Λ s ((φ ⋀ ψ) ⟶ ψ) := sorry
+
+def disj_elim_proof : Proof Λ s ((φ ⋁ ψ) ⟶ (φ ⟶ χ) ⟶ (ψ ⟶ χ) ⟶ χ) := sorry
+
+def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := sorry
 
 -- Added by Proof.composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry

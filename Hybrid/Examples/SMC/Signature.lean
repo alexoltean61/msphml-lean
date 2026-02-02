@@ -15,10 +15,10 @@ hybrid_def SMC :=
                 | "while_do_"(BExp, Stmt)           [WhileStmt]
                 | "_;_"(Stmt, Stmt)                 [SeqStmt]
 
-    sort Val ::= subsort Nat | subsort Bool
+    sort Val ::= subsort Nat | subsort Bool | t | f  -- temporary
     sort ValStack ::= nil
                 | "_·_"(Val, ValStack)        [consValStack]
-    sort Mem ::= empty | "set"(Mem, Var, Val)
+    sort Mem ::= empty | "set"(Mem, Var, Val) [set]
     sort CtrlStack ::= "c"(AExp)              [cAExp]
                 | "c"(BExp)                   [cBExp]
                 | "c"(Stmt)                   [cStmt]
@@ -34,11 +34,21 @@ hybrid_def SMC :=
 abbrev SMCFormL := FormL SMC
 abbrev SMCForm  := Form SMC
 
+instance : Coe ℕ (SMC.CtNoms SMC.Nat) where
+  coe := λ n => ⟨toString n, ⟨n, rfl⟩⟩
 instance : Coe ℕ (SMCForm SMC.Nat) where
   coe := λ n => ℋNom (.ctNom ⟨toString n, ⟨n, rfl⟩⟩)
+instance : Coe Bool (SMC.CtNoms SMC.Bool) where
+  coe := λ b => ⟨toString b, by cases b <;> simp⟩
 instance : Coe Bool (SMCForm SMC.Bool) where
-  coe := λ b =>
-    ℋNom (.ctNom  ⟨toString b, by cases b <;> simp⟩)
+  coe := λ b => ℋNom (.ctNom  b)
+def boolValNom : Bool → SMC.CtNoms SMC.Val
+  | true  => ⟨SMC.t, rfl⟩
+  | false => ⟨SMC.f, rfl⟩
+instance : Coe Bool (SMC.CtNoms SMC.Val) where
+  coe := boolValNom
+instance : Coe Bool (SMCForm SMC.Val) where
+  coe := λ b => ℋNom (.ctNom  b)
 
 namespace SMC
 /-
@@ -74,6 +84,8 @@ instance : Evaluable ℕ where
   ctrlStackEval := λ n => FormL.appl cAExp n
 instance : Evaluable (SMCForm Var) where
   ctrlStackEval := λ x => FormL.appl cAExp x
+instance : Evaluable (SMCForm Nat) where
+  ctrlStackEval := λ x => FormL.appl cAExp x
 
 class HasSeq (α : Type u) where
   seq : α → α → α
@@ -88,14 +100,15 @@ notation:100 "⟨" vs ", " mem "⟩" => ℋ⟨mkConfig⟩ (vs, mem)
 -- Note!: [α] φ = ¬ ⟨α⟩ ¬ φ
 notation:100 "[" ctrl "]" config => ℋ⟨PDLOp⟩ᵈ (∼ctrl, config)
 notation:100 "asgn" "(" x ")" => ℋ⟨SMC.asgnVar_CtrlStack⟩ x
-notation:100 x:101 "::=" a:101 => ℋ⟨SMC.«_:=_Var_AExp_Stmt»⟩ (x, a)
+abbrev asgnStmt (x : SMCForm Var) (a : SMCForm AExp) := ℋ⟨SMC.«_:=_Var_AExp_Stmt»⟩ (x, a)
+notation:100 x:101 "::=" a:101 => asgnStmt x a
 notation:100 "if" bexp "then" s1 "else" s2 "endif" => ℋ⟨IteStmt⟩ (bexp, s1, s2)
 notation:100 "while" bexp "do'" s => ℋ⟨WhileStmt⟩ (bexp, s)
 notation:100 c1 "∪" c2 => ℋ⟨PDLUnion⟩ (c1, c2)
 notation:100 c1"*" => ℋ⟨PDLStar⟩ c1
 notation:100 c1"?" => ℋ⟨PDLTest⟩ c1
 notation:100 v:99 "⬝" vs:100 => ℋ⟨consValStack⟩ (v, vs)
-notation:100 "set" "(" mem ", "  x ", "  n ")" => ℋ⟨setMem_Var_Val_Mem⟩ (mem, x, n)
+notation:100 "set" "(" mem ", "  x ", "  n ")" => ℋ⟨set⟩ (mem, x, n)
 notation:102 "++" x:101 => ℋ⟨«++Var_AExp»⟩ x
 notation:102 a1:99 "+" a2:100 => ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 notation:100 a1:99 "<=" a2:100 => ℋ⟨Leq⟩ (a1, a2)
