@@ -298,6 +298,12 @@ lemma occurs_nom_implies : (φ ⟶ ψ).occurs i = (φ.occurs i || ψ.occurs i) :
 lemma occurs_nom_conj : (φ ⋀ ψ).occurs i = (φ.occurs i || ψ.occurs i) := by
   simp only [occurs, Term.occurs, nom_occurs]
 
+lemma subst_self_var : φ[x // x] = φ := by
+  induction φ <;> (
+    simp [Term.subst, var_subst]
+  )
+  repeat aesop
+
 end CongrLemmas
 
 lemma not_free_bound {symbs : Symbols α} {s t u : symbs.signature.S} {x : symbs.svarType s} {y : symbs.svarType t} {φ : Form symbs u} (h : φ.occurs_free x = false): (ℋ∀ y φ).occurs_free x = false := by
@@ -363,6 +369,59 @@ lemma not_free_var_subst {symbs : Symbols α} {s : symbs.signature.S} {sorts : L
 lemma not_free_var_subst' {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {x y : symbs.svarType s} {φ : FormL symbs sorts} (h : φ.occurs_free x = false): φ.var_subst y x = φ := by
   apply not_free_var_subst
   exact h
+
+lemma not_free_nom_subst {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} {x : symbs.svarType s} {k : symbs.nominal s} {φ : FormL symbs sorts} (h : φ.occurs_free x = false): φ[k // x] = φ := by
+  induction φ with
+  | bind z φ ih =>
+      rename_i t _
+      by_cases eq_sorts : s = t
+      . subst eq_sorts
+        simp [Term.subst, nom_subst] at ih ⊢
+        simp [occurs_free] at h
+        intro h2
+        apply ih
+        apply h
+        exact h2
+      . simp [eq_sorts]
+        simp only [occurs_free, eq_sorts, ↓reduceDIte] at h
+        exact ih h
+  | svar z =>
+      simp [occurs_free, var_occurs] at h
+      simp [Term.subst, nom_subst]
+      intro h2
+      specialize h h2
+      intro v
+      subst v
+      contradiction
+  | appl σ ψ ih =>
+      simp [Term.subst, nom_subst]
+      apply ih
+      exact h
+  | or φ ψ ih1 ih2 =>
+      simp [Term.subst, nom_subst]
+      simp at h
+      apply And.intro
+      . apply ih1
+        exact h.1
+      . apply ih2
+        exact h.2
+  | neg φ ih =>
+      simp [Term.subst, nom_subst]
+      apply ih
+      exact h
+  | cons φ ψs ih1 ih2 =>
+      simp [Term.subst, nom_subst]
+      simp at h
+      apply And.intro
+      . apply ih1
+        exact h.1
+      . apply ih2
+        exact h.2
+  | «at» k _ ih =>
+      simp [Term.subst, nom_subst]
+      apply ih
+      exact h
+  | _ => simp [Term.subst, nom_subst] at h ⊢
 
 end FormL
 

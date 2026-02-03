@@ -61,8 +61,10 @@ def sumCorrect (vs : SMCForm ValStack)
     . apply propagateSeq
       apply composition
       . apply assgnNat
-      .
-        admit
+      . apply weakeningPost
+        . apply iteration
+          repeat admit
+        . admit
 
 def effectfulIf (i : SMCForm Var): SMCForm Stmt :=
   if (++i <= 1) then
