@@ -3,7 +3,7 @@ import Hybrid.Language.Form
 
 hybrid_def SMC :=
     sort Nat  ::= builtin Nat
-    sort Bool ::= builtin Bool | "_==_"(Nat, Nat) | "_<=_"(Nat, Nat)
+    sort Bool ::= builtin Bool | "_==_"(Nat, Nat) | "_<=_"(Nat, Nat) [LeqNat]
 
     sort Var  ::= builtin String
     sort AExp ::= subsort Nat | subsort Var
@@ -58,8 +58,9 @@ namespace SMC
 -/
 instance : Coe (SMCForm Nat) (SMCForm AExp) where
   coe := λ n => ℋ⟨nat2AExp⟩ n
+def natValForm (n : SMCForm Nat) := ℋ⟨nat2Val⟩ n
 instance : Coe (SMCForm Nat) (SMCForm Val) where
-  coe := λ n => ℋ⟨nat2Val⟩ n
+  coe n := natValForm n
 instance : OfNat (SMCForm AExp) n where
   ofNat := ℋ⟨nat2AExp⟩ n
 instance : Coe (SMCForm Var) (SMCForm AExp) where
@@ -67,7 +68,7 @@ instance : Coe (SMCForm Var) (SMCForm AExp) where
 instance : Coe (SMCForm Bool) (SMCForm Val) where
   coe := λ b => ℋ⟨bool2Val⟩ b
 instance : Coe (CtNoms s) (SMCForm s) where
-  coe := λ c => FormL.nom (.ctNom c)
+  coe := λ c => ℋNom c
 
 class Evaluable (α : Type u) where
   ctrlStackEval : α → SMCForm CtrlStack
@@ -112,5 +113,6 @@ notation:100 "set" "(" mem ", "  x ", "  n ")" => ℋ⟨set⟩ (mem, x, n)
 notation:102 "++" x:101 => ℋ⟨«++Var_AExp»⟩ x
 notation:102 a1:99 "+" a2:100 => ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 notation:100 a1:99 "<=" a2:100 => ℋ⟨Leq⟩ (a1, a2)
+notation:100 n1:99 "<=" n2:100 => ℋ⟨LeqNat⟩ (n1, n2)
 
 end SMC
