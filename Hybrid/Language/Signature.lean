@@ -163,10 +163,14 @@ abbrev Symbols.svarType (symbs : Symbols α) := λ s => Set.Elem (symbs.svar s)
 abbrev Symbols.nomType (symbs : Symbols α)  := λ s => Set.Elem (symbs.nom s)
 abbrev Symbols.ctNomType (symbs : Symbols α):= λ s => Set.Elem (symbs.signature.N s)
 
+@[coe]
+abbrev coerceNomTypeNominal : symbs.nomType s → symbs.nominal s := .nom
+@[coe]
+abbrev coerceCtNomTypeNominal : symbs.ctNomType s → symbs.nominal s := .ctNom
 instance : Coe (symbs.nomType s) (symbs.nominal s) where
-  coe := .nom
+  coe := coerceNomTypeNominal
 instance : Coe (symbs.ctNomType s) (symbs.nominal s) where
-  coe := .ctNom
+  coe := coerceCtNomTypeNominal
 
 instance : Denumerable (symbs.svarType s) where
   encode := (symbs.svarCtbl s).encode

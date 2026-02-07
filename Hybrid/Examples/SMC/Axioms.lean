@@ -74,7 +74,9 @@ def AAsgn (n : SMCForm Val)
 --   c(if bexp then s1 else s2) ↔ c(bexp) ; ( (true? ; c(s1)) ∪ (false? ; c(s2)) )
 def DIf (bexp : SMCForm BExp)
           (s1 s2 : SMCForm Stmt) : SMCForm CtrlStack :=
-      c(if bexp then s1 else s2 endif) ←→ c(bexp) ; ((true ? ; c(s1)) ∪ (false ? ; c(s2)))
+      c(if bexp then s1 else s2 endif) ←→ c(bexp) ; ((true : CtNoms Val) ? ; c(s1)) ∪ ((false : CtNoms Val) ? ; c(s2))
+
+#print DIf
 
 -- Memory consistency axioms:
 
@@ -102,21 +104,21 @@ def ATestTrue (v : SMCForm Val)
          (v' : SMC.nominal Val)
          (vs : SMCForm ValStack)
          (mem : SMCForm Mem) : SMCForm Config :=
-        ℋ@ v' v ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ⟨vs, mem⟩ ⋀ ℋ@ v' v
+        ℋ@ v' v ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [v' ?] ⟨vs, mem⟩ ⋀ ℋ@ v' v
 
 def ATestFalse (v : SMCForm Val)
          (v' : SMC.nominal Val)
          (vs : SMCForm ValStack)
          (mem : SMCForm Mem)
          (ψ : SMCForm Config) : SMCForm Config :=
-        ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ψ
+        ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [v' ?] ψ
 
 
 -- DWhile
 --   c(while bexp do s) ↔ c(bexp) ; ( (true?) ; c(s) ; c(bexp) )* ; false?
 def DWhile (bexp : SMCForm BExp)
           (s : SMCForm Stmt) : SMCForm CtrlStack :=
-    c(while bexp do' s ) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?
+    c(while bexp do: s od) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?
 
 def AStar (π : SMCForm CtrlStack)
          (γ : SMCForm Config) : SMCForm Config :=

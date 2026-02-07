@@ -21,6 +21,7 @@ def univClosure (φ : Form symbs s) (vars : VarList symbs) : Form symbs s :=
 /--
   Free variables of a formula, given as a list of pairs ⟨sort, variable⟩.
 -/
+@[simp]
 def FV : FormL symbs ss → VarList symbs
   | @FormL.svar  _ _ s x   =>
       [⟨s, x⟩]
@@ -33,16 +34,27 @@ def FV : FormL symbs ss → VarList symbs
   | φ ⋁ ψ   => (φ.FV.append ψ.FV).dedup
   | _ => []
 
+@[simp]
+def closed (φ : FormL symbs ss) := φ.FV = []
+
 def Instantiation (symbs : Symbols α) := List ((s : symbs.signature.S) × symbs.svar s × symbs.nominal s)
 
+@[simp]
 def Instantiation.apply (φ : FormL symbs ss) : Instantiation symbs → FormL symbs ss
   | []                   => φ
   | ⟨_, x, k⟩ :: i' => (Instantiation.apply φ i')[k // x]
 
 structure Instance (φ : FormL symbs ss) where
-  form   : FormL symbs ss
   inst   : Instantiation symbs
-  hApply : form = inst.apply φ
+
+abbrev Instance.form {φ : FormL symbs ss} (ψ : Instance φ) : FormL symbs ss := ψ.inst.apply φ
 
 notation:100 "ℋ∃cl " xs φ => existClosure φ xs
 notation:100 "ℋ∀cl " xs φ => univClosure φ xs
+
+end FormL
+
+def ClosedFormL [DecidableEq α] (symbs : Symbols α) (ss) :=
+  Subtype (λ (φ : FormL symbs ss) => φ.closed)
+def ClosedForm [DecidableEq α] (symbs : Symbols α) (s : symbs.signature.S) :=
+  ClosedFormL symbs ([s])

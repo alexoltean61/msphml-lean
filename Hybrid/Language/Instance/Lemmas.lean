@@ -149,3 +149,20 @@ lemma FVsubst {φ : FormL symbs ss} {s : symbs.signature.S} {x : symbs.svar s} {
           specialize ih2 hR
           rw [ih2]
           admit
+
+@[simp]
+lemma Instance.distribAnd {i : Instantiation symbs} :
+  i.apply (φ ⋀ ψ) = (i.apply φ ⋀ i.apply ψ) := sorry
+
+@[simp]
+lemma Instance.distribCons {i : Instantiation symbs} :
+  i.apply (φ, φs) = (i.apply φ, i.apply φs) := sorry
+
+@[simp]
+lemma Instance.distribAt {i : Instantiation symbs} :
+  i.apply ((ℋ@ k φ) : Form symbs t) = ℋ@ k (i.apply φ) := sorry
+
+
+@[simp]
+lemma Instance.distribAppl {i : Instantiation symbs} {σ : symbs.signature.«Σ» (s::ss) rng} {φs : FormL symbs (s::ss)} :
+  i.apply (ℋ⟨σ⟩ φs) = ℋ⟨σ⟩ (i.apply φs) := sorry
