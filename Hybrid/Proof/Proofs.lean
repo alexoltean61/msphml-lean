@@ -1,5 +1,5 @@
+import Hybrid.Language
 import Hybrid.Proof.Hilbert
-import Hybrid.Language.Instance.Lemmas
 
 namespace Proof
 

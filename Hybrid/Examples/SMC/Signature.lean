@@ -1,6 +1,5 @@
 import Hybrid.BNF
-import Hybrid.Language.Form
-import Hybrid.Language.Instance.Def
+import Hybrid.Language
 
 hybrid_def SMC :=
     sort Nat  ::= builtin Nat
