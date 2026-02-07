@@ -1,5 +1,5 @@
 import Hybrid.Examples.SMC.Axioms
-import Hybrid.Proof.Equiv.Equiv
+import Hybrid.Proof
 
 open SMC
 

@@ -350,5 +350,3 @@ theorem StrongSoundness {Λ : AxiomSet symbs} : Γ ⊢(Λ) φ → Γ ⊨Fr(Λ) �
   exists forms
   apply Soundness
   exact pf
-
-#print axioms StrongSoundness
