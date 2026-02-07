@@ -4,8 +4,6 @@ import Hybrid.Language.Substitution
 variable {α : Type u}
 variable [DecidableEq α]
 
-lemma choice_swap {φ_list : FiniteChoice Γ} (h : ∀ φ ∈ φ_list, φ.1 ∈ Δ) : ∃ (φ_list' : FiniteChoice Δ), φ_list.conjunction = φ_list'.conjunction := sorry
-
 lemma nominal_occurs_context {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} (j : symbs.nominal s) (φ: FormL symbs sorts) :
   φ.occurs j ↔ ∃ (t : symbs.signature.S) (ψ : Form symbs t) (_ : ψ.Context φ), ψ.occurs j := by
   simp only [FormL.occurs, Term.occurs]
@@ -214,85 +212,3 @@ lemma not_nominal_occurs_context {symbs : Symbols α} {s : symbs.signature.S} {s
     rhs ; intro ; simp only [Bool.not_eq_false]
   apply not_congr
   apply nominal_occurs_context
-
-lemma nominal_occurs_union {symbs : Symbols α} {s : symbs.signature.S} {Γ Δ: PremiseSet symbs s} {i : symbs.nominal s} : (Γ ∪ Δ).occurs i ↔ Γ.occurs i ∨ Δ.occurs i := by
-  apply Iff.intro
-  -- aesop'd --
-  . simp only [PremiseSet.occurs, Set.mem_union, forall_exists_index, and_imp]
-    intro x a a_1
-    obtain ⟨val, property⟩ := s
-    cases a with
-    | inl h =>
-      apply Or.inl
-      apply Exists.intro
-      · apply And.intro
-        · exact h
-        · simp_all only
-    | inr h_1 =>
-      apply Or.inr
-      apply Exists.intro
-      · apply And.intro
-        on_goal 2 => {exact a_1
-        }
-        · simp_all only
-  . simp only [PremiseSet.occurs, Set.mem_union]
-    intro a
-    obtain ⟨val, property⟩ := s
-    cases a with
-    | inl h =>
-      obtain ⟨w, h⟩ := h
-      obtain ⟨left, right⟩ := h
-      apply Exists.intro
-      · apply And.intro
-        on_goal 2 => {exact right
-        }
-        · simp_all only [true_or]
-    | inr h_1 =>
-      obtain ⟨w, h⟩ := h_1
-      obtain ⟨left, right⟩ := h
-      apply Exists.intro
-      · apply And.intro
-        on_goal 2 => {exact right
-        }
-        · simp_all only [or_true]
-
-lemma nominal_not_occurs_premise {symbs : Symbols α} {s t : symbs.signature.S} {Γ: PremiseSet symbs s} {i : symbs.nominal t} (h : ¬Γ.occurs i) : ∀ Θ : FiniteChoice Γ, Θ.conjunction.occurs i = false := by
-  intro ⟨Θ, nodup⟩
-  simp only [FiniteChoice.conjunction]
-  induction Θ with
-  | nil => simp only [List.conjunction, FormL.occurs_nom_top]
-  | cons head tail ih =>
-      simp only [PremiseSet.occurs, not_exists, not_and, Bool.not_eq_true] at h
-      simp only [List.conjunction, FormL.occurs_nom_conj, Bool.or_eq_false_iff]
-      rw [List.nodup_cons] at nodup
-      apply And.intro (ih nodup.2)
-      exact h head head.2
-
-lemma nominal_not_occurs_conjunction {symbs : Symbols α} {s t : symbs.signature.S} {Γ: PremiseSet symbs s} {i : symbs.nominal t} {Θ : List Γ} : Θ.conjunction.occurs i = false ↔ ∀ ψ ∈ Θ, ψ.1.occurs i = false := by
-  apply Iff.intro
-  . intro h ψ ψ_in_T
-    induction Θ with
-    | nil => contradiction
-    | cons head tail ih =>
-        simp only [List.mem_cons] at ψ_in_T
-        apply Or.elim ψ_in_T
-        . intro eq
-          subst eq
-          aesop
-        . intro
-          apply ih
-          simp only [List.conjunction, FormL.occurs_nom_conj, Bool.or_eq_false_iff] at h
-          exact h.1
-          assumption
-  . intro h
-    induction Θ with
-    | nil => simp only [List.conjunction, FormL.occurs_nom_top]
-    | cons head tail ih =>
-        simp only [List.conjunction, FormL.occurs_nom_conj, Bool.or_eq_false_iff]
-        apply And.intro
-        . apply ih
-          intros
-          apply h
-          simp_all only [List.mem_cons, or_true, implies_true, forall_const, forall_eq_or_imp]
-        . apply h head _
-          simp only [List.mem_cons, true_or]

@@ -319,8 +319,6 @@ section BarcanLemma
       specialize h4 C''
       exact h4 h5
 
-  #print axioms BarcanLemma
-
 end BarcanLemma
 
 section SubstitutionLemma
