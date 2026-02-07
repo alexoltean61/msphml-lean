@@ -88,6 +88,9 @@ def bridge_proof {j : symbs.nominal t} {φ : Form symbs t} (C : (ℋNom j).Conte
 
 def helperInsertAnd : Proof Λ s (φ ⟶ ψ) → Proof Λ s (φ ⟶ χ) → Proof Λ s (φ ⟶ ψ ⋀ χ) := sorry
 
+def existElimPf {φ ψ : Form symbs s} (h : ψ.closed):
+  Proof Λ s ((φ ⟶ ψ).univClosure φ.FV ⟶ (φ.existClosure φ.FV ⟶ ψ)) := sorry
+
 def q2NomContra {k : symbs.nominal t} : Proof Λ s (φ[k // x] ⟶ ℋ∃ x φ) :=
   sorry
 
@@ -116,19 +119,15 @@ def insertExistCl : Proof Λ s (φ ⟶ φ.existClosure vars) := by
 
 def instanceToExistPf {φ : Form symbs s} (ψ : φ.Instance) :
   Proof Λ s (ψ.form ⟶ (φ.existClosure φ.FV)) := by
-    obtain ⟨ψ, inst, hApply⟩ := ψ
-    induction inst generalizing φ ψ with
+    obtain ⟨inst⟩ := ψ
+    let ψ := inst.apply φ
+    induction inst generalizing φ with
     | nil =>
-        simp [FormL.Instantiation.apply] at hApply ⊢
-        symm at hApply
-        subst hApply
         apply insertExistCl
     | cons h t ih =>
         -- h maps x to k
         obtain ⟨sx, x, k⟩ := h
-        simp [FormL.Instantiation.apply] at hApply ih ⊢
-        subst hApply
-        specialize @ih φ[k//x] (FormL.Instantiation.apply φ[k//x] t) rfl
+        specialize @ih φ[k//x]
         by_cases isFree : φ.occurs_free x
         . -- ih : Proof Λ s (t.apply φ[k//x] ⟶ ℋ∃ φ[k//x].FV φ[k//x])
           rw [←FormL.FVisFV] at isFree
@@ -164,7 +163,25 @@ def instanceToExistPf {φ : Form symbs s} (ψ : φ.Instance) :
 
 def genIterated : Proof Λ s φ → Proof Λ s (φ.univClosure vars) := sorry
 
-def existElimPf {φ ψ : Form symbs s} (h : ψ.FV = []):
-  Proof Λ s ((φ ⟶ ψ).univClosure φ.FV ⟶ (φ.existClosure φ.FV ⟶ ψ)) := sorry
+def instanceToUnivPf {φ : Form symbs s} (ψ : φ.Instance) :
+  Proof Λ s (ψ.form) →
+  Proof Λ s (φ.univClosure φ.FV) := by
+    -- By repeated generalization on nominals.
+    -- (I.e.: if instance maps x to i, generalize i to x in ψ)
+    -- (Will obtain a proof of ⊢ φ)
+    -- (By genIterated, this becomes ⊢ ∀cl φ)
+    admit
+
+def instanceToUnivPf' {φ : Form symbs s} (ψ : φ.Instance) (hfv : χ.closed) :
+  Proof Λ s (ψ.form ⟶ χ) →
+  Proof Λ s ((φ ⟶ χ).univClosure φ.FV) := by
+    -- (ψ.form ⟶ χ) is an instance of (φ ⟶ χ)
+    -- So apply instanceToUnivPf to hypothesis and obtain
+    -- ⊢ (φ ⟶ χ).univClosure (φ ⟶ χ).FV
+    -- Since χ.FV = [], then (φ ⟶ χ).FV = φ.FV.
+    -- Therefore:
+    -- ⊢ (φ ⟶ χ).univClosure φ.FV
+    -- QED
+    admit
 
 end Proof

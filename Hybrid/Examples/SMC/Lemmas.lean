@@ -31,16 +31,19 @@ def amem1 (h : x ≠ y) : SMCProof _
   (set(set(mem, x, n), y, m) ←→ set(set(mem, y, m), x, n)) := .ax ⟨_, .intro <| .AMem1 h⟩
 
 def atesttrue : SMCProof _
-  (ℋ@ v' v ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ⟨vs, mem⟩ ⋀ ℋ@ v' v) := .ax ⟨_, .intro .ATestTrue⟩
+  (ℋ@ v' v ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [v' ?] ⟨vs, mem⟩ ⋀ ℋ@ v' v) := .ax ⟨_, .intro .ATestTrue⟩
 
 def atestfalse : SMCProof _
-  (ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [(ℋNom v') ?] ψ) := .ax ⟨_, .intro .ATestFalse⟩
+  (ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [v' ?] ψ) := .ax ⟨_, .intro .ATestFalse⟩
 
 def app {n : ℕ} : SMCProof _
   (⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨↑(n.add 1) ⬝ vs, set(mem, x, ↑(n.add 1))⟩) := .ax ⟨_, .intro .App⟩
 
 def dwhile {bexp : SMCForm BExp} : SMCProof _
-  (c(while bexp do' s ) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?) := .ax ⟨_, .intro .DWhile⟩
+  (c(while bexp do: s od) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?) := .ax ⟨_, .intro .DWhile⟩
+
+def dleq {a1 a2 : SMCForm AExp} : SMCProof _
+  (c(a1 <= a2) ←→ c(a1) ; c(a2) ; leq) := .ax ⟨_, .intro .DLeq⟩
 
 def aind : SMCProof _
   (γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ) := .ax ⟨_, .intro .AInd⟩
@@ -86,7 +89,7 @@ def propagateDAsgn {v : SMCForm Nat} (h : SMCProof _ (φ ⟶ [c(v); asgn(s)] cfg
   exact propagateImplL
 
 def propagateDIf {bexp : SMCForm BExp}
-    (h : SMCProof _ (φ ⟶ [c(bexp) ; ((true ? ; c(s1)) ∪ (false ? ; c(s2)))] ψ)) :
+    (h : SMCProof _ (φ ⟶ [c(bexp) ; ((true : CtNoms Val) ? ; c(s1)) ∪ ((false : CtNoms Val) ? ; c(s2))] ψ)) :
   SMCProof _ (φ ⟶ [c(if bexp then s1 else s2 endif)] ψ) := sorry
 
 def propagateACup
@@ -95,8 +98,12 @@ def propagateACup
   SMCProof _ (φ ⟶ [π ∪ π'] γ) := sorry
 
 def propagateDWhile {bexp : SMCForm BExp}
-    (h : SMCProof _ (φ ⟶ [c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?] γ)):
-  SMCProof _ (φ ⟶ [c(while bexp do' s)] γ) := sorry
+    (h : SMCProof _ (φ ⟶ [c(bexp) ; ((true : CtNoms Val) ? ; c(s) ; c(bexp))* ; (false : CtNoms Val) ?] γ)):
+  SMCProof _ (φ ⟶ [c(while bexp do: s od)] γ) := sorry
+
+def propagateDLeq {a1 a2 : SMCForm AExp}
+  (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; leq] ψ)):
+  SMCProof _ (φ ⟶ [c(a1 <= a2)] ψ) := sorry
 
 def propagateAInd
     (h : SMCProof _ (φ ⟶ γ ⋀ [π*](γ ⟶ [π]γ))):
@@ -154,7 +161,7 @@ def conditional {b : SMCForm BExp}
       . apply composition
         case h.h2.h1.h2 =>
           exact h2
-        . let tr : SMC.nominal Val := Symbols.nominal.ctNom $ boolValNom true
+        . let tr : SMC.nominal Val := true
           apply
             Proof.mp
               (Proof.mp
@@ -167,7 +174,7 @@ def conditional {b : SMCForm BExp}
       . apply composition
         case h.h2.h2.h2 =>
           exact h3
-        . let fl : SMC.nominal Val := Symbols.nominal.ctNom $ boolValNom false
+        . let fl : SMC.nominal Val := Symbols.nominal.ctNom ↑false
           apply
             Proof.mp
               (Proof.mp
@@ -178,15 +185,18 @@ def conditional {b : SMCForm BExp}
           . apply export_proof
             apply atesttrue
 
+def helperDistributeEx :
+  SMCProof _ ((φ ⟶ ψ).existClosure vars) →
+  SMCProof _ (φ.existClosure vars ⟶ ψ) := sorry
+
 def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
-    {init : ⟨B ⬝ vs, mem⟩.Instance}
-    {body : ⟨B ⬝ vs, mem⟩.Instance}
+    (cl₁ : b.closed) (cl₂: s.closed)
+    (B : SMCForm Val) (vs : SMCForm ValStack) (mem : SMCForm Mem)
+    (init : ⟨B ⬝ vs, mem⟩.Instance)
     (h1 : SMCProof _ (φ ⟶ [c(b)] init.form))
-    (h2 : SMCProof _ (⟨vs, mem⟩ ⋀ ℋ@ true B ⟶ [c(s) ; c(b)] body.form)):
-  (SMCProof _ (φ ⟶ [c(while b do' s)] (⟨vs, mem⟩ ⋀ ℋ@ (false : SMC.nominal Val) B).existClosure (⟨B ⬝ vs, mem⟩).FV)) := by
-
-  let C : (body.form ⟶ ℋ∃cl (ℋ⟨mkConfig⟩(ℋ⟨consValStack⟩(B, vs), mem)).FV ℋ⟨mkConfig⟩(ℋ⟨consValStack⟩(B, vs), mem)).Context (∼ c(s);c(b), (body.form ⟶ ℋ∃cl (ℋ⟨mkConfig⟩(ℋ⟨consValStack⟩(B, vs), mem)).FV ℋ⟨mkConfig⟩(ℋ⟨consValStack⟩(B, vs), mem))) := .tail .refl
-
+    (h2 : (preBody : (⟨vs, mem⟩ ⋀ ℋ@ (true : SMC.CtNoms Val) B).Instance) → Σ (body : ⟨B ⬝ vs, mem⟩.Instance),
+      SMCProof _ (preBody.form ⟶ [c(s) ; c(b)] body.form)):
+  (SMCProof _ (φ ⟶ [c(while b do: s od)] (⟨vs, mem⟩ ⋀ ℋ@ (false : SMC.nominal Val) B).existClosure (⟨B ⬝ vs, mem⟩).FV)) := by
   apply propagateDWhile
   . apply composition
     . exact h1
@@ -199,26 +209,43 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
         . apply Proof.mp (.prop1 _ _)
           apply Proof.ug (.tail .refl)
           apply Proof.mp (existElimPf _)
-          . apply genIterated
-            let tr : SMC.nominal Val := Symbols.nominal.ctNom $ boolValNom true
-            apply
-              Proof.mp
-                (Proof.mp
-                  (Proof.mp disj_elim_proof $ tertium_non_daturAt_proof tr B)
-                  _)
-            repeat {
-            . apply export_proof
-              apply composition
-              . first | apply atestfalse |  apply atesttrue
-              . apply imp_trans_proof h2
-                apply Proof.mp (.k _ _ _ _ C)
-                apply Proof.ug C
-                apply instanceToExistPf
-            }
+          . apply instanceToUnivPf' init
+            . admit
+            . simp only [FormL.Instance.distribAppl, FormL.Instance.distribCons]
+              let Binit   := init.inst.apply B
+              let vsinit  := init.inst.apply vs
+              let meminit := init.inst.apply mem
+              rw [show (init.inst.apply B = Binit) by rfl, show (init.inst.apply vs = vsinit) by rfl, show (init.inst.apply mem = meminit) by rfl]
+              let tr : SMC.nominal Val := true
+              apply
+                Proof.mp
+                  (Proof.mp
+                    (Proof.mp disj_elim_proof $ tertium_non_daturAt_proof tr Binit)
+                    _)
+              . apply export_proof
+                apply composition
+                . apply atestfalse
+                . apply id_proof
+              . apply export_proof
+                apply composition
+                . apply atesttrue
+                . obtain ⟨body, pf⟩ := h2 ⟨init.inst⟩
+                  simp [FormL.Instance.form] at pf
+                  apply imp_trans_proof pf
+                  . let preBody := ⟨(body.inst.apply B ⬝ body.inst.apply vs), body.inst.apply mem⟩
+                    let preBodyFVs := ⟨(B ⬝ vs), mem⟩
+                    let preBodyExists := preBodyFVs.existClosure preBodyFVs.FV
+                    let pgm := ∼c(s) ; c(b)
+                    let C : (preBody ⟶ preBodyExists).Context (pgm, (preBody ⟶ preBodyExists)) := .tail .refl
+                    apply Proof.mp (Proof.k preBody preBodyExists _ PDLOp C)
+                    apply Proof.ug C
+                    let preBodyInst : preBodyFVs.Instance := ⟨body.inst⟩
+                    rw [ show (preBody = preBodyInst.form) by simp [preBody, preBodyFVs, preBodyInst] ]
+                    apply instanceToExistPf
           . admit
       . apply Proof.mp (existElimPf _)
         . apply genIterated
-          let fl : SMC.nominal Val := Symbols.nominal.ctNom $ boolValNom false
+          let fl : SMC.nominal Val := false
           apply
             Proof.mp
               (Proof.mp

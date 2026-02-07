@@ -46,15 +46,21 @@ def sumPgm (s i n : SMCForm Var)
   : SMCForm Stmt :=
   s ::= 0;
   i ::= 0;
-  while (++i <= n) do'
+  while (++i <= n) do:
     s ::= s + i
+  od
 
 def sumCorrect (vs : SMCForm ValStack)
         (mem : SMCForm Mem)
         (s i n : CtNoms Var)
         (vn : ℕ) :
     SMCProof _
-      (⟨vs, set(mem, n, vn)⟩ ⟶ [c(sumPgm s i n)] ⟨vs, set(set(set(mem, n, vn), s, vn * (vn.add 1).div2), i, vn.add 1)⟩) := by
+      (⟨vs, set(mem, n, vn)⟩ ⟶ [c(sumPgm s i n)] ⟨vs, set(set(set(mem, n, vn), s, (vn *Nat (vn *Nat (vn +Nat 1)) /Nat 2)), i, vn +Nat 1)⟩) := by
+    let xvi  : SMC.svar Nat := ⟨"x1", by simp⟩
+    let vi   := ℋVar xvi
+    let xB   : SMCForm Bool := vi <= vn
+    let xmem : SMCForm Mem  := set(set(set(mem, s, (vi *Nat (vi -Nat 1)) /Nat 2), i, vi), n, vn)
+    let init : ⟨xB ⬝ vs, xmem⟩.Instance := ⟨[⟨_, xvi, (1:ℕ)⟩]⟩
     apply propagateSeq
     apply composition
     . apply assgnNat
@@ -62,8 +68,23 @@ def sumCorrect (vs : SMCForm ValStack)
       apply composition
       . apply assgnNat
       . apply weakeningPost
-        . apply iteration
-          repeat admit
+        . apply iteration (by simp) (by simp) xB vs xmem init
+          . apply propagateDLeq
+            apply composition
+            . apply app
+            . dsimp only [Nat.add_eq, Nat.reduceAdd]
+              apply composition
+              . have memEq :
+                  set(set(set(mem, n, vn), s, (0:ℕ)), i, (1:ℕ)) = set(set(set(mem, s, (0:ℕ)), i, (1:ℕ)), n, vn)
+                    := sorry -- TODO!
+                rw [memEq]
+                apply aid
+              . simp? [init, xB, vi]
+                admit
+          . intro preBody
+            apply Sigma.mk
+            . admit
+            . admit
         . admit
 
 def effectfulIf (i : SMCForm Var): SMCForm Stmt :=

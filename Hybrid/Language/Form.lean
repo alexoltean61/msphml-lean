@@ -79,16 +79,20 @@ notation:51 φ:40 " ←→ " ψ:51  => FormL.iff φ ψ
 
 section Coercions
 
-  variable (symbs : Symbols α)
-  variable (s : symbs.signature.S)
-  instance : Coe (symbs.svar s) (Form symbs s) where
-    coe := FormL.svar
-
-  instance : Coe (symbs.nominal s) (Form symbs s) where
-    coe := FormL.nom
-
-  instance : Coe (symbs.prop s) (Form symbs s) where
-    coe := FormL.prop
+  variable {symbs : Symbols α}
+  variable {s : symbs.signature.S}
+  @[coe]
+  abbrev coeVarSymbs : symbs.svar s → FormL symbs [s] := FormL.svar
+  @[coe]
+  abbrev coeNomSymbs : symbs.nominal s → FormL symbs [s] := FormL.nom
+  @[coe]
+  abbrev coePropSymbs : symbs.prop s → FormL symbs [s] := FormL.prop
+  instance : Coe (symbs.svar s) (FormL symbs [s]) where
+    coe := coeVarSymbs
+  instance : Coe (symbs.nominal s) (FormL symbs [s]) where
+    coe := coeNomSymbs
+  instance : Coe (symbs.prop s) (FormL symbs [s]) where
+    coe := coePropSymbs
 
 end Coercions
 
