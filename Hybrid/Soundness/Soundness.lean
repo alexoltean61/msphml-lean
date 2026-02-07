@@ -262,7 +262,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
             have ⟨C', C'_iso⟩ := C.subst_not_iso Cᵤ h_symm φ
             specialize wsSat C'
             symm at C'_iso
-            rw [FormL.occ_nom, not_nominal_occurs_context] at noccCtx
+            rw [FormL.occ_nom, FormL.not_nominal_occurs_context] at noccCtx
             specialize noccCtx C'
             rw [←v_variant_agreement noccCtx wₜ]
             rw [WProd.select_iso C'_iso] at wsSat
@@ -273,7 +273,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
         have : M.1.Fr.W sₜ = M'.1.Fr.W sₜ := v_variant_world_inv sₜ
         conv =>
           lhs; simp [M', v_variant_valuation]
-        rw [FormL.occ_nom, not_nominal_occurs_context] at noccCtx
+        rw [FormL.occ_nom, FormL.not_nominal_occurs_context] at noccCtx
         have noccφ := noccCtx (FormL.subst_to_ctx _ _)
         rw [←v_variant_agreement noccφ wₜ]
         exact wsSat t

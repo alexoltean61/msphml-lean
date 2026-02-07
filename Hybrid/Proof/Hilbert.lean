@@ -1,5 +1,4 @@
 import Hybrid.Language
-import Hybrid.Language.Substitution
 
 variable {α : Type u}
 variable [DecidableEq α]

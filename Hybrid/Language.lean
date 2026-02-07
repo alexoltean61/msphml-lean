@@ -1,5 +1,4 @@
 import Hybrid.Language.Signature
 import Hybrid.Language.Form
 import Hybrid.Language.Context
-import Hybrid.Language.Substitution
-import Hybrid.Language.Lemmas
+import Hybrid.Language.Variables
