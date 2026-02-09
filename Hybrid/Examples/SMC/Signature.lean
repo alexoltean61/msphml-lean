@@ -93,8 +93,10 @@ instance : Coe (SMCForm Var) (SMCForm AExp) where
 instance : Coe (SMCForm Bool) (SMCForm Val) where
   coe := coerceBoolVal
 
+@[simp]
 instance : OfNat (SMCForm Nat) n where
   ofNat := n
+@[simp]
 instance : OfNat (SMCForm AExp) n where
   ofNat := ℋ⟨nat2AExp⟩ n
 
@@ -128,7 +130,7 @@ abbrev asgnStmt (x : SMCForm Var) (a : SMCForm AExp) := ℋ⟨SMC.«_:=_Var_AExp
 abbrev union (c1 c2 : SMCForm CtrlStack) := ℋ⟨PDLUnion⟩ (c1, c2)
 abbrev aexpPlus (a1 a2 : SMCForm AExp) := ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 abbrev aexpLeq (a1 a2 : SMCForm AExp) := ℋ⟨Leq⟩ (a1, a2)
-abbrev aexpNat (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
+abbrev natLeq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev plusNat (a1 a2 : SMCForm Nat) := ℋ⟨PlusNat⟩ (a1, a2)
 abbrev minusNat (a1 a2 : SMCForm Nat) := ℋ⟨MinusNat⟩ (a1, a2)
 abbrev mulNat (a1 a2 : SMCForm Nat) := ℋ⟨MulNat⟩ (a1, a2)
@@ -142,14 +144,14 @@ abbrev config (vs : SMCForm ValStack) (mem : SMCForm Mem) := ℋ⟨mkConfig⟩ (
 def asgn (x : SMCForm Var) := ℋ⟨SMC.asgnVar_CtrlStack⟩ x
 def ifthenelse (bexp : SMCForm BExp) (s1 s2 : SMCForm Stmt) := ℋ⟨IteStmt⟩ (bexp, s1, s2)
 def whiledo (bexp : SMCForm BExp) (s : SMCForm Stmt) := ℋ⟨WhileStmt⟩ (bexp, s)
-def set (mem : SMCForm Mem) (x : SMCForm Var) (n : SMCForm Val) := ℋ⟨memset⟩ (mem, x, n)
+abbrev set (mem : SMCForm Mem) (x : SMCForm Var) (n : SMCForm Val) := ℋ⟨memset⟩ (mem, x, n)
 
 prefix:102 "++" => plusplus
 infix:100 " ::= " => asgnStmt
 infix:100 " ∪ "   => union
 infixr:102 " + "  => aexpPlus
 infix:100 " <= "  => aexpLeq
-infix:100 " <= "  => aexpNat
+infix:100 " <=Nat "  => natLeq
 infixr:100 " +Nat " => plusNat
 infixl:100 " -Nat " => minusNat
 infixr:100 " *Nat " => mulNat
@@ -169,6 +171,10 @@ notation:100 "set" "(" mem ", "  x ", "  n ")" => set mem x n
 
 open Lean PrettyPrinter
 
+@[app_unexpander FormL.appl]
+def unexpandMemset : Unexpander
+  | `($_ ``memset $mem $x $n) => `(set($mem, $x, $n))
+  | _ => throw ()
 @[app_unexpander pdlOp]
 def unexpandPdlOp : Unexpander
   | `($_ $ctrl $config) => `([$ctrl] $config)
@@ -193,5 +199,41 @@ def unexpandWhile : Unexpander
   | `($_ $bexp $s) =>
         `(while ($bexp) do: $s od )
   | _ => throw ()
+
+#check Repr
+#check (ToString ℕ)
+
+def Char.toNat' : Char → ℕ
+  | '0' => 0
+  | '1' => 1
+  | '2' => 2
+  | '3' => 3
+  | '4' => 4
+  | '5' => 5
+  | '6' => 6
+  | '7' => 7
+  | '8' => 8
+  | '9' => 9
+  | _   => 111
+
+instance : Encodable (CtNoms Nat) where
+  encode k  := k.1.foldl (λ acc x => (acc * 10) + (Char.toNat' x)) 0
+  decode  n := some ⟨toString n, by simp⟩
+  encodek k := by
+    obtain ⟨str, ⟨n, hn⟩⟩ := k
+    subst hn
+    simp [toString]
+    admit
+
+instance : Encodable (SMC.nominal Nat) where
+  encode k  := sorry
+  decode  n := sorry
+  encodek k := sorry
+
+def NatSet : Set String := { toString n | n : ℕ }
+instance : Encodable NatSet where
+  encode  := sorry
+  decode  := sorry
+  encodek := sorry
 
 end SMC

@@ -36,14 +36,36 @@ def atesttrue : SMCProof _
 def atestfalse : SMCProof _
   (ℋ@ v' (∼v) ⋀ ⟨v ⬝ vs, mem⟩ ⟶ [v' ?] ψ) := .ax ⟨_, .intro .ATestFalse⟩
 
-def app {n : ℕ} : SMCProof _
-  (⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨↑(n.add 1) ⬝ vs, set(mem, x, ↑(n.add 1))⟩) := .ax ⟨_, .intro .App⟩
+def app {n : SMCForm Nat} : SMCProof _
+  (⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨(n +Nat 1) ⬝ vs, set(mem, x, (n +Nat 1))⟩) := .ax ⟨_, .intro .App⟩
 
 def dwhile {bexp : SMCForm BExp} : SMCProof _
   (c(while bexp do: s od) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?) := .ax ⟨_, .intro .DWhile⟩
 
 def dleq {a1 a2 : SMCForm AExp} : SMCProof _
   (c(a1 <= a2) ←→ c(a1) ; c(a2) ; leq) := .ax ⟨_, .intro .DLeq⟩
+
+def aleq  (n1 n2 : SMCForm Nat)
+          (vs : SMCForm ValStack)
+          (mem : SMCForm Mem): SMCProof _
+  (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) :=  .ax ⟨_, .intro .ALeq⟩
+
+def aleqNat {n1 n2 : ℕ}
+          {vs : SMCForm ValStack}
+          {mem : SMCForm Mem}: SMCProof _
+  (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1.ble n2) ⬝ vs, mem⟩) :=  sorry
+
+def dplus : SMCProof _
+  (c(a1 + a2) ←→ c(a1) ; c(a2) ; plus) := .ax ⟨_, .intro .DPlus⟩
+
+def aplus {n1 n2 : SMCForm Nat} : SMCProof _
+    (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
+
+def aplus' {n1 n2 : SMCForm Nat} {v : SMCForm Val} : SMCProof _
+    (⟨(n2 ⋀ v) ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
+
+def nleq {n1 n2 : ℕ}: SMCProof _
+  ((n1 <=Nat n2) ←→ n1.ble n2) := .ax ⟨_, .intro .NLeq⟩
 
 def aind : SMCProof _
   (γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ) := .ax ⟨_, .intro .AInd⟩
@@ -67,11 +89,19 @@ def propagateMemL {mem1 mem2 : SMCForm Mem}
   (h1 : SMCProof _ (mem1 ←→ mem2))
   (h2 : SMCProof _ (⟨vs, mem2⟩ ⟶ [pgm] cfg)) : SMCProof _ (⟨vs, mem1⟩ ⟶ [pgm] cfg) := by sorry
 
+def propagateMemL' {mem1 mem2 : SMCForm Mem}
+  (h1 : SMCProof _ (mem1 ⟶ mem2))
+  (h2 : SMCProof _ (⟨vs, mem2⟩ ⟶ [pgm] cfg)) : SMCProof _ (⟨vs, mem1⟩ ⟶ [pgm] cfg) := by sorry
+
 def propagateMemR {mem1 mem2 : SMCForm Mem}
   (h1 : SMCProof _ (mem1 ←→ mem2))
   (h2 : SMCProof _ (cfg ⟶ [pgm] ⟨vs, mem2⟩)) : SMCProof _ (cfg ⟶ [pgm] ⟨vs, mem1⟩) := by sorry
 
-def propagateDAsgn {v : SMCForm Nat} (h : SMCProof _ (φ ⟶ [c(v); asgn(s)] cfg)) : SMCProof _ (φ ⟶ [c(s ::= v)] cfg) := by
+def propagateStackL {vs1 vs2 : SMCForm ValStack}
+  (h1 : SMCProof _ (vs1 ←→ vs2))
+  (h2 : SMCProof _ (⟨vs2, mem⟩ ⟶ [pgm] cfg)) : SMCProof _ (⟨vs1, mem⟩ ⟶ [pgm] cfg) := by sorry
+
+def propagateDAsgn {v : SMCForm AExp} (h : SMCProof _ (φ ⟶ [c(v); asgn(s)] cfg)) : SMCProof _ (φ ⟶ [c(s ::= v)] cfg) := by
   simp [Evaluable.ctrlStackEval] at h ⊢
   have C : (∼(c(v); asgn(s))).Context (∼(c(v); asgn(s)), cfg) := .head
   have propagateNeg : SMCProof _ ((∼c(s ::= v)) ←→ ∼(c(v); asgn(s))) := simpNeg dasgn
@@ -105,9 +135,18 @@ def propagateDLeq {a1 a2 : SMCForm AExp}
   (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; leq] ψ)):
   SMCProof _ (φ ⟶ [c(a1 <= a2)] ψ) := sorry
 
+def propagateNLeq {n1 n2 : ℕ}
+    (h : SMCProof _ (φ ⟶ [α] ⟨(n1.ble n2) ⬝ vs, mem⟩)):
+  SMCProof _ (φ ⟶ [α] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) := sorry
+
+def propagateDPlus
+    (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; plus] ψ)):
+  SMCProof _ (φ ⟶ [c(a1 + a2)] ψ) := sorry
+
 def propagateAInd
     (h : SMCProof _ (φ ⟶ γ ⋀ [π*](γ ⟶ [π]γ))):
   SMCProof _ (φ ⟶ [π*] γ) := sorry
+
 
 end Propagation
 
@@ -185,10 +224,6 @@ def conditional {b : SMCForm BExp}
           . apply export_proof
             apply atesttrue
 
-def helperDistributeEx :
-  SMCProof _ ((φ ⟶ ψ).existClosure vars) →
-  SMCProof _ (φ.existClosure vars ⟶ ψ) := sorry
-
 def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
     (cl₁ : b.closed) (cl₂: s.closed)
     (B : SMCForm Val) (vs : SMCForm ValStack) (mem : SMCForm Mem)
@@ -204,7 +239,7 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
       case h.h2.φ₁ =>
         exact (⟨B ⬝ vs, mem⟩).existClosure (⟨B ⬝ vs, mem⟩).FV
       . apply propagateAInd
-        apply helperInsertAnd
+        apply helperInsertAndR
         . apply instanceToExistPf
         . apply Proof.mp (.prop1 _ _)
           apply Proof.ug (.tail .refl)
@@ -262,5 +297,13 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
               apply insertExistCl
         . admit
 
+def iteration' {b : SMCForm BExp} {s : SMCForm Stmt} {k : SMC.nominal st}
+    (cl₁ : b.closed) (cl₂: s.closed)
+    (init : (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).Instance)
+    (h1 : SMCProof _ (φ ⟶ [c(b)] init.form))
+    (h2 : (preBody : (⟨vs, mem⟩ ⋀ (ℋ@ k P) ⋀ ℋ@ (true : SMC.CtNoms Val) B).Instance) → Σ (body : (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).Instance),
+      SMCProof _ (preBody.form ⟶ [c(s) ; c(b)] body.form)) :
+  (SMCProof _ (φ ⟶ [c(while b do: s od)] (⟨vs, mem⟩ ⋀ (ℋ@ k P) ⋀ ℋ@ (false : SMC.nominal Val) B).existClosure (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).FV)) := by
+    admit
 
 end Rules

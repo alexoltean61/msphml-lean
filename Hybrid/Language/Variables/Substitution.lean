@@ -172,6 +172,7 @@ variable {s t u : symbs.signature.S}
 variable {sorts : List symbs.signature.S}
 variable {x y : symbs.svarType s}
 variable {i j : symbs.nominal s}
+variable {k : symbs.nominal t}
 variable {σ : symbs.signature.«Σ» (t :: sorts) u}
 
 @[simp]
@@ -185,6 +186,14 @@ lemma subst_nom {k : symbs.nomType s} {φ : FormL symbs ss} : φ[k // x] = φ[(S
 
 @[simp]
 lemma subst_ct_nom {k : symbs.ctNomType s} {φ : FormL symbs ss} : φ[k // x] = φ[(Symbols.nominal.ctNom k) // x] := by simp [Term.subst]
+
+@[simp]
+lemma subst_var_nom : (ℋNom k)[y // x] = (ℋNom k) := by
+  simp only [Term.subst, var_subst]
+
+@[simp]
+lemma subst_nom_nom : (ℋNom k)[i // x] = (ℋNom k) := by
+  simp only [Term.subst, nom_subst]
 
 @[simp]
 lemma subst_var_appl : (ℋ⟨σ⟩ φ)[y // x] = ℋ⟨σ⟩ (φ[y // x]) := by
@@ -201,6 +210,14 @@ lemma subst_var_or : (φ ⋁ ψ)[y // x] = φ[y // x] ⋁ ψ[y // x] := by
 @[simp]
 lemma subst_nom_or : (φ ⋁ ψ)[i // x] = φ[i // x] ⋁ ψ[i // x] := by
   simp only [Term.subst, nom_subst]
+
+@[simp]
+lemma subst_var_and : (φ ⋀ ψ)[y // x] = φ[y // x] ⋀ ψ[y // x] := by
+  simp only [Term.subst, var_subst, FormL.and]
+
+@[simp]
+lemma subst_nom_and : (φ ⋀ ψ)[i // x] = φ[i // x] ⋀ ψ[i // x] := by
+  simp only [Term.subst, nom_subst, FormL.and]
 
 @[simp]
 lemma subst_var_neg : (∼φ)[y // x] = ∼(φ[y // x]) := by

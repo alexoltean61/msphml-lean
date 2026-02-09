@@ -1,4 +1,5 @@
 import Hybrid.Language.Variables.Instance
+import Hybrid.Language.Variables.Fresh
 
 set_option maxHeartbeats 400000
 
@@ -151,6 +152,10 @@ lemma FVsubst {φ : FormL symbs ss} {s : symbs.signature.S} {x : symbs.svar s} {
           admit
 
 @[simp]
+lemma Instance.nom {i : Instantiation symbs} {k : symbs.nominal s} :
+  i.apply k = (ℋNom k) := sorry
+
+@[simp]
 lemma Instance.distribAnd {i : Instantiation symbs} :
   i.apply (φ ⋀ ψ) = (i.apply φ ⋀ i.apply ψ) := sorry
 
@@ -162,10 +167,71 @@ lemma Instance.distribCons {i : Instantiation symbs} :
 lemma Instance.distribAt {i : Instantiation symbs} :
   i.apply ((ℋ@ k φ) : Form symbs t) = ℋ@ k (i.apply φ) := sorry
 
-
 @[simp]
 lemma Instance.distribAppl {i : Instantiation symbs} {σ : symbs.signature.«Σ» (s::ss) rng} {φs : FormL symbs (s::ss)} :
   i.apply (ℋ⟨σ⟩ φs) = ℋ⟨σ⟩ (i.apply φs) := sorry
+
+-- TODO: Check Mathlib.Logic.Denumerable.lean
+lemma ofNat_Injective [d : Denumerable β]: (Denumerable.ofNat β).Injective := by
+  intro n m
+  have ⟨inv, ⟨_, h⟩⟩ := d.decode_inv n
+  subst h
+  have ⟨inv, ⟨_, h⟩⟩ := d.decode_inv m
+  subst h
+  simp only [Denumerable.ofNat_encode, Encodable.encode_inj, imp_self]
+
+lemma freshVarIsFresh {φ : FormL symbs ss} {s : symbs.signature.S} : (φ.occurs_free <| φ.freshVar s) = false := by
+  refine eq_false_of_ne_true ?_
+  rw [←FVisFV]
+  induction φ with
+  | svar x =>
+      simp
+      intro heq ; subst heq
+      simp
+      conv =>
+        rhs ; rhs
+        rw [← Denumerable.ofNat_encode x]
+      intro habs
+      have := ofNat_Injective habs
+      simp at this
+  | bind y φ ih =>
+      simp [-freshVar] at ih ⊢
+      intro habs
+      apply ih ; clear ih
+      admit
+  | appl σ φ ih =>
+      simp [-freshVar] at ih ⊢
+      intro habs
+      apply ih ; clear ih
+      admit
+  | or φ ψ ih1 ih2 =>
+      simp [-freshVar] at ih1 ih2 ⊢
+      apply And.intro
+      . intro habs
+        admit
+      . intro habs
+        admit
+  | neg φ ih =>
+      simp [-freshVar] at ih ⊢
+      intro habs
+      apply ih ; clear ih
+      admit
+  | «at» k φ ih =>
+      simp [-freshVar] at ih ⊢
+      intro habs
+      apply ih ; clear ih
+      admit
+  | cons φ ψ ih1 ih2 =>
+      simp [-freshVar] at ih1 ih2 ⊢
+      apply And.intro
+      . intro habs
+        admit
+      . intro habs
+        admit
+  | _ => simp
+
+lemma freshVarListIsFresh {φs : FormLList symbs} {s : symbs.signature.S} :
+  ∀ form, φs.elem form → (form.2.occurs_free <| φs.freshVar s) = false := by sorry
 
 lemma nominal_occurs_context {symbs : Symbols α} {s : symbs.signature.S} {sorts : List symbs.signature.S} (j : symbs.nominal s) (φ: FormL symbs sorts) :
   φ.occurs j ↔ ∃ (t : symbs.signature.S) (ψ : Form symbs t) (_ : ψ.Context φ), ψ.occurs j := by

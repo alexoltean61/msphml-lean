@@ -8,6 +8,8 @@ variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {Λ : AxiomSet symbs}
 
+def falsum : False := sorry
+
 def top_proof : Proof Λ s (ℋ⊤) := prop1 _ _
 
 def id_proof : Proof Λ s (φ ⟶ φ) := sorry
@@ -36,9 +38,12 @@ def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := sorry
 -- Added by Proof.composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry
 
-def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) : Proof Λ s φ[i // x] → Proof Λ s φ[y // x] := sorry
+def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) :
+  Proof Λ s φ[i // x] → Proof Λ s φ[y // x] := sorry
 
-def helperInsertAnd : Proof Λ s (φ ⟶ ψ) → Proof Λ s (φ ⟶ χ) → Proof Λ s (φ ⟶ ψ ⋀ χ) := sorry
+def helperInsertAndR : Proof Λ s (φ ⟶ ψ) → Proof Λ s (φ ⟶ χ) → Proof Λ s (φ ⟶ ψ ⋀ χ) := sorry
+
+def helperInsertAndL : Proof Λ s (φ ⟶ χ) → Proof Λ s (φ ⋀ ψ ⟶ χ) := sorry
 
 def existElimPf {φ ψ : Form symbs s} (h : ψ.closed):
   Proof Λ s ((φ ⟶ ψ).univClosure φ.FV ⟶ (φ.existClosure φ.FV ⟶ ψ)) := sorry

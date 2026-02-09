@@ -28,31 +28,31 @@ abbrev Aid (vs : SMCForm ValStack)
 def App  (vs : SMCForm ValStack)
          (mem : SMCForm Mem)
          (x : SMCForm Var)
-         (n : ℕ)
+         (n : SMCForm Nat)
   : SMCForm Config :=
-    ⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨↑(n.add 1) ⬝ vs, set(mem, x, ↑(n.add 1))⟩
+    ⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨(n +Nat 1) ⬝ vs, set(mem, x, (n +Nat 1))⟩
 
 -- c(a1 + a2) ↔ c(a1) ; c(a2) ; plus
 def DPlus (a1 a2 : SMCForm AExp) : SMCForm CtrlStack :=
     c(a1 + a2) ←→ c(a1) ; c(a2) ; plus
 
 -- ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨n1 + n2 ⬝ vs, mem⟩
-def Aplus (n1 n2 : ℕ)
+def Aplus (n1 n2 : SMCForm Nat)
           (vs : SMCForm ValStack)
           (mem : SMCForm Mem)
     : SMCForm Config :=
-      ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨↑(n1.add n2) ⬝ vs, mem⟩
+      ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩
 
 -- c(a1 <= a2) ↔ c(a1) ; c(a2) ; leq
 def DLeq (a1 a2 : SMCForm AExp) : SMCForm CtrlStack :=
     c(a1 <= a2) ←→ c(a1) ; c(a2) ; leq
 
 -- ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨↑(n1 ≤ n2), mem⟩
-def ALeq (n1 n2 : ℕ)
+def ALeq (n1 n2 : SMCForm Nat)
           (vs : SMCForm ValStack)
           (mem : SMCForm Mem)
     : SMCForm Config :=
-      ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨↑(n1.ble n2) ⬝ vs, mem⟩
+      ⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩
 
 -- γ ⟶ [skip] γ
 def ASkip (γ : SMCForm Config): SMCForm Config :=
@@ -165,6 +165,11 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AFalseBoolVal       : Axiom (AFalseBoolVal)
   | ATrueValEmbed       : Axiom (ATrueValEmbed)
   | AFalseValEmbed      : Axiom (AFalseValEmbed)
+  | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2) -- move me
+  | APlusNat {n₁ n₂ : ℕ}: Axiom ((n₁ +Nat n₂) ←→ (n₁ + n₂))                -- move me
+  | AMulNat {n₁ n₂ : ℕ} : Axiom ((n₁ *Nat n₂) ←→ (n₁ * n₂))                -- move me
+  | AMinusNat {n₁ n₂ : ℕ} : Axiom ((n₁ -Nat n₂) ←→ (n₁ - n₂))                -- move me
+  | ADivNat {n₁ n₂ : ℕ} : Axiom ((n₁ /Nat n₂) ←→ (n₁ / n₂))                -- move me
 
 -- The set of axioms for SMC is that of formulas φ for which a term
 -- Axiom φ exists, for all s s:

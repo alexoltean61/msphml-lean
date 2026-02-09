@@ -13,6 +13,11 @@ def Instantiation.apply (φ : FormL symbs ss) : Instantiation symbs → FormL sy
   | []                   => φ
   | ⟨_, x, k⟩ :: i' => (Instantiation.apply φ i')[k // x]
 
+-- TODO......
+-- Note: you MUST ensure that an instantiation is defined for all free variables of a formula;
+-- or you MUST return a sound (fresh?) nominal if it is not
+def Instantiation.valueOf (x : symbs.svar s) : Instantiation symbs → symbs.nominal s := sorry
+
 structure Instance (φ : FormL symbs ss) where
   inst   : Instantiation symbs
 
