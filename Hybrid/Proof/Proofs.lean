@@ -1,5 +1,6 @@
 import Hybrid.Language
 import Hybrid.Proof.Hilbert
+import Hybrid.Proof.Fragment
 
 namespace Proof
 
@@ -8,7 +9,11 @@ variable [DecidableEq α]
 variable {symbs : Symbols α}
 variable {Λ : AxiomSet symbs}
 
-def falsum : False := sorry
+def mp_frag (maj : fragment P Λ (φ ⟶ ψ)) (min : fragment P Λ φ) (h : P _ ψ) : fragment P Λ ψ := by
+  apply fragment.mk (mp maj.1 min.1)
+  simp [inFragment, h, maj.2, min.2]
+def dni_frag (h : P _ (φ ⟶ ∼∼ φ)) : fragment P Λ (φ ⟶ ∼∼ φ) := sorry
+def contrap_frag : fragment P Λ ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := sorry
 
 def top_proof : Proof Λ s (ℋ⊤) := prop1 _ _
 
@@ -33,9 +38,9 @@ def conj_elimR_proof : Proof Λ s ((φ ⋀ ψ) ⟶ ψ) := sorry
 
 def disj_elim_proof : Proof Λ s ((φ ⋁ ψ) ⟶ (φ ⟶ χ) ⟶ (ψ ⟶ χ) ⟶ χ) := sorry
 
-def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := sorry
+def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := (@contrap_frag _ _ _ _ .univ _ _ _).1
 
--- Added by Proof.composition
+-- Added by composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry
 
 def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) :
