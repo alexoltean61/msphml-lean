@@ -16,7 +16,8 @@
   reasoning inside a fragment of many-sorted polyadic hybrid logic.
 -/
 
-import Hybrid.Examples.ModalBase.Signature
+import Hybrid.Examples.Modal.Signature
+import Hybrid.Examples.Modal.Base.Base
 
 inductive S5Schema : Modal → Type where
   | AxT : S5Schema (□ φ ⟶ φ)

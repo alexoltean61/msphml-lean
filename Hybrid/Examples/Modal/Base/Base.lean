@@ -11,19 +11,9 @@
   That is: no state variables, no quantification, no @-binding!
 -/
 
-import Hybrid.BNF
+import Hybrid.Examples.Modal.Signature
 import Hybrid.Language
 import Hybrid.Proof
-
-hybrid_def ModalBase :=
-  sort WFF ::= "◇"(WFF) [poss]
-
-  -- TODO: Allow declaring propositional variables in the DSL
-  -- sort WFF ::= prop p | prop q | prop r
-  -- Or maybe:
-  -- sort WFF ::= countable prop
-
-def FormulaSort := ModalBase.WFF
 
 @[simp]
 def IsBase : Fragment ModalBase
