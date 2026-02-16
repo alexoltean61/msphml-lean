@@ -155,6 +155,36 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
         exists τ₁
         exists form
         exists ctx_w3
+  | @dual _ _ _ _ χ =>
+      intro M g w
+      simp only [Sat.iff]
+      apply Iff.intro
+      . intro h
+        simp only [Sat.neg]
+        intro habs
+        simp only [Sat.appl, Sat.applDual] at h habs
+        obtain ⟨ws, h, rWs⟩ := h
+        specialize habs ws rWs
+        obtain ⟨s', φ, C, habs⟩ := habs
+        rw [Sat.context] at h
+        have ⟨ψ, C', eq, iso⟩ := C.from_negAll
+        subst eq
+        specialize h C'
+        rw [Sat.neg, WProd.select_iso iso] at habs
+        exact habs h
+      . intro h
+        simp only [Sat.neg, Sat.applDual, not_forall, not_exists] at h
+        obtain ⟨ws, rWs, h⟩ := h
+        exists ws
+        apply And.intro _ rWs
+        rw [Sat.context]
+        intro s' φ C
+        have ⟨ψ, C', eq, iso⟩ := C.to_negAll
+        subst eq
+        specialize h s' (∼φ) C'
+        simp only [WProd.select_iso iso]
+        simp [Sat.neg] at h
+        exact h
   | barcan x φ σ C h =>
       intro M g w
       simp only [Sat.implies]

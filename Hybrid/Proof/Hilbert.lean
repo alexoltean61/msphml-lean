@@ -15,6 +15,7 @@ inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signatur
       (σ : symbs.signature.«Σ» _ s)
       (C : (φ ⟶ ψ).Context χ):
             Proof Λ s (ℋ⟨σ⟩ᵈ χ ⟶ (ℋ⟨σ⟩ᵈ C[φ] ⟶ ℋ⟨σ⟩ᵈ C[ψ]))
+  | dual  : Proof Λ s (ℋ⟨σ⟩ χ ←→ ∼ℋ⟨σ⟩ᵈ χ.negAll)
   | mp    : Proof Λ s (φ ⟶ ψ) → Proof Λ s φ → Proof Λ s ψ
   | ug {φ : Form symbs s₁}
        (C : φ.Context ψ):

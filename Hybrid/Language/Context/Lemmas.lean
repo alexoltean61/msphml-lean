@@ -286,6 +286,49 @@ lemma subst_back {φ ψ : Form symbs s} {τ : FormL symbs sorts}
       . unfold subst_to_ctx
         simp only [id_eq, subst]
 
+def from_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ.negAll} : Σ' (ψ : Form symbs s) (C₂ : ψ.Context τ), φ = ∼ψ ∧ C₁.iso C₂ := by
+  let τcopy := τ
+  cases τ with
+  | cons χ χs =>
+      simp [FormL.negAll] at C₁
+      cases C₁ with
+      | head =>
+          apply PSigma.mk χ
+          apply PSigma.mk .head _
+          simp [iso]
+      | tail C' =>
+          -- For some reason Lean failed to auto-generate
+          -- the induction hypothesis, so:
+          have ⟨ψ, C'', eq, iso⟩ := C'.from_negAll
+          exact ⟨ψ, .tail C'', eq, iso⟩
+  | _ =>
+    cases C₁
+    . unfold FormL.negAll
+      apply PSigma.mk τcopy
+      apply PSigma.mk .refl
+      simp [τcopy, iso]
+
+def to_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} : Σ' (ψ : Form symbs s) (C₂ : ψ.Context τ.negAll), ∼φ = ψ ∧ C₁.iso C₂ := by
+  let τcopy := τ
+  cases τ with
+  | cons χ χs =>
+      cases C₁ with
+      | head =>
+          apply PSigma.mk (∼φ)
+          simp [FormL.negAll]
+          apply PSigma.mk .head _
+          simp [iso]
+      | tail C' =>
+          -- For some reason Lean failed to auto-generate
+          -- the induction hypothesis, so:
+          have ⟨ψ, C'', eq, iso⟩ := C'.to_negAll
+          exact ⟨ψ, .tail C'', eq, iso⟩
+  | _ =>
+    cases C₁
+    . apply PSigma.mk (∼τcopy)
+      apply PSigma.mk .refl
+      simp [τcopy, iso]
+
 end Context
 
 lemma subst_to_ctx_iso {χ : Form sig s}
