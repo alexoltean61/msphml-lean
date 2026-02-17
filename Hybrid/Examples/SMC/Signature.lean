@@ -7,12 +7,13 @@ hybrid_def SMC :=
                 | "_-_"(Nat, Nat) [MinusNat]
                 | "_*_"(Nat, Nat) [MulNat]
                 | "_/_"(Nat, Nat) [DivNat]
-    sort Bool ::= builtin Bool | "_==_"(Nat, Nat) | "_<=_"(Nat, Nat) [LeqNat]
+    sort Bool ::= builtin Bool | "_<=_"(Nat, Nat) [LeqNat] | "_==_"(Nat, Nat) [EqNat]
 
     sort Var  ::= builtin String
     sort AExp ::= subsort Nat | subsort Var
-    sort AExp ::= "_+_"(AExp, AExp) | "++"(Var)
+    sort AExp ::= "_+_"(AExp, AExp) | "++"(Var) | "_%_"(AExp, AExp) [ModAExp]
     sort BExp ::= "_<=_"(AExp, AExp)                [Leq]
+    sort BExp ::= "_=_"(AExp, AExp)                 [Eq]
     sort Stmt ::= skip
                 | "_:=_"(Var, AExp)
                 | "if_then_else_"(BExp, Stmt, Stmt) [IteStmt]
@@ -27,7 +28,7 @@ hybrid_def SMC :=
                 | "c"(BExp)                   [cBExp]
                 | "c"(Stmt)                   [cStmt]
                 | "asgn"(Var)
-                | plus | leq
+                | plus | leq | eq
                 | "_?"(Val)                   [PDLTest]
                 | "_∪_"(CtrlStack, CtrlStack) [PDLUnion]
                 | "_;_"(CtrlStack, CtrlStack) [PDLSeq]
@@ -77,7 +78,6 @@ abbrev coerceVarAExp (v : SMCForm Var) : SMCForm AExp := ℋ⟨var2AExp⟩ v
 abbrev coerceNatVal (n : SMCForm Nat) : SMCForm Val := ℋ⟨nat2Val⟩ n
 @[coe]
 abbrev coerceBoolVal (b : SMCForm Bool) : SMCForm Val := ℋ⟨bool2Val⟩ b
-
 
 /-
   Subsort operators probably also require some specific axioms
@@ -130,11 +130,14 @@ abbrev asgnStmt (x : SMCForm Var) (a : SMCForm AExp) := ℋ⟨SMC.«_:=_Var_AExp
 abbrev union (c1 c2 : SMCForm CtrlStack) := ℋ⟨PDLUnion⟩ (c1, c2)
 abbrev aexpPlus (a1 a2 : SMCForm AExp) := ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 abbrev aexpLeq (a1 a2 : SMCForm AExp) := ℋ⟨Leq⟩ (a1, a2)
+abbrev aexpEq (a1 a2 : SMCForm AExp) := ℋ⟨Eq⟩ (a1, a2)
+abbrev natEq (a1 a2 : SMCForm Nat) := ℋ⟨EqNat⟩ (a1, a2)
 abbrev natLeq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev plusNat (a1 a2 : SMCForm Nat) := ℋ⟨PlusNat⟩ (a1, a2)
 abbrev minusNat (a1 a2 : SMCForm Nat) := ℋ⟨MinusNat⟩ (a1, a2)
 abbrev mulNat (a1 a2 : SMCForm Nat) := ℋ⟨MulNat⟩ (a1, a2)
 abbrev divNat (a1 a2 : SMCForm Nat) := ℋ⟨DivNat⟩ (a1, a2)
+abbrev modAExp (a1 a2 : SMCForm AExp) := ℋ⟨ModAExp⟩ (a1, a2)
 abbrev stackCons (v : SMCForm Val) (vs : SMCForm ValStack) := ℋ⟨consValStack⟩ (v, vs)
 abbrev star (c1 : SMCForm CtrlStack) := ℋ⟨PDLStar⟩ (c1)
 abbrev test (v : SMCForm Val) := ℋ⟨PDLTest⟩ v
@@ -151,7 +154,10 @@ infix:100 " ::= " => asgnStmt
 infix:100 " ∪ "   => union
 infixr:102 " + "  => aexpPlus
 infix:100 " <= "  => aexpLeq
-infix:100 " <=Nat "  => natLeq
+infixl:100 " is "  => aexpEq
+infixl:100 " mod " => modAExp
+infix:100 " ==Nat "  => natEq
+infix:100 " <=Nat "  => natEq
 infixr:100 " +Nat " => plusNat
 infixl:100 " -Nat " => minusNat
 infixr:100 " *Nat " => mulNat

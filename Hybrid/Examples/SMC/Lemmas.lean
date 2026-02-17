@@ -135,6 +135,10 @@ def propagateDLeq {a1 a2 : SMCForm AExp}
   (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; leq] ψ)):
   SMCProof _ (φ ⟶ [c(a1 <= a2)] ψ) := sorry
 
+def propagateDEq {a1 a2 : SMCForm AExp}
+  (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; eq] ψ)):
+  SMCProof _ (φ ⟶ [c(a1 is a2)] ψ) := sorry
+
 def propagateNLeq {n1 n2 : ℕ}
     (h : SMCProof _ (φ ⟶ [α] ⟨(n1.ble n2) ⬝ vs, mem⟩)):
   SMCProof _ (φ ⟶ [α] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) := sorry

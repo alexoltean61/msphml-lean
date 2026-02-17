@@ -166,6 +166,10 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | ATrueValEmbed       : Axiom (ATrueValEmbed)
   | AFalseValEmbed      : Axiom (AFalseValEmbed)
   | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2) -- move me
+  | NEq {n1 n2 : ℕ}     : Axiom ((n1 ==Nat n2) ←→ (n1 == n2)) -- move me
+  | DEq : Axiom (c(a1 is a2) ←→ c(a1) ; c(a2) ; eq)
+  | AEq {n1 n2 : SMCForm Nat} :
+        Axiom (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [eq] ⟨(n1 ==Nat n2) ⬝ vs, mem⟩)
   | APlusNat {n₁ n₂ : ℕ}: Axiom ((n₁ +Nat n₂) ←→ (n₁ + n₂))                -- move me
   | AMulNat {n₁ n₂ : ℕ} : Axiom ((n₁ *Nat n₂) ←→ (n₁ * n₂))                -- move me
   | AMinusNat {n₁ n₂ : ℕ} : Axiom ((n₁ -Nat n₂) ←→ (n₁ - n₂))                -- move me
