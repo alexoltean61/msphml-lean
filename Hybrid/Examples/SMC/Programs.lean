@@ -238,13 +238,13 @@ def sumCorrect (vs : SMCForm ValStack)
                     -----------------------
                     have := aleq (FormL.Instantiation.apply vi preBody.inst +Nat 1) vn (FormL.Instantiation.apply vs preBody.inst) (set(set(set(set(mem, ↑↑s, ↑((FormL.Instantiation.apply vi preBody.inst *Nat FormL.Instantiation.apply vi preBody.inst -Nat 1) /Nat  2)), ↑↑s, ↑(((FormL.Instantiation.apply vi preBody.inst *Nat FormL.Instantiation.apply vi preBody.inst -Nat 1) /Nat 2) +Nat FormL.Instantiation.apply vi preBody.inst)), ↑↑i, ↑(FormL.Instantiation.apply vi preBody.inst +Nat 1)), ↑↑n, ↑↑↑↑vn))
                     convert aleq
-                    admit
+                    sorry
         . have eqFV : ⟨↑xB ⬝ vs, xmem⟩.FV = (⟨vs, xmem⟩ ⋀ ℋ@ ↑↑false↑xB).FV := sorry -- TODO!
           rw [eqFV]
           apply mp (existElimPf _)
           . apply genIterated
             unfold xmem ; unfold xB
-            admit
+            sorry
           . -- Oops! vs may not be closed!
-            admit
+            sorry
 -/

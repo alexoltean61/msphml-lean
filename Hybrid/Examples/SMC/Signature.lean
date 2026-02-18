@@ -230,7 +230,7 @@ instance : Encodable (CtNoms Nat) where
     obtain ⟨str, ⟨n, hn⟩⟩ := k
     subst hn
     simp [toString]
-    admit
+    sorry
 
 instance : Encodable (SMC.nominal Nat) where
   encode k  := sorry

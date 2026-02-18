@@ -102,7 +102,7 @@ def instanceToExistPf {φ : Form symbs s} (ψ : φ.Instance) :
           rw [←FormL.FVisFV] at isFree
           -- Now (1), φ[k//x].FV   ==   φ.FV \ { x }, since ⟨sx, x⟩ ∈ FormL.FV φ
           rw [FormL.FVsubst isFree] at ih ; clear isFree
-          admit
+          sorry
           /-
             Also (2), t.apply φ[k//x]   ==   (t.apply φ)[k // x], if we can guarantee that no
             variable in the instantiation occurs twice.
@@ -128,7 +128,7 @@ def instanceToExistPf {φ : Form symbs s} (ψ : φ.Instance) :
           -/
         . simp at isFree
           rw [FormL.not_free_nom_subst isFree] at ih
-          admit
+          sorry
 
 def genIterated : Proof Λ s φ → Proof Λ s (φ.univClosure vars) := sorry
 
@@ -139,7 +139,7 @@ def instanceToUnivPf {φ : Form symbs s} (ψ : φ.Instance) :
     -- (I.e.: if instance maps x to i, generalize i to x in ψ)
     -- (Will obtain a proof of ⊢ φ)
     -- (By genIterated, this becomes ⊢ ∀cl φ)
-    admit
+    sorry
 
 def instanceToUnivPf' {φ : Form symbs s} (ψ : φ.Instance) (hfv : χ.closed) :
   Proof Λ s (ψ.form ⟶ χ) →
@@ -151,6 +151,6 @@ def instanceToUnivPf' {φ : Form symbs s} (ψ : φ.Instance) (hfv : χ.closed) :
     -- Therefore:
     -- ⊢ (φ ⟶ χ).univClosure φ.FV
     -- QED
-    admit
+    sorry
 
 end Proof

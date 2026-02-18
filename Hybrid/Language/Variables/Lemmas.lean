@@ -128,11 +128,11 @@ lemma FVsubst {φ : FormL symbs ss} {s : symbs.signature.S} {x : symbs.svar s} {
         . intro hL
           specialize ih1 hL
           rw [ih1]
-          admit
+          sorry
         . intro hR
           specialize ih2 hR
           rw [ih2]
-          admit
+          sorry
     | neg φ ih =>
         simp [Term.subst, nom_subst, FV] at ih h ⊢
         repeat apply_assumption
@@ -145,11 +145,11 @@ lemma FVsubst {φ : FormL symbs ss} {s : symbs.signature.S} {x : symbs.svar s} {
         . intro hL
           specialize ih1 hL
           rw [ih1]
-          admit
+          sorry
         . intro hR
           specialize ih2 hR
           rw [ih2]
-          admit
+          sorry
 
 @[simp]
 lemma Instance.nom {i : Instantiation symbs} {k : symbs.nominal s} :
@@ -198,36 +198,36 @@ lemma freshVarIsFresh {φ : FormL symbs ss} {s : symbs.signature.S} : (φ.occurs
       simp [-freshVar] at ih ⊢
       intro habs
       apply ih ; clear ih
-      admit
+      sorry
   | appl σ φ ih =>
       simp [-freshVar] at ih ⊢
       intro habs
       apply ih ; clear ih
-      admit
+      sorry
   | or φ ψ ih1 ih2 =>
       simp [-freshVar] at ih1 ih2 ⊢
       apply And.intro
       . intro habs
-        admit
+        sorry
       . intro habs
-        admit
+        sorry
   | neg φ ih =>
       simp [-freshVar] at ih ⊢
       intro habs
       apply ih ; clear ih
-      admit
+      sorry
   | «at» k φ ih =>
       simp [-freshVar] at ih ⊢
       intro habs
       apply ih ; clear ih
-      admit
+      sorry
   | cons φ ψ ih1 ih2 =>
       simp [-freshVar] at ih1 ih2 ⊢
       apply And.intro
       . intro habs
-        admit
+        sorry
       . intro habs
-        admit
+        sorry
   | _ => simp
 
 lemma freshVarListIsFresh {φs : FormLList symbs} {s : symbs.signature.S} :

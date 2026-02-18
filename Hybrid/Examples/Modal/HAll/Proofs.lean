@@ -11,4 +11,4 @@ def contraP : PfHAll ((ψ ⟶ φ) ⟶ (~φ ⟶ ~ψ)) := sorry
 def ax_nom_instance {i : nom} (m n : ℕ) :
   PfHAll (◇^m (i ⋀ φ) ⟶ □^n (i ⟶ φ)) := by
 
-  admit
+  sorry

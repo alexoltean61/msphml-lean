@@ -62,7 +62,7 @@ def propagateSeq {s1 s2 : SMCForm Stmt} (h : SMCProof _ (φ ⟶ [c(s1) ; c(s2)] 
 def assgnVar (s : SMCForm Var) (x : SMCForm Var):
   SMCProof _  (⟨vs, mem⟩ ⟶ [c(x)] ⟨v ⬝ vs, mem⟩) →
   SMCProof _  (⟨vs, mem⟩ ⟶ [c(s ::= x)] ⟨vs, set(mem, s, v)⟩) := by
-    admit
+    sorry
 
 def bubble3Mem (neq1 : x ≠ y) (neq2 : x ≠ z) :
   SMCProof _
@@ -269,7 +269,7 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
           apply Proof.ug (.tail .refl)
           apply Proof.mp (existElimPf _)
           . apply instanceToUnivPf' init
-            . admit
+            . sorry
             . simp only [FormL.Instance.distribAppl, FormL.Instance.distribCons]
               let Binit   := init.inst.apply B
               let vsinit  := init.inst.apply vs
@@ -301,7 +301,7 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
                     let preBodyInst : preBodyFVs.Instance := ⟨body.inst⟩
                     rw [ show (preBody = preBodyInst.form) by simp [preBody, preBodyFVs, preBodyInst] ]
                     apply instanceToExistPf
-          . admit
+          . sorry
       . apply Proof.mp (existElimPf _)
         . apply genIterated
           let fl : SMC.nominal Val := false
@@ -319,7 +319,7 @@ def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
               apply Proof.mp (.k _ _ _ _ C')
               apply Proof.ug C'
               apply insertExistCl
-        . admit
+        . sorry
 
 def iteration' {b : SMCForm BExp} {s : SMCForm Stmt} {k : SMC.nominal st}
     (cl₁ : b.closed) (cl₂: s.closed)
@@ -328,7 +328,7 @@ def iteration' {b : SMCForm BExp} {s : SMCForm Stmt} {k : SMC.nominal st}
     (h2 : (preBody : (⟨vs, mem⟩ ⋀ (ℋ@ k P) ⋀ ℋ@ (true : SMC.CtNoms Val) B).Instance) → Σ (body : (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).Instance),
       SMCProof _ (preBody.form ⟶ [c(s) ; c(b)] body.form)) :
   (SMCProof _ (φ ⟶ [c(while b do: s od)] (⟨vs, mem⟩ ⋀ (ℋ@ k P) ⋀ ℋ@ (false : SMC.nominal Val) B).existClosure (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).FV)) := by
-    admit
+    sorry
 
 -/
 
