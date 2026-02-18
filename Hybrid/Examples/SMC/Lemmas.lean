@@ -50,25 +50,8 @@ def aleq  (n1 n2 : SMCForm Nat)
           (mem : SMCForm Mem): SMCProof _
   (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) :=  .ax ⟨_, .intro .ALeq⟩
 
-def aleqNat {n1 n2 : ℕ}
-          {vs : SMCForm ValStack}
-          {mem : SMCForm Mem}: SMCProof _
-  (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1.ble n2) ⬝ vs, mem⟩) :=  sorry
-
 def dplus : SMCProof _
   (c(a1 + a2) ←→ c(a1) ; c(a2) ; plus) := .ax ⟨_, .intro .DPlus⟩
-
-def aplus {n1 n2 : SMCForm Nat} : SMCProof _
-    (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
-
-def aplus' {n1 n2 : SMCForm Nat} {v : SMCForm Val} : SMCProof _
-    (⟨(n2 ⋀ v) ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
-
-def nleq {n1 n2 : ℕ}: SMCProof _
-  ((n1 <=Nat n2) ←→ n1.ble n2) := .ax ⟨_, .intro .NLeq⟩
-
-def aind : SMCProof _
-  (γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ) := .ax ⟨_, .intro .AInd⟩
 
 end Axioms
 
@@ -83,14 +66,11 @@ def assgnVar (s : SMCForm Var) (x : SMCForm Var):
 
 def bubble3Mem (neq1 : x ≠ y) (neq2 : x ≠ z) :
   SMCProof _
-    (set(set(set(mem, x, vx), y, vy), z, vz) ←→ set(set(set(mem, y, vy), z, vz), x, vx)) := sorry
+    (set(set(set(mem, x, vx), y, vy), z, vz) ←→ set(set(set(mem, y, vy), z, vz), x, vx)) :=
+      Proof.ax ⟨_, Nonempty.intro (.ABubble3Mem neq1 neq2)⟩
 
 def propagateMemL {mem1 mem2 : SMCForm Mem}
   (h1 : SMCProof _ (mem1 ←→ mem2))
-  (h2 : SMCProof _ (⟨vs, mem2⟩ ⟶ [pgm] cfg)) : SMCProof _ (⟨vs, mem1⟩ ⟶ [pgm] cfg) := by sorry
-
-def propagateMemL' {mem1 mem2 : SMCForm Mem}
-  (h1 : SMCProof _ (mem1 ⟶ mem2))
   (h2 : SMCProof _ (⟨vs, mem2⟩ ⟶ [pgm] cfg)) : SMCProof _ (⟨vs, mem1⟩ ⟶ [pgm] cfg) := by sorry
 
 def propagateMemR {mem1 mem2 : SMCForm Mem}
@@ -127,32 +107,31 @@ def propagateACup
     (h2 : SMCProof _ (φ ⟶ [π'] γ)) :
   SMCProof _ (φ ⟶ [π ∪ π'] γ) := sorry
 
-def propagateDWhile {bexp : SMCForm BExp}
-    (h : SMCProof _ (φ ⟶ [c(bexp) ; ((true : CtNoms Val) ? ; c(s) ; c(bexp))* ; (false : CtNoms Val) ?] γ)):
-  SMCProof _ (φ ⟶ [c(while bexp do: s od)] γ) := sorry
-
 def propagateDLeq {a1 a2 : SMCForm AExp}
   (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; leq] ψ)):
   SMCProof _ (φ ⟶ [c(a1 <= a2)] ψ) := sorry
 
-def propagateDEq {a1 a2 : SMCForm AExp}
-  (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; eq] ψ)):
-  SMCProof _ (φ ⟶ [c(a1 is a2)] ψ) := sorry
-
-def propagateNLeq {n1 n2 : ℕ}
-    (h : SMCProof _ (φ ⟶ [α] ⟨(n1.ble n2) ⬝ vs, mem⟩)):
-  SMCProof _ (φ ⟶ [α] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) := sorry
-
-def propagateDPlus
-    (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; plus] ψ)):
-  SMCProof _ (φ ⟶ [c(a1 + a2)] ψ) := sorry
-
-def propagateAInd
-    (h : SMCProof _ (φ ⟶ γ ⋀ [π*](γ ⟶ [π]γ))):
-  SMCProof _ (φ ⟶ [π*] γ) := sorry
-
+def propagateDAdd {n m : ℕ} :
+  SMCProof _ (⟨(n + m) ⬝ vs, mem⟩ ⟶ [α] φ)
+  → SMCProof _ (⟨(n +Nat m) ⬝ vs, mem⟩ ⟶ [α] φ) := sorry
 
 end Propagation
+
+section Lemmas
+
+def atInv :
+  SMCProof _ (ℋ@ i φ ⟶ [α] ℋ@ i φ) := sorry
+
+def kPgm :
+  SMCProof _ (([α] φ ⟶ ψ) ⟶ ([α] φ) ⟶ ([α] ψ)) := sorry
+
+def necessPgm :
+  SMCProof _ φ → SMCProof _ ([α] φ) := sorry
+
+def falseNatLeq {n m : ℕ} (h : n.ble m) :
+  SMCProof s (ℋ@ false ((n <=Nat m):SMCForm Val) ⟶ ℋ⊥) := sorry
+
+end Lemmas
 
 section Rules
 
@@ -227,6 +206,47 @@ def conditional {b : SMCForm BExp}
             apply atestfalse
           . apply export_proof
             apply atesttrue
+
+/-
+
+def aplus {n1 n2 : SMCForm Nat} : SMCProof _
+    (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
+
+def aplus' {n1 n2 : SMCForm Nat} {v : SMCForm Val} : SMCProof _
+    (⟨(n2 ⋀ v) ⬝ n1 ⬝ vs, mem⟩ ⟶ [plus] ⟨(n1 +Nat n2) ⬝ vs, mem⟩) := sorry
+
+def nleq {n1 n2 : ℕ}: SMCProof _
+  ((n1 <=Nat n2) ←→ n1.ble n2) := .ax ⟨_, .intro .NLeq⟩
+
+def aind : SMCProof _
+  (γ ⋀ [π*](γ ⟶ [π]γ) ←→ [π*] γ) := .ax ⟨_, .intro .AInd⟩
+
+
+def aleqNat {n1 n2 : ℕ}
+          {vs : SMCForm ValStack}
+          {mem : SMCForm Mem}: SMCProof _
+  (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1.ble n2) ⬝ vs, mem⟩) :=  sorry
+
+def propagateDWhile {bexp : SMCForm BExp}
+    (h : SMCProof _ (φ ⟶ [c(bexp) ; ((true : CtNoms Val) ? ; c(s) ; c(bexp))* ; (false : CtNoms Val) ?] γ)):
+  SMCProof _ (φ ⟶ [c(while bexp do: s od)] γ) := sorry
+
+def propagateDEq {a1 a2 : SMCForm AExp}
+  (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; eq] ψ)):
+  SMCProof _ (φ ⟶ [c(a1 is a2)] ψ) := sorry
+
+def propagateNLeq {n1 n2 : ℕ}
+    (h : SMCProof _ (φ ⟶ [α] ⟨(n1.ble n2) ⬝ vs, mem⟩)):
+  SMCProof _ (φ ⟶ [α] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) := sorry
+
+def propagateDPlus
+    (h : SMCProof _ (φ ⟶ [c(a1) ; c(a2) ; plus] ψ)):
+  SMCProof _ (φ ⟶ [c(a1 + a2)] ψ) := sorry
+
+def propagateAInd
+    (h : SMCProof _ (φ ⟶ γ ⋀ [π*](γ ⟶ [π]γ))):
+  SMCProof _ (φ ⟶ [π*] γ) := sorry
+
 
 def iteration {b : SMCForm BExp} {s : SMCForm Stmt}
     (cl₁ : b.closed) (cl₂: s.closed)
@@ -309,5 +329,7 @@ def iteration' {b : SMCForm BExp} {s : SMCForm Stmt} {k : SMC.nominal st}
       SMCProof _ (preBody.form ⟶ [c(s) ; c(b)] body.form)) :
   (SMCProof _ (φ ⟶ [c(while b do: s od)] (⟨vs, mem⟩ ⋀ (ℋ@ k P) ⋀ ℋ@ (false : SMC.nominal Val) B).existClosure (⟨B ⬝ vs, mem⟩ ⋀ (ℋ@ k P)).FV)) := by
     admit
+
+-/
 
 end Rules

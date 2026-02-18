@@ -1,9 +1,11 @@
 declare_syntax_cat sort_ident
 declare_syntax_cat nominal_ident
 declare_syntax_cat operator_ident
+declare_syntax_cat prop_ident
 declare_syntax_cat lean_type
 declare_syntax_cat nominal_decl
 declare_syntax_cat operator_decl
+declare_syntax_cat prop_decl
 declare_syntax_cat outward_name
 declare_syntax_cat production
 declare_syntax_cat ssort
@@ -15,12 +17,15 @@ declare_syntax_cat sort_defs
 /-- Hybrid sort identifier -/
 syntax ident : sort_ident
 syntax ident : nominal_ident
+syntax ident : prop_ident
 syntax str   : operator_ident
 /-- Lean builtin type, used as domain to model a given hybrid sort -/
 syntax "builtin" ident : lean_type
 
 /-- Hybrid constant nominal -/
 syntax (lean_type <|> nominal_ident) : nominal_decl
+/-- Propositional variable -/
+syntax "prop" (lean_type <|> prop_ident) : prop_decl
 syntax "[" ident "]" : outward_name
 syntax operator_ident "(" sort_ident,+ ")" optional(outward_name) : operator_decl
 syntax (nominal_decl <|> operator_decl) : production

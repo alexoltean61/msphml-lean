@@ -26,6 +26,11 @@ def export_theorem_proof : Proof Λ s ((φ ⋀ ψ ⟶ χ) ⟶ (φ ⟶ ψ ⟶ χ)
 def export_proof : Proof Λ s (φ ⋀ ψ ⟶ χ) → Proof Λ s (φ ⟶ ψ ⟶ χ) :=
   λ l1 => mp export_theorem_proof l1
 
+def import_proof : Proof Λ s (φ ⟶ ψ ⟶ χ) → Proof Λ s (φ ⋀ ψ ⟶ χ) :=
+  sorry
+
+def exfalso : Proof Λ s (ℋ⊥ ⟶ φ) := sorry
+
 def tertium_non_datur_proof : Proof Λ s (φ ⋁ ∼φ) := sorry
 
 def tertium_non_daturAt_proof (k : symbs.nominal t) (φ : Form symbs t) : Proof Λ s (ℋ@ k φ ⋁ ℋ@ k (∼φ)) := sorry
@@ -42,6 +47,8 @@ def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := (@contrap
 
 -- Added by composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry
+
+def imp_com_proof : Proof Λ s (φ ⟶ ψ ⟶ χ) → Proof Λ s (ψ ⟶ φ ⟶ χ) := sorry
 
 def generalize_nominals_proof {i : symbs.nominal t} {x y : symbs.svarType t} {φ : Form symbs s} (h : φ.occurs y = false) :
   Proof Λ s φ[i // x] → Proof Λ s φ[y // x] := sorry

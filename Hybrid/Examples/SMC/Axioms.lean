@@ -174,6 +174,14 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AMulNat {n₁ n₂ : ℕ} : Axiom ((n₁ *Nat n₂) ←→ (n₁ * n₂))                -- move me
   | AMinusNat {n₁ n₂ : ℕ} : Axiom ((n₁ -Nat n₂) ←→ (n₁ - n₂))                -- move me
   | ADivNat {n₁ n₂ : ℕ} : Axiom ((n₁ /Nat n₂) ←→ (n₁ / n₂))                -- move me
+  | ABubble3Mem (neq1 : x ≠ y) (neq2 : x ≠ z) :
+        Axiom ((set(set(set(mem, x, vx), y, vy), z, vz) ←→ set(set(set(mem, y, vy), z, vz), x, vx)))
+  | AStackLike3 (neq1 : y ≠ x) (neq2 : y ≠ z) (neq3 : x ≠ z):
+        Axiom ((set(set(set(set(mem, x, xn), y, zn), z, zn), y, xn) ←→ set(set(set(mem, x, xn), y, xn), z, zn)))
+  | AStackLike4 (neq1 : x ≠ z) (neq2 : x ≠ y) (neq3 : z ≠ y):
+        Axiom (set(set(set(mem, x, xn), y, yn), z, zn) ←→ set(set(set(set(mem, z, zn'), x, xn), y, yn), z, zn))
+  | AMemStack {n m : ℕ} (neq : x ≠ y) :
+        Axiom (⟨vs, set(set(set(mem, x, (n +Nat m)), y, yn), z, zn)⟩ ⟶ ⟨vs, set(set(mem, x, (n+m)), z, zn)⟩)
 
 -- The set of axioms for SMC is that of formulas φ for which a term
 -- Axiom φ exists, for all s s:

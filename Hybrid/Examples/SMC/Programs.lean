@@ -17,9 +17,17 @@ def swapPgm (x y aux : SMCForm Var) : SMCForm Stmt :=
   x   ::= y;
   y   ::= aux
 
+def incrementMax (x y aux : SMCForm Var): SMCForm Stmt :=
+  if (x <= ++y) then
+    aux ::= x;
+    x   ::= y;
+    y   ::= aux
+  endif
+
 def swapCorrect
   (neq1 : y ≠ x)
   (neq2 : y ≠ aux)
+  (neq3 : x ≠ aux)
   : SMCProof _
     (⟨vs, set(set(mem, y, yn), x, xn)⟩ ⟶ [c(swapPgm x y aux)] ⟨vs, set(set(set(mem, x, yn), aux, xn), y, xn)⟩) := by
   apply propagateSeq
@@ -29,19 +37,54 @@ def swapCorrect
   . apply propagateSeq
     apply composition
     . apply assgnVar
-      . apply propagateMemL (bubble3Mem neq1 neq2) ?transition -- HERE
+      . apply propagateMemL (bubble3Mem neq1 neq2) ?transition
         . exact yn
-        . apply propagateMemR (bubble3Mem neq1 neq2)           -- HERE
+        . apply propagateMemR (bubble3Mem neq1 neq2)
           apply aid
-    . apply @propagateMemL _ _ _ _ (set(set(set(mem, y, yn), x, yn), aux, xn))
-      . -- HERE
-        admit
-      . apply @propagateMemR _ _ _ _ (set(set(set(set(mem, y, yn), x, yn), aux, xn), y, xn))
-        . -- HERE
-          admit
+    . apply propagateMemL
+      . apply Proof.ax ⟨_, Nonempty.intro (.AStackLike3 neq1.symm neq3 neq2)⟩
+      . apply propagateMemR
+        . apply Proof.ax ⟨_, Nonempty.intro (.AStackLike4 neq1.symm neq3 neq2)⟩
         . apply assgnVar
           exact aid
 
+def ifCorr
+  (neq1 : x ≠ y)
+  (neq2 : y ≠ aux)
+  (neq3 : x ≠ aux):
+    SMCProof _
+      (⟨vs, set(set(mem, x, (0:ℕ)), y, (2:ℕ))⟩ ⟶
+        [c(incrementMax x y aux)] ⟨vs, set(set(mem, x, (3:ℕ)), y, (0:ℕ))⟩) := by
+    apply conditional
+    . apply propagateDLeq
+      apply composition
+      . apply propagateMemL (amem1 neq1)
+        . apply aid
+      . apply composition
+        . apply propagateMemL (amem1 neq1.symm)
+          apply app
+        . apply propagateDAdd
+          apply aleq
+    . apply import_proof
+      apply imp_trans_proof
+      . apply propagateMemL (amem1 neq1)
+        apply swapCorrect neq1.symm neq2 neq3
+      . apply imp_com_proof
+        apply imp_trans_proof
+        . apply atInv
+          . exact c(swapPgm x y aux)
+        . apply imp_trans_proof _ kPgm
+          . apply mp kPgm
+            apply necessPgm
+            apply mp (prop1 _ _)
+            apply Proof.ax ⟨_, Nonempty.intro <| .AMemStack neq3⟩
+    . apply import_proof
+      apply imp_com_proof
+      apply imp_trans_proof _ exfalso
+      apply falseNatLeq
+      simp only [Nat.ble_eq, Nat.zero_le]
+
+/-
 def sumPgm (s i n : CtNoms Var)
   : SMCForm Stmt :=
   s ::= 0;
@@ -204,20 +247,4 @@ def sumCorrect (vs : SMCForm ValStack)
             admit
           . -- Oops! vs may not be closed!
             admit
-
-def effectfulIf (i : SMCForm Var): SMCForm Stmt :=
-  if (++i <= 1) then
-    i ::= 2
-  else
-    i ::= 3
-  endif
-
-def ifCorr (i : SMCForm Var):
-    SMCProof _
-      (⟨vs, set(mem, i, (0 : ℕ))⟩ ⟶ [c(effectfulIf i)] ⟨vs, set(mem, i, (2 : ℕ))⟩) := by
-    apply conditional
-    . have test := @app vs mem i 0
-      simp at test
-
-      admit
-    repeat admit
+-/

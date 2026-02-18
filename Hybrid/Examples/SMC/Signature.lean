@@ -131,7 +131,7 @@ abbrev union (c1 c2 : SMCForm CtrlStack) := ℋ⟨PDLUnion⟩ (c1, c2)
 abbrev aexpPlus (a1 a2 : SMCForm AExp) := ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 abbrev aexpLeq (a1 a2 : SMCForm AExp) := ℋ⟨Leq⟩ (a1, a2)
 abbrev aexpEq (a1 a2 : SMCForm AExp) := ℋ⟨Eq⟩ (a1, a2)
-abbrev natEq (a1 a2 : SMCForm Nat) := ℋ⟨EqNat⟩ (a1, a2)
+abbrev natEq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev natLeq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev plusNat (a1 a2 : SMCForm Nat) := ℋ⟨PlusNat⟩ (a1, a2)
 abbrev minusNat (a1 a2 : SMCForm Nat) := ℋ⟨MinusNat⟩ (a1, a2)
@@ -172,6 +172,7 @@ notation:100 "c" "(" φ:100 ")" => Evaluable.ctrlStackEval φ
 notation:100 "⟨" vs ", " mem "⟩" => config vs mem
 notation:100 "asgn" "(" x ")" => asgn x
 notation:100 "if " bexp " then " s1 " else " s2 "endif" => ifthenelse bexp s1 s2
+notation:100 "if " bexp " then " s1 "endif" => ifthenelse bexp s1 skip
 notation:100 "while " bexp " do: " s " od" => whiledo bexp s
 notation:100 "set" "(" mem ", "  x ", "  n ")" => set mem x n
 
