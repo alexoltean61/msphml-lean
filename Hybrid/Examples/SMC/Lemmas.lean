@@ -1,6 +1,5 @@
 import Hybrid.Examples.SMC.Axioms
 import Hybrid.Proof
-import Hybrid.Proof.NewProofs
 
 open SMC
 

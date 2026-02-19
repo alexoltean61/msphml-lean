@@ -3,13 +3,23 @@ import Hybrid.Language
 variable {α : Type u}
 variable [DecidableEq α]
 
+def Eval (symbs : Symbols α) (s : symbs.signature.S) := Form symbs s → Prop
+
+@[grind]
+class Morphism (f : Eval symbs s) where
+  m_or   : f (φ ⋁ ψ) ↔ f φ ∨ f ψ
+  m_neg   : f (∼φ) ↔ ¬(f φ)
+
+@[simp, grind]
+def Tautology (φ : Form symbs s) : Prop :=
+  ∀ (e : Eval symbs s) [Morphism e], e φ
+
+
 inductive Proof {symbs : Symbols α} (Λ : AxiomSet symbs) : (s : symbs.signature.S) → Form symbs s → Type u
   -- Λ:
   | ax    : (φ : Λ s) → Proof Λ s φ
   -- Propositional:
-  | prop1 φ ψ   : Proof Λ s (φ ⟶ (ψ ⟶ φ))
-  | prop2 φ ψ χ : Proof Λ s ((φ ⟶ (ψ ⟶ χ)) ⟶ (φ ⟶ ψ) ⟶ (φ ⟶ χ))
-  | prop3 φ ψ   : Proof Λ s ((∼ψ ⟶ ∼φ) ⟶ (φ ⟶ ψ))
+  | taut {φ} : Tautology φ → Proof Λ s φ
   -- K:
   | k φ ψ χ
       (σ : symbs.signature.«Σ» _ s)

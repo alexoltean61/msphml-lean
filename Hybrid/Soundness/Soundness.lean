@@ -23,22 +23,19 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
       specialize M_in_fr M
       simp [Models.Fr] at M_in_fr
       apply M_in_fr
-  | prop1 =>
+  | taut h =>
+      rename_i s φ
       intro M g w
-      simp only [Sat.implies]
-      intro h1 _
-      assumption
-  | prop2 =>
-      intro M g w
-      simp only [Sat.implies]
-      intros
-      repeat apply_assumption
-  | prop3 =>
-      intro M g w
-      simp only [Sat.implies, Sat.neg]
-      intro
-      contrapose
-      assumption
+      let e : Eval symbs s := λ ψ => ⟨M, g, w⟩ ⊨ ψ
+      have m : Morphism e := by
+        apply Morphism.mk
+        . intro φ ψ
+          simp [e]
+        . intro φ
+          simp [e]
+      specialize @h e m
+      simp [e] at h
+      exact h
   | mp min maj ih1 ih2 =>
       intro M g w
       apply (Sat.implies.mp (ih1 M g w))

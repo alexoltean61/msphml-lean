@@ -1,4 +1,4 @@
-import Hybrid.Proof.Proofs
+import Hybrid.Proof.Tautologies
 
 namespace Proof
 
