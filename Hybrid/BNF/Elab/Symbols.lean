@@ -3,17 +3,19 @@ import Hybrid.BNF.Helpers
 
 open Lean Elab Command Term Meta
 
+abbrev universalStringSet : Set String := Set.univ
+abbrev univStringSetInh : Inhabited universalStringSet :=
+  ⟨"p", by simp⟩
+
 def defineSymb : Syntax → Name → Name → Name → TermElabM Unit := λ stx defName sig st => do
   let ty : Expr := mkAppN (mkConst ``Symbols [0]) #[stringType]
   let sortsTy : Expr := setStringElemType <| mkConst st
-  -- For now, prop and nom are always empty
-  let prop : Expr := .lam `s sortsTy setEmpty .default
+  -- For now, svar and nom are always empty
+  let svar : Expr := .lam `s sortsTy (.const ``universalStringSet []) .default
   let nom  : Expr := .lam `s sortsTy setEmpty .default
-  -- svar is the universal string set (todo: fix)
-  let svar : Expr := .lam `s sortsTy setUniv .default
-  -- IMPORTANT:
-  -- Proofs of countability are for now sorried out!
-  let svarCtbl ← mkSorry (.forallE `s sortsTy (mkApp (mkConst ``Denumerable [0]) (setStringElemType <| mkAppN svar #[.bvar 0])) .default) false
+  -- prop is the universal string set (todo: fix)
+  let prop : Expr := .lam `s sortsTy (.const ``universalStringSet []) .default
+  let propInh : Expr := .lam `s sortsTy (.const ``univStringSetInh []) .default
   addAndCompile
     (.defnDecl
       {
@@ -21,7 +23,7 @@ def defineSymb : Syntax → Name → Name → Name → TermElabM Unit := λ stx 
         levelParams := []
         type   := ty
         value  := mkAppN (mkConst ``Symbols.mk [0])
-                    #[stringType, mkConst sig, prop, nom, svar, svarCtbl]
+                    #[stringType, mkConst sig, prop, nom, svar, propInh]
         hints  := .abbrev
         safety := .safe
       }

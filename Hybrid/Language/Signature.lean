@@ -15,7 +15,7 @@ structure Symbols (α : Type u) where
   nom  : (s : signature.S) → Set α
   svar : (s : signature.S) → Set α
 
-  svarCtbl : Denumerable (svar s)
+  inh  : Inhabited (prop s)
 
 -- Often when dealing with syntax, we treat constant nominals and regular nominals uniformly.
 -- It helps to have their disjoint union defined as a standalone type.
@@ -47,24 +47,6 @@ instance : Coe (symbs.nomType s) (symbs.nominal s) where
   coe := coerceNomTypeNominal
 instance : Coe (symbs.ctNomType s) (symbs.nominal s) where
   coe := coerceCtNomTypeNominal
-
-instance : Denumerable (symbs.svarType s) where
-  encode := symbs.svarCtbl.encode
-  decode := symbs.svarCtbl.decode
-  encodek := symbs.svarCtbl.encodek
-  decode_inv := symbs.svarCtbl.decode_inv
-
-instance : Coe ℕ (symbs.svarType s) where
-  coe := Denumerable.ofNat (symbs.svarType s)
-
-instance : OfNat (symbs.svarType s) (n : Nat) where
-  ofNat := Denumerable.ofNat (symbs.svarType s) n
-
-instance : HAdd Nat (symbs.svarType s) Nat where
-  hAdd := λ n x => n + symbs.svarCtbl.encode x
-
-instance : HAdd (symbs.svarType s) Nat Nat where
-  hAdd := λ x n => symbs.svarCtbl.encode x + n
 
 instance [DecidableEq α] {symbs : Symbols α} {s : symbs.signature.S} : DecidableEq (symbs.signature.N s) := λ i j =>
   if h : (i.1 = j.1) then

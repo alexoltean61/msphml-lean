@@ -1,4 +1,4 @@
-import Hybrid.Language.Variables.FV
+import Hybrid.Language.Form
 import Hybrid.Language.Context
 
 variable {α : Type u}

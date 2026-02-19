@@ -38,7 +38,6 @@ hybrid_def SMC :=
 
 abbrev SMCFormL := FormL SMC
 abbrev SMCForm  := Form SMC
-abbrev SMCClosedForm := ClosedForm SMC
 
 instance : Coe (SMC.nominal s) (SMCForm s) where
   coe := coeNomSymbs
@@ -207,40 +206,5 @@ def unexpandWhile : Unexpander
         `(while ($bexp) do: $s od )
   | _ => throw ()
 
-#check Repr
-#check (ToString ℕ)
-
-def Char.toNat' : Char → ℕ
-  | '0' => 0
-  | '1' => 1
-  | '2' => 2
-  | '3' => 3
-  | '4' => 4
-  | '5' => 5
-  | '6' => 6
-  | '7' => 7
-  | '8' => 8
-  | '9' => 9
-  | _   => 111
-
-instance : Encodable (CtNoms Nat) where
-  encode k  := k.1.foldl (λ acc x => (acc * 10) + (Char.toNat' x)) 0
-  decode  n := some ⟨toString n, by simp⟩
-  encodek k := by
-    obtain ⟨str, ⟨n, hn⟩⟩ := k
-    subst hn
-    simp [toString]
-    admit
-
-instance : Encodable (SMC.nominal Nat) where
-  encode k  := sorry
-  decode  n := sorry
-  encodek k := sorry
-
-def NatSet : Set String := { toString n | n : ℕ }
-instance : Encodable NatSet where
-  encode  := sorry
-  decode  := sorry
-  encodek := sorry
 
 end SMC

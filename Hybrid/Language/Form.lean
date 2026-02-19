@@ -39,7 +39,7 @@ def FormL.applDual {symbs : Symbols α}
 @[match_pattern] def FormL.and (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.neg.or ψ.neg).neg
 @[match_pattern] def FormL.iff (φ ψ : FormL symbs [s]) : FormL symbs [s] := (φ.implies ψ).and (ψ.implies φ)
 @[match_pattern] def FormL.exists (x : symbs.svar t) (φ : FormL symbs [s]) : FormL symbs [s] := ((φ.neg).bind x).neg
-abbrev FormL.default : Form symbs s := FormL.svar 0
+abbrev FormL.default : Form symbs s := FormL.prop symbs.inh.default
 @[match_pattern] def FormL.top : Form symbs s := FormL.default.implies $ FormL.default.implies FormL.default
 @[match_pattern] def FormL.bot : Form symbs s := FormL.top.neg
 @[match_pattern] abbrev FormL.at_sort {symbs : Symbols α} {s : symbs.signature.S} (t : symbs.signature.S) (j : symbs.nominal s) (φ : Form symbs s) := @FormL.at α symbs s t j φ
