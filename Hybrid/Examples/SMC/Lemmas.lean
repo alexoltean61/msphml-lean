@@ -15,13 +15,13 @@ def aint {n : SMCForm Nat} : SMCProof _
   (⟨vs, mem⟩ ⟶ [c(n)] ⟨n ⬝ vs, mem⟩) := .ax ⟨_, .intro .Aint⟩
 
 def aasgn : SMCProof _
-  (⟨n ⬝ vs, mem⟩ ⟶ [asgn(x)] ⟨vs, set(mem, x, n)⟩) := .ax ⟨_, .intro .AAsgn⟩
+  (⟨n ⬝ vs, mem⟩ ⟶ [asgn(x)] ⟨vs, set(mem, x, n)⟩) := Proof.ax ⟨_, Nonempty.intro Axiom.AAsgn⟩
 
 def aid : SMCProof _
-  (⟨vs, set(mem, x, n)⟩ ⟶ [c(x)] ⟨n ⬝ vs, set(mem, x, n)⟩) := .ax ⟨_, .intro .Aid⟩
+  (⟨vs, set(mem, x, n)⟩ ⟶ [c(x)] ⟨n ⬝ vs, set(mem, x, n)⟩) := Proof.ax ⟨_, Nonempty.intro Axiom.Aid⟩
 
 def dasgn : SMCProof _
-      (c(x ::= a) ←→ c(a) ; asgn(x)) := .ax ⟨_, .intro .DAsgn⟩
+      (c(x ::= a) ←→ c(a) ; asgn(x)) := Proof.ax ⟨_, Nonempty.intro Axiom.DAsgn⟩
 
 def amem1 (h : x ≠ y) : SMCProof _
   (set(set(mem, x, n), y, m) ←→ set(set(mem, y, m), x, n)) := .ax ⟨_, .intro <| .AMem1 h⟩
@@ -255,7 +255,7 @@ def composition
     (h2 : SMCProof _ (φ₁ ⟶ [α₂] φ₂)) :
   SMCProof _ (φ₀ ⟶ [α₁ ; α₂] φ₂) := by
   have l1 : SMCProof _ ([α₁] (φ₁ ⟶ [α₂] φ₂)) := ug (.tail .refl) h2
-  -- Some ugly technicalities:
+  -- Some technicalities:
   --   Reasoning with contexts forces us to break the nice [α] φ notation into
   --   primitive applications of ℋ⟨PDLOp⟩ᵈ
   let C : (φ₁ ⟶ [α₂] φ₂).Context (∼α₁, (φ₁ ⟶ [α₂] φ₂)) := .tail .refl
