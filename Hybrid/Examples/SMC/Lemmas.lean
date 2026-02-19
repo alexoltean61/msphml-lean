@@ -66,11 +66,15 @@ end Axioms
 section Propagation
 
 def propagateNLeq {n1 n2 : ℕ} (h : n1.ble n2):
-    SMCProof _ (n1 <=Nat n2) := by
+    SMCProof s (ℋ@ true (n1 <=Nat n2)) := by
+  let tr : SMC.nominal Bool := true
   have l1 : SMCProof Bool ((n1 <=Nat n2) ←→ n1.ble n2) := nleq
-  rw [h] at l1
-  apply mp (mp conj_elimR_proof l1)
-  exact ax ⟨_, .intro .ATrue⟩
+  have l2 : SMCProof s (ℋ@ tr tr) := ref _ _
+  have l3 := @simpAt _ _ _ _ _ _ _ l1 s tr
+  have l4 := mp conj_elimR_proof l3
+  rw [h] at l4
+  have l5 := mp l4 l2
+  exact l5
 
 def propagateSeq {s1 s2 : SMCForm Stmt}
     (h : SMCProof _ (φ ⟶ [c(s1) ; c(s2)] cfg)) :
@@ -230,7 +234,6 @@ def falseNatLeq {n m : ℕ} (h : n.ble m) :
     . apply mp conj_elimL_proof
       exact ax ⟨_, .intro .AFalse⟩
     . apply mp dni'
-      apply genAt
       exact propagateNLeq h
 
 end Lemmas

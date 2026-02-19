@@ -163,7 +163,6 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AFalseBoolVal       : Axiom (AFalseBoolVal)
   | ATrueValEmbed       : Axiom (ATrueValEmbed)
   | AFalseValEmbed      : Axiom (AFalseValEmbed)
-  | ATrue               : Axiom ((true:SMCForm Bool))
   | AFalse {φ : SMCForm Bool}     : Axiom (ℋ@ false φ ←→ ∼ℋ@ true φ)
   | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2) -- move me
   | NEq {n1 n2 : ℕ}     : Axiom ((n1 ==Nat n2) ←→ (n1 == n2)) -- move me

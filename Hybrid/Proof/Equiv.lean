@@ -50,6 +50,11 @@ def impAppl
       rw [←this] at l2
       exact l2
 
+def impAt {k : symbs.nominal s} (imp : Proof Λ s (φ ⟶ ψ)):
+      Proof Λ t (ℋ@ k φ ⟶ ℋ@ k ψ) := by
+    apply mp (kAt _ _ _)
+    apply genAt
+    exact imp
 
 -- From this point in the file
 -- we will make the assumption that we have a proof
@@ -107,4 +112,14 @@ def simpAppl
       rw [this] ; clear this
       ----------
       apply impAppl
+      exact .mp .conj_elimR_proof iffAssumption
+
+def simpAt {k : symbs.nominal s}:
+      Proof Λ t (ℋ@ k φ ←→ ℋ@ k ψ) := by
+    apply Proof.mp (Proof.mp .conj_intro_proof _) _
+    . apply mp (kAt _ _ _)
+      apply genAt
+      exact .mp .conj_elimL_proof iffAssumption
+    . apply mp (kAt _ _ _)
+      apply genAt
       exact .mp .conj_elimR_proof iffAssumption
