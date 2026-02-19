@@ -17,6 +17,8 @@ All proofs living on this branch of the repository are **formalized in their ent
 - [Hybrid/Examples/SMC/Signature.lean](Hybrid/Examples/SMC/Signature.lean): Many-sorted signature for SMC machine
 - [Hybrid/Examples/SMC/Axioms.lean](Hybrid/Examples/SMC/Axioms.lean): Operational semantics of SMC machine
 - [Hybrid/Examples/SMC/Programs.lean](Hybrid/Examples/SMC/Programs.lean): Hoare-logic proofs for SMC machine
+- [Hybrid/Examples/Protocols/Proofs.lean](Hybrid/Examples/Protocols/Proofs.lean): Protocols verification
+- [Hybrid/Examples/BAN/Proofs.lean](Hybrid/Examples/BAN/Proofs.lean): BAN logic
 - [Hybrid/Examples/Modal/Base/S5.lean](Hybrid/Examples/Modal/Base/S5.lean): S5 in the base modal fragment
 
 ### Building
