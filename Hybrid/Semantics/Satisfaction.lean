@@ -64,7 +64,7 @@ def Sat (M : Model symbs) (g : Assignment M) (w : WProd M.Fr.W sorts) : FormL sy
 | .prop p        => w ∈ M.Vₚ p
 | .nom n         => w = M.VNom n
 | .svar x        => w = g x
-| .appl σ arg    => ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ -- TODO: also allow constant modal operators in the FormL definition
+| .appl σ arg    => ∃ w', Sat M g w' arg ∧ ⟨w, w'⟩ ∈ M.Fr.R σ
 | .neg φ         => ¬ Sat M g w φ
 | .or φ ψ        => Sat M g w φ ∨ Sat M g w ψ
 | .at k φ        => let u := M.VNom k;  Sat M g u φ

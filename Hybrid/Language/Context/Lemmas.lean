@@ -5,7 +5,7 @@ namespace FormL
 namespace Context
 
 /--
-  TODO: Refactor me!
+  This file should be refactored in the near future.
 -/
 
 @[refl]

@@ -13,7 +13,7 @@ def defineSymb : Syntax → Name → Name → Name → TermElabM Unit := λ stx 
   -- For now, svar and nom are always empty
   let svar : Expr := .lam `s sortsTy (.const ``universalStringSet []) .default
   let nom  : Expr := .lam `s sortsTy setEmpty .default
-  -- prop is the universal string set (todo: fix)
+  -- prop is the universal string set (todo: make this modularly definable)
   let prop : Expr := .lam `s sortsTy (.const ``universalStringSet []) .default
   let propInh : Expr := .lam `s sortsTy (.const ``univStringSetInh []) .default
   addAndCompile

@@ -7,7 +7,6 @@ inductive FormL (symbs : Symbols α) : List symbs.signature.S → Type u
   | nom  : symbs.nominal s → FormL symbs [s]
   | svar : symbs.svar s → FormL symbs [s]
   | appl : symbs.signature.«Σ» (h :: t) s → FormL symbs (h :: t) → FormL symbs [s]
---  | ct   : symbs.signature.«Σ» [] s → FormL symbs [s]
   | or   : FormL symbs [s] → FormL symbs [s] → FormL symbs [s]
   | neg  : FormL symbs [s] → FormL symbs [s]
   | at   : symbs.nominal t → FormL symbs [t] → FormL symbs [s]

@@ -41,10 +41,9 @@ lemma tautExclMiddle : ∀ {e : Eval symbs s} [Morphism e], ¬e φ ∨ e φ := b
   intro e m
   grind
 
--- Unfortunately all syntactic proofs that depend on excluded middle will be classical
--- TODO: Move to fully syntactic embedding of propositional logic
+-- All syntactic proofs that depend on excluded middle will be classical
+-- In the future, we shall move to fully syntactic embedding of propositional logic
 -- (Lukasiewicz axioms instead of morphisms)
-#print axioms tautExclMiddle
 
 variable [DecidableEq α]
 

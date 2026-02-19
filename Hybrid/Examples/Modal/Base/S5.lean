@@ -34,9 +34,7 @@ open Proof
 def ax_k : S5Pf (□ (φ ⟶ ψ) ⟶ □ φ ⟶ □ ψ) := by
   simp only [Modal.boxIsLL]
   apply Proof.fragment.mk (k _ _ (φ.toForm ⟶ ψ.toForm) ModalBase.poss .refl)
-  -- Below, we prove the base modal fragment is closed under K axiom formatoin
-  -- TODO: Should be less of a headache to prove this!
-  -- IsBase is a boolean after all
+  -- Below, we prove the base modal fragment is closed under K axiom formation
   simp [inFragment, IsBase, FormL.Context.subst]
   apply And.intro
   . apply baseApplDual

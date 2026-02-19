@@ -94,9 +94,6 @@ end Defs
 
 section Lemmas
 
-  /--
-    TODO: This lemma should be unnecessary!
-  -/
   lemma v_variant_nom_fr {M : Model symbs} {j : symbs.nomType s} {w : WProd M.Fr.W ([s])} : (M.v_variant j w).Fr = M.Fr := by
     simp [Model.v_variant]
 
@@ -199,9 +196,6 @@ section Lemmas
         . simp [Model.v_variant, Model.VNom, WProd.v_variant, same_sorts]
           apply ih
 
-  /-
-    TODO: Do you really need to repeat the almost same proof twice?
-  -/
   lemma v_variant_at_agreement' {M : Model symbs} (w : M.Fr.W s) {j : symbs.nominal s} {k : symbs.nominal t} {g : Assignment (M.v_variant j w)} {ws : WProd (M.v_variant j w).Fr.W ([u])} {φ : Form symbs t} (h : (ℋ@[[u]] k φ).occurs j = false)
   (ih : (⟨M, g.v_variant_inverse j w, M.VNom k⟩ ⊨ φ) ↔ ⟨M.v_variant j w, g, WProd.v_variant (M.VNom k) j w⟩ ⊨ φ) :
     (⟨M, g.v_variant_inverse j w, ws.v_variant_inverse j w⟩ ⊨ ℋ@[[u]] k φ) ↔ ⟨M.v_variant j w, g, ws⟩ ⊨ ℋ@[[u]] k φ := by
@@ -293,9 +287,6 @@ section Lemmas
           aesop
       | _ => simp [Model.v_variant, WProd.v_variant, Assignment.v_variant]
 
-  /-
-    TODO: Do you really need to repeat the almost same proof twice?
-  -/
   lemma v_variant_agreement' {M : Model symbs} {φ : FormL symbs sorts} {j : symbs.nominal s} (w : M.Fr.W s) {ws : WProd (M.v_variant j w).Fr.W sorts} {g : Assignment (M.v_variant j w)} (h : φ.occurs j = false) :
     (⟨M, g.v_variant_inverse j w, ws.v_variant_inverse j w⟩ ⊨ φ) ↔ ⟨M.v_variant j w, g, ws⟩ ⊨ φ := by
     cases j <;>

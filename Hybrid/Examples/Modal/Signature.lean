@@ -14,12 +14,6 @@
 import Hybrid.BNF
 
 hybrid_def ModalBase :=
-  sort WFF ::= builtin Nat       -- these are constant nominals unf.
   sort WFF ::= "◇"(WFF) [poss]
-
-  -- TODO: Allow declaring propositional variables in the DSL
-  -- sort WFF ::= prop p | prop q | prop r
-  -- Or maybe:
-  -- sort WFF ::= countable prop
 
 def FormulaSort := ModalBase.WFF
