@@ -142,8 +142,6 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | Aint {vs mem n}     : Axiom (Aint vs mem n)
   | Aid {vs mem x n}    : Axiom (Aid vs mem x n)
   | App {vs mem x n}    : Axiom (App vs mem x n)
-  | DPlus {a1 a2}       : Axiom (DPlus a1 a2)
-  | Aplus {n1 n2 vs mem}: Axiom (Aplus n1 n2 vs mem)
   | DLeq {a1 a2}        : Axiom (DLeq a1 a2)
   | ALeq {n1 n2 vs mem} : Axiom (ALeq n1 n2 vs mem)
   | ASkip {γ}           : Axiom (ASkip γ)
@@ -151,8 +149,6 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AAsgn {n vs mem x}  : Axiom (AAsgn n vs mem x)
   | DIf {bexp s1 s2}    : Axiom (DIf bexp s1 s2)
   | DWhile {bexp s}     : Axiom (DWhile bexp s)
-  | AMem1 {x y n m mem} h : Axiom (AMem1 x y h n m mem)
-  | AMem2 {x n m mem}   : Axiom (AMem2 x n m mem)
   | ACup {π π' γ}       : Axiom (ACup π π' γ)
   | ASeq {π π' γ}       : Axiom (ASeq π π' γ)
   | ATestTrue {v v' vs mem} : Axiom (ATestTrue v v' vs mem)
@@ -164,15 +160,10 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | ATrueValEmbed       : Axiom (ATrueValEmbed)
   | AFalseValEmbed      : Axiom (AFalseValEmbed)
   | AFalse {φ : SMCForm Bool}     : Axiom (ℋ@ false φ ←→ ∼ℋ@ true φ)
-  | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2) -- move me
-  | NEq {n1 n2 : ℕ}     : Axiom ((n1 ==Nat n2) ←→ (n1 == n2)) -- move me
-  | DEq : Axiom (c(a1 is a2) ←→ c(a1) ; c(a2) ; eq)
-  | AEq {n1 n2 : SMCForm Nat} :
-        Axiom (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [eq] ⟨(n1 ==Nat n2) ⬝ vs, mem⟩)
+  | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2)
   | APlusNat {n₁ n₂ : ℕ}: Axiom (((n₁ +Nat n₂):SMCForm Val) ←→ (n₁ + n₂))                -- move me
-  | AMulNat {n₁ n₂ : ℕ} : Axiom ((n₁ *Nat n₂) ←→ (n₁ * n₂))                -- move me
-  | AMinusNat {n₁ n₂ : ℕ} : Axiom ((n₁ -Nat n₂) ←→ (n₁ - n₂))                -- move me
-  | ADivNat {n₁ n₂ : ℕ} : Axiom ((n₁ /Nat n₂) ←→ (n₁ / n₂))                -- move me
+  -- Helper axioms for memory reasoning:
+  | AMem1 {x y n m mem} h : Axiom (AMem1 x y h n m mem)
   | ABubble3Mem (neq1 : x ≠ y) (neq2 : x ≠ z) :
         Axiom ((set(set(set(mem, x, vx), y, vy), z, vz) ←→ set(set(set(mem, y, vy), z, vz), x, vx)))
   | AStackLike3 (neq1 : y ≠ x) (neq2 : y ≠ z) (neq3 : x ≠ z):

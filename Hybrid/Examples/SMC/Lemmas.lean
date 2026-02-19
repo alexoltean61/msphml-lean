@@ -7,12 +7,8 @@ namespace Proof
 
 section Axioms
 
-def aseqL : SMCProof _
-  (([π ; π'] γ) ⟶ [π][π'] γ) := -- FIXME: binding of implications!
-  .mp .conj_elimL_proof (.ax ⟨_, .intro .ASeq⟩)
-
 def aseqR : SMCProof _
-  (([π][π'] γ) ⟶ [π ; π'] γ) := -- FIXME: binding of implications!
+  (([π][π'] γ) ⟶ [π ; π'] γ) :=
   .mp .conj_elimR_proof (.ax ⟨_, .intro .ASeq⟩)
 
 def aint {n : SMCForm Nat} : SMCProof _
@@ -39,9 +35,6 @@ def atestfalse : SMCProof _
 def app {n : SMCForm Nat} : SMCProof _
   (⟨vs, set(mem, x, n)⟩ ⟶ [c(++x)] ⟨(n +Nat 1) ⬝ vs, set(mem, x, (n +Nat 1))⟩) := .ax ⟨_, .intro .App⟩
 
-def dwhile {bexp : SMCForm BExp} : SMCProof _
-  (c(while bexp do: s od) ←→ c(bexp) ; (true ? ; c(s) ; c(bexp))* ; false ?) := .ax ⟨_, .intro .DWhile⟩
-
 def dleq {a1 a2 : SMCForm AExp} : SMCProof _
   (c(a1 <= a2) ←→ c(a1) ; c(a2) ; leq) := .ax ⟨_, .intro .DLeq⟩
 
@@ -49,9 +42,6 @@ def aleq  (n1 n2 : SMCForm Nat)
           (vs : SMCForm ValStack)
           (mem : SMCForm Mem): SMCProof _
   (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [leq] ⟨(n1 <=Nat n2) ⬝ vs, mem⟩) :=  .ax ⟨_, .intro .ALeq⟩
-
-def dplus : SMCProof _
-  (c(a1 + a2) ←→ c(a1) ; c(a2) ; plus) := .ax ⟨_, .intro .DPlus⟩
 
 def bubble3Mem (neq1 : x ≠ y) (neq2 : x ≠ z) :
   SMCProof _

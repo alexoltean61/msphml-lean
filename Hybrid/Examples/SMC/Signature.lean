@@ -4,14 +4,11 @@ import Hybrid.Language
 hybrid_def SMC :=
     sort Nat  ::= builtin Nat
                 | "_+_"(Nat, Nat) [PlusNat]
-                | "_-_"(Nat, Nat) [MinusNat]
-                | "_*_"(Nat, Nat) [MulNat]
-                | "_/_"(Nat, Nat) [DivNat]
     sort Bool ::= builtin Bool | "_<=_"(Nat, Nat) [LeqNat] | "_==_"(Nat, Nat) [EqNat]
 
     sort Var  ::= builtin String
     sort AExp ::= subsort Nat | subsort Var
-    sort AExp ::= "_+_"(AExp, AExp) | "++"(Var) | "_%_"(AExp, AExp) [ModAExp]
+    sort AExp ::= "_+_"(AExp, AExp) | "++"(Var)
     sort BExp ::= "_<=_"(AExp, AExp)                [Leq]
     sort BExp ::= "_=_"(AExp, AExp)                 [Eq]
     sort Stmt ::= skip
@@ -20,7 +17,7 @@ hybrid_def SMC :=
                 | "while_do_"(BExp, Stmt)           [WhileStmt]
                 | "_;_"(Stmt, Stmt)                 [SeqStmt]
 
-    sort Val ::= subsort Nat | subsort Bool | t | f  -- temporary
+    sort Val ::= subsort Nat | subsort Bool | t | f
     sort ValStack ::= nil
                 | "_·_"(Val, ValStack)        [consValStack]
     sort Mem ::= empty | "set"(Mem, Var, Val) [memset]
@@ -57,15 +54,6 @@ instance : Coe Bool (SMC.CtNoms SMC.Bool) where
   coe := Bool.toCtNom
 instance : Coe Bool (SMC.CtNoms SMC.Val) where
   coe := Bool.toValCtNom
-
-/-
-instance : Coe ℕ (SMCForm SMC.Nat) where
-  coe := λ n => ℋNom (.ctNom ⟨toString n, ⟨n, rfl⟩⟩)
-instance : Coe Bool (SMCForm SMC.Bool) where
-  coe := λ b => ℋNom (.ctNom  b)
-instance : Coe Bool (SMCForm SMC.Val) where
-  coe := λ b => ℋNom (.ctNom  b)
--/
 
 namespace SMC
 
@@ -129,14 +117,9 @@ abbrev asgnStmt (x : SMCForm Var) (a : SMCForm AExp) := ℋ⟨SMC.«_:=_Var_AExp
 abbrev union (c1 c2 : SMCForm CtrlStack) := ℋ⟨PDLUnion⟩ (c1, c2)
 abbrev aexpPlus (a1 a2 : SMCForm AExp) := ℋ⟨«_+_AExp_AExp_AExp»⟩ (a1, a2)
 abbrev aexpLeq (a1 a2 : SMCForm AExp) := ℋ⟨Leq⟩ (a1, a2)
-abbrev aexpEq (a1 a2 : SMCForm AExp) := ℋ⟨Eq⟩ (a1, a2)
 abbrev natEq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev natLeq (a1 a2 : SMCForm Nat) := ℋ⟨LeqNat⟩ (a1, a2)
 abbrev plusNat (a1 a2 : SMCForm Nat) := ℋ⟨PlusNat⟩ (a1, a2)
-abbrev minusNat (a1 a2 : SMCForm Nat) := ℋ⟨MinusNat⟩ (a1, a2)
-abbrev mulNat (a1 a2 : SMCForm Nat) := ℋ⟨MulNat⟩ (a1, a2)
-abbrev divNat (a1 a2 : SMCForm Nat) := ℋ⟨DivNat⟩ (a1, a2)
-abbrev modAExp (a1 a2 : SMCForm AExp) := ℋ⟨ModAExp⟩ (a1, a2)
 abbrev stackCons (v : SMCForm Val) (vs : SMCForm ValStack) := ℋ⟨consValStack⟩ (v, vs)
 abbrev star (c1 : SMCForm CtrlStack) := ℋ⟨PDLStar⟩ (c1)
 abbrev test (v : SMCForm Val) := ℋ⟨PDLTest⟩ v
@@ -153,14 +136,8 @@ infix:100 " ::= " => asgnStmt
 infix:100 " ∪ "   => union
 infixr:102 " + "  => aexpPlus
 infix:100 " <= "  => aexpLeq
-infixl:100 " is "  => aexpEq
-infixl:100 " mod " => modAExp
-infix:100 " ==Nat "  => natEq
 infix:100 " <=Nat "  => natEq
 infixr:100 " +Nat " => plusNat
-infixl:100 " -Nat " => minusNat
-infixr:100 " *Nat " => mulNat
-infixl:100 " /Nat " => divNat
 infixr:100 " ⬝ "   => stackCons
 postfix:100 "*"   => star
 postfix:100 "?"   => test
