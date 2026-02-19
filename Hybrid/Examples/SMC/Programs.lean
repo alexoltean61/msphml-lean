@@ -32,11 +32,11 @@ def swapCorrect
     (⟨vs, set(set(mem, y, yn), x, xn)⟩ ⟶ [c(swapPgm x y aux)] ⟨vs, set(set(set(mem, x, yn), aux, xn), y, xn)⟩) := by
   apply propagateSeq
   apply composition
-  . apply assgnVar
+  . apply assignment
     exact aid
   . apply propagateSeq
     apply composition
-    . apply assgnVar
+    . apply assignment
       . apply propagateMemL (bubble3Mem neq1 neq2) ?transition
         . exact yn
         . apply propagateMemR (bubble3Mem neq1 neq2)
@@ -45,7 +45,7 @@ def swapCorrect
       . apply Proof.ax ⟨_, Nonempty.intro (.AStackLike3 neq1.symm neq3 neq2)⟩
       . apply propagateMemR
         . apply Proof.ax ⟨_, Nonempty.intro (.AStackLike4 neq1.symm neq3 neq2)⟩
-        . apply assgnVar
+        . apply assignment
           exact aid
 
 def ifCorr

@@ -179,7 +179,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
         apply And.intro _ rWs
         rw [Sat.context]
         intro s' φ C
-        have ⟨ψ, C', eq, iso⟩ := C.to_negAll
+        have ⟨ψ, C', eq, iso, _⟩ := C.to_negAll
         subst eq
         specialize h s' (∼φ) C'
         simp only [WProd.select_iso iso]

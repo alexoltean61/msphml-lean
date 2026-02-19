@@ -74,9 +74,7 @@ def AAsgn (n : SMCForm Val)
 --   c(if bexp then s1 else s2) ↔ c(bexp) ; ( (true? ; c(s1)) ∪ (false? ; c(s2)) )
 def DIf (bexp : SMCForm BExp)
           (s1 s2 : SMCForm Stmt) : SMCForm CtrlStack :=
-      c(if bexp then s1 else s2 endif) ←→ c(bexp) ; ((true : CtNoms Val) ? ; c(s1)) ∪ ((false : CtNoms Val) ? ; c(s2))
-
-#print DIf
+      c(bexp) ; ((true : CtNoms Val) ? ; c(s1)) ∪ ((false : CtNoms Val) ? ; c(s2)) ←→ c(if bexp then s1 else s2 endif)
 
 -- Memory consistency axioms:
 
@@ -94,7 +92,7 @@ def AMem2 (x : SMCForm Var)
 -- PDL-inspired axioms:
 def ACup (π π' : SMCForm CtrlStack)
          (γ : SMCForm Config) : SMCForm Config :=
-        [π ∪ π'] γ ←→ [π] γ ⋀ [π'] γ
+        (([π] γ) ⋀ [π'] γ) ←→ [π ∪ π'] γ
 
 def ASeq (π π' : SMCForm CtrlStack)
          (γ : SMCForm Config) : SMCForm Config :=
@@ -165,12 +163,14 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
   | AFalseBoolVal       : Axiom (AFalseBoolVal)
   | ATrueValEmbed       : Axiom (ATrueValEmbed)
   | AFalseValEmbed      : Axiom (AFalseValEmbed)
+  | ATrue               : Axiom ((true:SMCForm Bool))
+  | AFalse {φ : SMCForm Bool}     : Axiom (ℋ@ false φ ←→ ∼ℋ@ true φ)
   | NLeq {n1 n2 : ℕ}    : Axiom ((n1 <=Nat n2) ←→ n1.ble n2) -- move me
   | NEq {n1 n2 : ℕ}     : Axiom ((n1 ==Nat n2) ←→ (n1 == n2)) -- move me
   | DEq : Axiom (c(a1 is a2) ←→ c(a1) ; c(a2) ; eq)
   | AEq {n1 n2 : SMCForm Nat} :
         Axiom (⟨n2 ⬝ n1 ⬝ vs, mem⟩ ⟶ [eq] ⟨(n1 ==Nat n2) ⬝ vs, mem⟩)
-  | APlusNat {n₁ n₂ : ℕ}: Axiom ((n₁ +Nat n₂) ←→ (n₁ + n₂))                -- move me
+  | APlusNat {n₁ n₂ : ℕ}: Axiom (((n₁ +Nat n₂):SMCForm Val) ←→ (n₁ + n₂))                -- move me
   | AMulNat {n₁ n₂ : ℕ} : Axiom ((n₁ *Nat n₂) ←→ (n₁ * n₂))                -- move me
   | AMinusNat {n₁ n₂ : ℕ} : Axiom ((n₁ -Nat n₂) ←→ (n₁ - n₂))                -- move me
   | ADivNat {n₁ n₂ : ℕ} : Axiom ((n₁ /Nat n₂) ←→ (n₁ / n₂))                -- move me

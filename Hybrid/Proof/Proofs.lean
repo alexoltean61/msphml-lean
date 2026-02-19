@@ -15,6 +15,9 @@ def mp_frag (maj : fragment P Λ (φ ⟶ ψ)) (min : fragment P Λ φ) (h : P _ 
 def dni_frag (h : P _ (φ ⟶ ∼∼ φ)) : fragment P Λ (φ ⟶ ∼∼ φ) := sorry
 def contrap_frag : fragment P Λ ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := sorry
 
+def dni : (Proof Λ s (φ ⟶ ∼∼φ)) := sorry
+def dni' : (Proof Λ s (φ ⟶ ∼φ ⟶ ℋ⊥)) := sorry
+
 def top_proof : Proof Λ s (ℋ⊤) := prop1 _ _
 
 def id_proof : Proof Λ s (φ ⟶ φ) := sorry
@@ -33,9 +36,13 @@ def exfalso : Proof Λ s (ℋ⊥ ⟶ φ) := sorry
 
 def tertium_non_datur_proof : Proof Λ s (φ ⋁ ∼φ) := sorry
 
-def tertium_non_daturAt_proof (k : symbs.nominal t) (φ : Form symbs t) : Proof Λ s (ℋ@ k φ ⋁ ℋ@ k (∼φ)) := sorry
-
 def conj_intro_proof : Proof Λ s (φ ⟶ ψ ⟶ (φ ⋀ ψ)) := sorry
+
+def conj_intro_hyp_proof : Proof Λ s ((φ ⟶ ψ) ⟶ (φ ⟶ χ) ⟶ (φ ⟶ ψ ⋀ χ)) := sorry
+
+def conj_intro_hyp (h1 : Proof Λ s (φ ⟶ ψ))
+            (h2 : Proof Λ s (φ ⟶ χ)):
+      Proof Λ s (φ ⟶ ψ ⋀ χ) := mp (mp conj_intro_hyp_proof h1) h2
 
 def conj_elimL_proof : Proof Λ s ((φ ⋀ ψ) ⟶ φ) := sorry
 
@@ -43,7 +50,14 @@ def conj_elimR_proof : Proof Λ s ((φ ⋀ ψ) ⟶ ψ) := sorry
 
 def disj_elim_proof : Proof Λ s ((φ ⋁ ψ) ⟶ (φ ⟶ χ) ⟶ (ψ ⟶ χ) ⟶ χ) := sorry
 
+def disj_elim_not : Proof Λ s (φ ⋁ ψ ⟶ ∼ φ ⟶ ψ) := sorry
+
 def contraposition : Proof Λ s ((ψ ⟶ φ) ⟶ (∼φ ⟶ ∼ψ)) := (@contrap_frag _ _ _ _ .univ _ _ _).1
+
+def contraposition' : Proof Λ s ((ψ ⟶ ∼φ) ⟶ (φ ⟶ ∼ψ)) := sorry
+def contraposition'' : Proof Λ s ((∼ψ ⟶ φ) ⟶ (∼φ ⟶ ψ)) := sorry
+
+def impAsDisj : Proof Λ s ((∼φ ⟶ ψ) ⟶ (φ ⋁ ψ)) := sorry
 
 -- Added by composition
 def imp_trans_proof : Proof Λ s (φ ⟶ ψ) → Proof Λ s (ψ ⟶ χ) → Proof Λ s (φ ⟶ χ) := sorry

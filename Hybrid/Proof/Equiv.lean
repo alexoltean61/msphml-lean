@@ -33,6 +33,24 @@ def impDualAppl
     rw [←FormL.Context.subst_in_iso_helper isIso]
     exact l2
 
+def impAppl
+               (C : φ.Context args)
+               (imp : Proof Λ s (φ ⟶ ψ))
+            : Proof Λ _ ((ℋ⟨σ⟩ args) ⟶ (ℋ⟨σ⟩ C[ψ])) := by
+    apply imp_trans_proof
+    . apply mp conj_elimL_proof dual
+    . apply imp_trans_proof _ (mp conj_elimR_proof dual)
+      apply mp contraposition
+      let ⟨χ, C', eq, iso', substNegAll⟩ := C.to_negAll
+      rw [substNegAll]
+      subst eq
+      have l1 := mp contraposition imp
+      have l2 := @impDualAppl _ _ _ _ _ _ _ _ _ _ _ σ ((∼ψ).subst_to_ctx C') l1
+      have : args.negAll = ((∼ψ).subst_to_ctx C')[∼φ] := FormL.Context.subst_back _
+      rw [←this] at l2
+      exact l2
+
+
 -- From this point in the file
 -- we will make the assumption that we have a proof
 -- of φ ←→ ψ:
@@ -70,4 +88,23 @@ def simpDualAppl
       rw [this] ; clear this
       ----------
       apply impDualAppl
+      exact .mp .conj_elimR_proof iffAssumption
+
+def simpAppl
+               (C : φ.Context args)
+            : Proof Λ _ ((ℋ⟨σ⟩ args) ←→ (ℋ⟨σ⟩ C[ψ])) := by
+    apply Proof.mp (Proof.mp .conj_intro_proof _) _
+    . apply impAppl
+      exact .mp .conj_elimL_proof iffAssumption
+    . -- This reduces to the other case by taking
+      -- C[ψ] as primitive (χ), and writing args in terms
+      -- of χ:
+      ----------
+      let χ := C[ψ] ; have : C[ψ] = χ := rfl
+      rw [this] ; clear this
+      let C' : ψ.Context χ := ψ.subst_to_ctx C
+      have : args = C'[φ] := C.subst_back
+      rw [this] ; clear this
+      ----------
+      apply impAppl
       exact .mp .conj_elimR_proof iffAssumption

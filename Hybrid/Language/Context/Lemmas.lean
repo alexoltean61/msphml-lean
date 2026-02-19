@@ -105,7 +105,7 @@ lemma subst_in_iso_helper {φ ψ χ γ : Form symbs s} {τ : FormL symbs sorts} 
       | _ => cases C₂ with
              | _ => rfl
 
-lemma subst_in_iso {φ χ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : χ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[φ] = τ := by
+lemma subst_in_iso {φ χ δ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} {C₂ : δ.Context C₁[χ]} (h : C₂.iso C₁) : C₂[φ] = τ := by
   rw [subst_in_iso_helper h, subst_as_id]
 
 lemma if_iso_sorts {φ : Form symbs s} {ψ : Form symbs s'} {τ : FormL symbs sorts} (C₁ : φ.Context τ) (C₂ : ψ.Context τ) (h : C₁.iso C₂) : s = s' := by
@@ -308,7 +308,7 @@ def from_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context 
       apply PSigma.mk .refl
       simp [τcopy, iso]
 
-def to_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} : Σ' (ψ : Form symbs s) (C₂ : ψ.Context τ.negAll), ∼φ = ψ ∧ C₁.iso C₂ := by
+def to_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ} : Σ' (ψ : Form symbs s) (C₂ : ψ.Context τ.negAll), ∼φ = ψ ∧ C₁.iso C₂ ∧ (∀ {ψ : Form symbs s}, C₁[ψ].negAll = C₂[∼ψ]) := by
   let τcopy := τ
   cases τ with
   | cons χ χs =>
@@ -316,19 +316,24 @@ def to_negAll {φ : Form symbs s} {τ : FormL symbs sorts} {C₁ : φ.Context τ
       | head =>
           apply PSigma.mk (∼φ)
           simp [FormL.negAll]
-          apply PSigma.mk .head _
+          apply PSigma.mk .head
           simp [iso]
+          simp [subst, FormL.negAll]
       | tail C' =>
           -- For some reason Lean failed to auto-generate
           -- the induction hypothesis, so:
-          have ⟨ψ, C'', eq, iso⟩ := C'.to_negAll
-          exact ⟨ψ, .tail C'', eq, iso⟩
+          have ⟨ψ, C'', eq, iso, negAll⟩ := C'.to_negAll
+          refine ⟨ψ, .tail C'', eq, iso, ?pf⟩
+          intro χ
+          simp [subst, FormL.negAll]
+          apply negAll
   | _ =>
     cases C₁
     . apply PSigma.mk (∼τcopy)
       apply PSigma.mk .refl
       simp [τcopy, iso]
-
+      intro χ
+      cases χ <;> simp [subst, FormL.negAll]
 end Context
 
 lemma subst_to_ctx_iso {χ : Form sig s}
