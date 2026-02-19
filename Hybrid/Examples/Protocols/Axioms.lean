@@ -14,6 +14,10 @@ inductive Axiom : {s : Sorts} → ProtocolsForm s → Type
   : Axiom $ ⟪ (a ◁ m) ⊔ γ ⟫ ⟶ [send a, b(⦃ m ⦄k)] ⟪ (a ◁ m) ⊔ γ  ⟫
 | H₂ {a : ProtocolsForm Agent} {m : ProtocolsForm Msg} {γ : ProtocolsForm StNom}
   : Axiom $ ⟪ γ ⟫ ⟶ [recv a(m)] ⟪ (a ◁ m) ⊔ γ ⟫
+| ST₁ {a : ProtocolsForm Agent} {m : ProtocolsForm Msg} {γ₁ γ₂ : ProtocolsForm StNom}
+  : Axiom $ ⟪ γ₁ ⊔ (a ◁ m) ⊔ γ₂ ⟫ ⟶ ⟪ (a ◁ m) ⊔ γ₁ ⊔ γ₂ ⟫
+| ST₃ {a : ProtocolsForm Agent} {m : ProtocolsForm Msg} {γ : ProtocolsForm StNom}
+  : Axiom $ ⟪ (a ◁ m) ⊔ γ ⟫ ⟶ 𝕏 a, m
 | OSS₁ {a b : ProtocolsForm Agent} {m : ProtocolsForm Msg} { γ : ProtocolsForm StNom }
   : Axiom $ ⟪ (a ◁ m) ⊔ γ ⟫ ⟶ [send a, b(⦃ m ⦄pk(b))] 𝔹 a, (𝕏 b, m)
 | OSS₂ {a b : ProtocolsForm Agent} {m : ProtocolsForm Msg} {γ : ProtocolsForm StNom}

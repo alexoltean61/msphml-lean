@@ -93,4 +93,4 @@ notation " ⟪ " γ " ⟫ " => configOp γ
 notation "[" α "]" p => actionOp α p
 notation "𝕏 " a ", " p => explicitKnowledgeOp a p
 
-notation "𝕂 " a ", " p => 𝔹 a, p ⋀ p
+notation "𝕂 " a ", " p => (𝔹 a, p) ⋀ p
