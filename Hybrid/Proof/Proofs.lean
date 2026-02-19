@@ -1,4 +1,4 @@
-import Hybrid.Proof.Equiv
+import Hybrid.Proof.ImpPropagation
 
 namespace Proof
 
