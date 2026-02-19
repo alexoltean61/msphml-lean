@@ -6,29 +6,29 @@ variable {α : Type u}
 variable {symbs : Symbols α}
 variable {Λ : AxiomSet symbs}
 
-@[simp, grind]
+@[simp, grind .]
 lemma tautOr {φ : Form symbs s} : ∀ e [Morphism e], e (φ ⋁ ψ) ↔ e φ ∨ e ψ := by
   intro _ m
   simp [m.m_or]
-@[simp, grind]
+@[simp, grind .]
 lemma tautNeg {φ : Form symbs s} : ∀ e [Morphism e], e (∼φ) ↔ ¬e φ := by
   intro _ m
   simp [m.m_neg]
-@[simp, grind]
+@[simp, grind .]
 lemma tautImp {φ : Form symbs s} : ∀ e [Morphism e], e (φ ⟶ ψ) ↔ ¬e φ ∨ e ψ := by
   intro e m
   unfold FormL.implies
   grind
-@[simp, grind]
+@[simp, grind .]
 lemma tautAnd {φ : Form symbs s} : ∀ e [Morphism e], e (φ ⋀ ψ) ↔ e φ ∧ e ψ := by
   intro _ m
   unfold FormL.and
   grind
-@[simp]
+@[simp, grind .]
 lemma tautTop  : ∀ {e : Eval symbs s} [Morphism e], e (@FormL.top _ _ s) := by
   unfold FormL.top
   grind
-@[simp]
+@[simp, grind .]
 lemma tautBot  : ∀ {e : Eval symbs s} [Morphism e], e (@FormL.bot _ _ s) ↔ ⊥ := by
   unfold FormL.bot
   conv =>

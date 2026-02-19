@@ -79,6 +79,8 @@ variable {symbs : Symbols α}
 variable {s : symbs.signature.S}
 
 section Defs
+  set_option linter.unusedVariables false
+
   -- Definitions below will be paramtrized over a particular *class* of models,
   -- so not necessarily over the class of all models.
 
@@ -401,14 +403,12 @@ section Lemmas
     . rfl
 
   lemma Entails.if_general {Γ : PremiseSet symbs s} : (Γ ⊨ φ) → (Γ ⊨(C) φ) := by
-    intro h
-    intro M
+    intro h M
     have := h ⟨M, Models.all_maximal C M.2⟩
     exact this
 
   lemma Entails.if_model_frame {Λ : AxiomSet symbs} : Γ ⊨Mod(Λ) φ → Γ ⊨Fr(Λ) φ := by
-    intro h
-    intro M
+    intro h M
     have := h ⟨M, Models.fr_in_ax M.2⟩
     exact this
 
@@ -447,8 +447,7 @@ section Lemmas
 
 
   lemma Entails.monotonicity {Γ Δ : PremiseSet symbs s} (h : Γ ⊆ Δ) : (Γ ⊨(C) φ) → (Δ ⊨(C) φ) := by
-    intro h1 M
-    intro g w h2
+    intro h1 M g w h2
     apply h1
     intro φ
     exact h2 ⟨φ.1, h φ.2⟩

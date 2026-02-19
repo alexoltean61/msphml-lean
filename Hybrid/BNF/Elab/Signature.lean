@@ -6,7 +6,6 @@ open Lean Elab Command Term Meta
 def defineSig : Name → Name → Name → Name → TermElabM Name := λ nmspace st op nom => do
   let defName : Name := .str nmspace "Sig" -- e.g., def SMC.Sig := ...
   let ty : Expr := mkAppN (mkConst ``Signature [0]) #[stringType]
-  let sortsTy : Expr := setStringElemType <| mkConst st
   addAndCompile
     (.defnDecl
       {

@@ -66,7 +66,7 @@ def DIf (bexp : SMCForm BExp)
 -- Memory consistency axioms:
 
 def AMem1 (x y : SMCForm Var)
-          (h : x ≠ y)
+          (_ : x ≠ y)
           (n m : SMCForm Val)
           (mem : SMCForm Mem) : SMCForm Mem :=
         set(set(mem, x, n), y, m) ←→ set(set(mem, y, m), x, n)
@@ -159,7 +159,7 @@ inductive Axiom : {s : Sorts} → SMCForm s → Type
 
 -- The set of axioms for SMC is that of formulas φ for which a term
 -- Axiom φ exists, for all s s:
-@[simp] def SMCΛ : AxiomSet SMC := λ s => { φ | Nonempty (Axiom φ) }
+@[simp] def SMCΛ : AxiomSet SMC := λ _ => { φ | Nonempty (Axiom φ) }
 
 -- The Hilbert proof system for SMC:
 def SMCProof := Proof SMCΛ

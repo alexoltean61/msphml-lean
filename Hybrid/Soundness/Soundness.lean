@@ -99,8 +99,7 @@ theorem Soundness {Λ : AxiomSet symbs} : ⊢(Λ, s) φ → ⊨Fr(Λ) φ := by
   | k φ ψ χ σ ctx =>
       intro M g w
       simp only [Sat.implies, Sat.applDual]
-      intro h1 h2
-      intro ws wRws
+      intro h1 h2 ws wRws
       specialize h1 ws wRws
       specialize h2 ws wRws
       -- How the proof works from here:
