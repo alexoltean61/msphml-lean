@@ -3,10 +3,21 @@ import Hybrid.Examples.Modal.Base.S5
 namespace S5
 open Proof
 
-/- Some helper propositional proofs. TODO: Prove me! -/
-def dni : S5Pf (φ ⟶ ~~φ) := dni_frag (by simp; apply modalIsBase)
-def impTrans : S5Pf ((φ ⟶ ψ) ⟶ (ψ ⟶ χ) ⟶ (φ ⟶ χ)) := sorry
-def contraP : S5Pf ((ψ ⟶ φ) ⟶ (~φ ⟶ ~ψ)) := sorry
+/- Some helper propositional proofs, lifted from the general logic -/
+def dni : S5Pf (φ ⟶ ~~φ) := by
+  apply Proof.fragment.mk Proof.dni
+  simp [Proof.dni, inFragment]
+  apply modalIsBase
+def impTrans : S5Pf ((φ ⟶ ψ) ⟶ (ψ ⟶ χ) ⟶ (φ ⟶ χ)) := by
+  apply Proof.fragment.mk Proof.imp_trans_theorem_proof
+  simp [Proof.imp_trans_theorem_proof, inFragment]
+  apply And.intro (And.intro _ _) (And.intro (And.intro _ _) (And.intro _ _))
+  repeat { apply modalIsBase }
+def contraP : S5Pf ((ψ ⟶ φ) ⟶ (~φ ⟶ ~ψ)) := by
+  apply Proof.fragment.mk Proof.contraposition
+  simp [Proof.contraposition, inFragment]
+  apply And.intro (And.intro _ _) (And.intro _ _)
+  repeat { apply modalIsBase }
 
 
 /-

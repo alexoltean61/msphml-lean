@@ -58,7 +58,10 @@ def ax_a5 : S5Pf (◇ φ ⟶ □◇φ) := by
   simp [inFragment, Modal.imp]
   exact And.intro modalIsBase modalIsBase
 
-def modusPonens (maj : S5Pf (φ ⟶ ψ)) (min : S5Pf φ) : S5Pf ψ := mp_frag maj min modalIsBase
+def modusPonens (maj : S5Pf (φ ⟶ ψ)) (min : S5Pf φ) : S5Pf ψ := by
+  apply fragment.mk (mp maj.1 min.1)
+  simp [inFragment, maj.2, min.2]
+  apply modalIsBase
 
 def necessitation (pf : S5Pf φ) : S5Pf (□ φ) := by
   let l1 : Proof _ _ (φ.boxLL).1 := ug .refl pf.pf
