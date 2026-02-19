@@ -4,7 +4,7 @@ This repository contains a formalization of [[1]](https://arxiv.org/abs/1905.050
 
 It implements a system of modal logic strong enough to define arbitrary algebraic structures and reason about their properties. This system is *polyadic* (allows modal operators with arbitrary arities), *many-sorted* (it partitions symbols based on their sorts), and *hybrid* (it allows referencing states by means of so-called *state symbols*).
 
-In particular, our work is focused on applications to the operational semantics of programming languages. We provide a [custom DSL](Hybrid/BNF/Syntax.lean) which the user can use to define their own programming language syntax & semantics (or any other kind of algebraic structure). Feel free to check out our [examples](Hybrid/Examples).
+In particular, our work is focused on applications to the operational semantics of programming languages. We provide a [custom DSL](Hybrid/BNF/Syntax.lean) which the user can use to define their own programming language syntax & semantics (or any other kind of algebraic structure). Feel free to check out our [examples](Hybrid/Examples/Examples.lean).
 
 All proofs living on this branch of the repository are **formalized in their entirety** and **completely sorry-free**.
 
