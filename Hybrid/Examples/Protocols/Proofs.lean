@@ -43,7 +43,7 @@ def dl_th_1' {α β : ProtocolsForm Act} {p q r : ProtocolsForm Prot}
   let h₉  : ProtocolsProof _ $ [α](([β]q) ⟶ (([β]r) ⟶ [β](q ⋀ r))) := Necα h₈
   let h₁₀ : ProtocolsProof _ $ ([α](([β]q) ⟶ (([β]r) ⟶ [β](q ⋀ r)))) ⟶ (([α]([β]q)) ⟶ ([α]((([β]r) ⟶ [β](q ⋀ r))))) := Kα
   let h₁₁ : ProtocolsProof _ $ ([α][β]q) ⟶ ([α]((([β]r) ⟶ [β](q ⋀ r)))) := Proof.mp h₁₀ h₉
-  let h₁₂ : ProtocolsProof _ $ p ⟶ [α]((([β]r) ⟶ [β](q ⋀ r))) :=Proof.imp_trans_proof h₀ h₁₁
+  let h₁₂ : ProtocolsProof _ $ p ⟶ [α]((([β]r) ⟶ [β](q ⋀ r))) := Proof.imp_trans_proof h₀ h₁₁
   let h₁₃ : ProtocolsProof _ $ ([α]((([β]r) ⟶ [β](q ⋀ r)))) ⟶ (([α]([β]r)) ⟶ ([α]([β](q ⋀ r)))) := Kα
   let h₁₄ : ProtocolsProof _ $ p ⟶ (([α]([β]r)) ⟶ ([α]([β](q ⋀ r)))) := Proof.imp_trans_proof h₁₂ h₁₃
   exact pl_aux h₁ h₁₄
@@ -107,3 +107,43 @@ def OSS { i r : ProtocolsForm Agent}
     let h₂₈ : ProtocolsProof _ $ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ ([send i, r(⦃ n ⦄pk(r))](([recv r(n)](𝕏 i, n)))) := Proof.imp_trans_proof h₂₇ h₂₆
     let h₂₉ : ProtocolsProof _ $ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ ([send i, r(⦃ n ⦄pk(r))](([recv r(n)]((𝔹 r, (𝕏 i, n)) ⋀ (𝕏 i, n))))) := dl_th_1' h₁₁ h₂₈
     exact dl_th_1' h₁₁ h₂₈
+
+def OSS' { i r : ProtocolsForm Agent}
+  { n : ProtocolsForm Msg }
+  : ProtocolsProof _ $ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶
+    [(send i, r(⦃ n ⦄pk(r)))]([(recv r(n))](𝕂 r, (𝕏 i, n))) := by
+    apply dl_th_1'
+    . apply dl_th_2_left
+      . apply Proof.imp_trans_proof
+        . exact Proof.ax ⟨⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [send i, r(⦃ n ⦄pk(r))] ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ , Nonempty.intro $ Axiom.H₁ ⟩
+        . apply Proof.mp
+          . exact Kα
+          . apply Necα
+            apply dl_th_1
+            . exact Proof.ax ⟨ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [recv r(n)]𝔹 r, (𝕏 i, n), Nonempty.intro $ Axiom.OSS₂ ⟩
+            . exact Proof.ax ⟨ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [recv r(n)] ⟪ (r ◁ n) ⊔ (i ◁ n) ⊔ γ₀ i r ⟫ , Nonempty.intro $ Axiom.H₂ ⟩
+    . apply Proof.imp_trans_proof
+      . apply dl_th_2_right
+        . apply Proof.imp_trans_proof
+          . exact Proof.ax ⟨⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [send i, r(⦃ n ⦄pk(r))] ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ , Nonempty.intro $ Axiom.H₁ ⟩
+          . apply Proof.mp
+            . exact Kα
+            . apply Necα
+              . apply dl_th_1
+                . exact Proof.ax ⟨ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [recv r(n)]𝔹 r, (𝕏 i, n), Nonempty.intro $ Axiom.OSS₂ ⟩
+                . exact Proof.ax ⟨ ⟪ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ [recv r(n)] ⟪ (r ◁ n) ⊔ (i ◁ n) ⊔ γ₀ i r ⟫ , Nonempty.intro $ Axiom.H₂ ⟩
+      . apply Proof.imp_trans_proof
+        . apply Proof.mp
+          . exact @Kα (send i, r(⦃ n ⦄pk(r))) _ (([recv r(n)](⟪  (i ◁ n) ⊔ (r ◁ n) ⊔ γ₀ i r ⟫)))
+          . apply Necα
+            apply Proof.mp
+            . exact @Kα (recv r(n)) (⟪ (r ◁ n) ⊔ (i ◁ n) ⊔ γ₀ i r ⟫) (⟪  (i ◁ n) ⊔ (r ◁ n) ⊔ γ₀ i r ⟫)
+            . apply Necα
+              exact Proof.ax ⟨ ⟪ (r ◁ n) ⊔ (i ◁ n) ⊔ γ₀ i r ⟫ ⟶ ⟪  (i ◁ n) ⊔ (r ◁ n) ⊔ γ₀ i r ⟫, Nonempty.intro $ Axiom.ST₁ ⟩
+        . apply Proof.mp
+          . exact Kα
+          . apply Necα
+            apply Proof.mp
+            . exact Kα
+            . apply Necα
+              exact (Proof.ax ⟨ (⟪ (i ◁ n) ⊔ (r ◁ n) ⊔ γ₀ i r ⟫ ⟶ 𝕏 i, n), Nonempty.intro $ Axiom.ST₃⟩)
