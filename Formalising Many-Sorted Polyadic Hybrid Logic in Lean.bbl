@@ -1,0 +1,100 @@
+\begin{thebibliography}{10}
+
+\bibitem{master}
+Anonymous.
+\newblock {\em Mechanizing Many-Sorted Polyadic Hybrid Logic in the Lean 4
+  Prover}.
+\newblock Master Thesis, 2025.
+
+\bibitem{ramics}
+Anonymous.
+\newblock Hybrid many-sorted modal logic with nominal terms.
+\newblock In {\em Relational and Algebraic Methods in Computer Science (RAMiCS)
+  2026}. accepted, 2026.
+
+\bibitem{handbook}
+Carlos Areces and Balder {ten Cate}.
+\newblock 14 hybrid logics.
+\newblock In Patrick Blackburn, Johan {Van Benthem}, and Frank Wolter, editors,
+  {\em Handbook of Modal Logic}, volume~3 of {\em Studies in Logic and
+  Practical Reasoning}, pages 821--868. Elsevier, 2007.
+
+\bibitem{matchingcoq}
+P{\'{e}}ter Bereczky, Xiaohong Chen, D{\'{a}}niel Horp{\'{a}}csi,
+  Tam{\'{a}}s~B{\'{a}}lint Mizsei, Lucas Pe{\~{n}}a, and Jan Tusil.
+\newblock Mechanizing matching logic in coq.
+\newblock In Vlad Rusu, editor, {\em Proceedings of the Sixth Working Formal
+  Methods Symposium, {FROM} 2022, "Al. I. Cuza University", Iasi, Romania,
+  19-20 September, 2022}, volume 369 of {\em {EPTCS}}, pages 17--36, 2022.
+
+\bibitem{mod}
+Patrick Blackburn, Maarten De~Rijke, and Yde Venema.
+\newblock {\em Modal logic}, volume~53.
+\newblock Cambridge University Press, 2001.
+
+\bibitem{whatarehybrid}
+Patrick Blackburn and Jerry Seligman.
+\newblock What are hybrid languages?
+\newblock In Marcus Kracht, Maarten de~Rijke, Heinrich Wansing, and Michael
+  Zakharyaschev, editors, {\em Advances in Modal Logic}, pages 41--62. CSLI
+  Publications, 1998.
+
+\bibitem{ban}
+Michael Burrows, Martin Abadi, and Roger Needham.
+\newblock A logic of authentication.
+\newblock {\em ACM Transactions on Computer Systems (TOCS)}, 8(1):18--36, 1990.
+
+\bibitem{matching}
+Xiaohong Chen and Grigore Ro\c{s}u.
+\newblock Matching $\mu$-logic.
+\newblock In {\em Proceedings of the 34th Annual ACM/IEEE Symposium on Logic in
+  Computer Science}, LICS '19. IEEE Press, 2021.
+
+\bibitem{matchinglean}
+Horatiu Cheval and Bogdan Macovei.
+\newblock Matching logic in lean.
+\newblock {\em Technical report}, 2022.
+\newblock URL: \url{https://gitlab.com/ilds/aml-lean/MatchingLogic/}.
+
+\bibitem{hybridcoq}
+Christian Doczkal and Gert Smolka.
+\newblock Constructive formalization of hybrid logic with eventualities.
+\newblock In Jean-Pierre Jouannaud and Zhong Shao, editors, {\em Certified
+  Programs and Proofs}, pages 5--20, Berlin, Heidelberg, 2011. Springer Berlin
+  Heidelberg.
+
+\bibitem{hybridisabelle}
+Asta~Halkj\ae{}r From, Patrick Blackburn, and J\o{}rgen Villadsen.
+\newblock Formalizing a seligman-style tableau system for hybrid logic: (short
+  paper).
+\newblock In {\em Automated Reasoning: 10th International Joint Conference,
+  IJCAR 2020, Paris, France, July 1–4, 2020, Proceedings, Part I}, page
+  474–481, Berlin, Heidelberg, 2020. Springer-Verlag.
+
+\bibitem{tableaux}
+Ioana Leu{\c{s}}tean, Natalia Moang{\u{a}}, and Traian~Florin
+  {\c{S}}erb{\u{a}}nu{\c{t}}{\u{a}}.
+\newblock Operational semantics and program verification using many-sorted
+  hybrid modal logic.
+\newblock In Serenella Cerrito and Andrei Popescu, editors, {\em Automated
+  Reasoning with Analytic Tableaux and Related Methods}, pages 446--476, Cham,
+  2019. Springer International Publishing.
+
+\bibitem{lean4}
+Leonardo~de Moura and Sebastian Ullrich.
+\newblock The lean 4 theorem prover and programming language.
+\newblock In {\em Automated Deduction – CADE 28: 28th International
+  Conference on Automated Deduction, Virtual Event, July 12–15, 2021,
+  Proceedings}, page 625–635, Berlin, Heidelberg, 2021. Springer-Verlag.
+
+\bibitem{itpagents24}
+Kai Obendrauf, Anne Baanen, Patrick Koopmann, and Vera Stebletsova.
+\newblock Lean formalization of completeness proof for coalition logic with
+  common knowledge.
+\newblock In Yves Bertot, Temur Kutsia, and Michael Norrish, editors, {\em 15th
+  International Conference on Interactive Theorem Proving (ITP 2024)}, Leibniz
+  International Proceedings in Informatics, LIPIcs, pages 1--18. Schloss
+  Dagstuhl- Leibniz-Zentrum fur Informatik GmbH, Dagstuhl Publishing, September
+  2024.
+
+\end{thebibliography}
